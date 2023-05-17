@@ -1,5 +1,5 @@
-import { isSPAnalysis, isSPWorkspace, SPAnalysis, SPWorkspace } from "./stan-playground-types"
-import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
+import { isSPAnalysis, isSPAnalysisFile, isSPAnalysisRun, isSPWorkspace, SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPWorkspace } from "./stan-playground-types"
+import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 // getWorkspaces
 
@@ -83,6 +83,34 @@ export const isGetAnalysesResponse = (x: any): x is GetAnalysesResponse => {
     })
 }
 
+// getAnalysis
+
+export type GetAnalysisRequest = {
+    type: 'getAnalysis'
+    timestamp: number
+    analysisId: string
+}
+
+export const isGetAnalysisRequest = (x: any): x is GetAnalysisRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysis'),
+        timestamp: isNumber,
+        analysisId: isString
+    })
+}
+
+export type GetAnalysisResponse = {
+    type: 'getAnalysis'
+    analysis: SPAnalysis
+}
+
+export const isGetAnalysisResponse = (x: any): x is GetAnalysisResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysis'),
+        analysis: isSPAnalysis
+    })
+}
+
 // createAnalysis
 
 export type CreateAnalysisRequest = {
@@ -111,20 +139,176 @@ export const isCreateAnalysisResponse = (x: any): x is CreateAnalysisResponse =>
     })
 }
 
+// getAnalysisFiles
+
+export type GetAnalysisFilesRequest = {
+    type: 'getAnalysisFiles'
+    timestamp: number
+    analysisId: string
+}
+
+export const isGetAnalysisFilesRequest = (x: any): x is GetAnalysisFilesRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysisFiles'),
+        timestamp: isNumber,
+        analysisId: isString
+    })
+}
+
+export type GetAnalysisFilesResponse = {
+    type: 'getAnalysisFiles'
+    analysisFiles: SPAnalysisFile[]
+}
+
+export const isGetAnalysisFilesResponse = (x: any): x is GetAnalysisFilesResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysisFiles'),
+        analysisFiles: isArrayOf(isSPAnalysisFile)
+    })
+}
+
+// setAnalysisFile
+
+export type SetAnalysisFileRequest = {
+    type: 'setAnalysisFile'
+    timestamp: number
+    analysisId: string
+    fileName: string
+    fileContent: string
+}
+
+export const isSetAnalysisFileRequest = (x: any): x is SetAnalysisFileRequest => {
+    return validateObject(x, {
+        type: isEqualTo('setAnalysisFile'),
+        timestamp: isNumber,
+        analysisId: isString,
+        fileName: isString,
+        fileContent: isString
+    })
+}
+
+export type SetAnalysisFileResponse = {
+    type: 'setAnalysisFile'
+}
+
+export const isSetAnalysisFileResponse = (x: any): x is SetAnalysisFileResponse => {
+    return validateObject(x, {
+        type: isEqualTo('setAnalysisFile')
+    })
+}
+
+// getAnalysisFile
+
+export type GetAnalysisFileRequest = {
+    type: 'getAnalysisFile'
+    timestamp: number
+    analysisId: string
+    fileName: string
+}
+
+export const isGetAnalysisFileRequest = (x: any): x is GetAnalysisFileRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysisFile'),
+        timestamp: isNumber,
+        analysisId: isString,
+        fileName: isString
+    })
+}
+
+export type GetAnalysisFileResponse = {
+    type: 'getAnalysisFile'
+    analysisFile: SPAnalysisFile
+}
+
+export const isGetAnalysisFileResponse = (x: any): x is GetAnalysisFileResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysisFile'),
+        analysisFile: isSPAnalysisFile
+    })
+}
+
+// getAnalysisRuns
+
+export type GetAnalysisRunsRequest = {
+    type: 'getAnalysisRuns'
+    timestamp: number
+    analysisId: string
+}
+
+export const isGetAnalysisRunsRequest = (x: any): x is GetAnalysisRunsRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysisRuns'),
+        timestamp: isNumber,
+        analysisId: isString
+    })
+}
+
+export type GetAnalysisRunsResponse = {
+    type: 'getAnalysisRuns'
+    analysisRuns: SPAnalysisRun[]
+}
+
+export const isGetAnalysisRunsResponse = (x: any): x is GetAnalysisRunsResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getAnalysisRuns'),
+        analysisRuns: isArrayOf(isSPAnalysisRun)
+    })
+}
+
+// getDataBlob
+
+export type GetDataBlobRequest = {
+    type: 'getDataBlob'
+    timestamp: number
+    workspaceId: string
+    sha1: string
+}
+
+export const isGetDataBlobRequest = (x: any): x is GetDataBlobRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getDataBlob'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        sha1: isString
+    })
+}
+
+export type GetDataBlobResponse = {
+    type: 'getDataBlob'
+    content: string
+}
+
+export const isGetDataBlobResponse = (x: any): x is GetDataBlobResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getDataBlob'),
+        content: isString
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
     GetWorkspacesRequest |
     CreateWorkspaceRequest |
     GetAnalysesRequest |
-    CreateAnalysisRequest
+    GetAnalysisRequest |
+    CreateAnalysisRequest |
+    GetAnalysisFilesRequest |
+    SetAnalysisFileRequest |
+    GetAnalysisFileRequest |
+    GetAnalysisRunsRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
         isGetWorkspacesRequest,
         isCreateWorkspaceRequest,
         isGetAnalysesRequest,
-        isCreateAnalysisRequest
+        isGetAnalysisRequest,
+        isCreateAnalysisRequest,
+        isGetAnalysisFilesRequest,
+        isSetAnalysisFileRequest,
+        isGetAnalysisFileRequest,
+        isGetAnalysisRunsRequest
     ])(x)
 }
 
@@ -154,13 +338,23 @@ export type PlaygroundResponse =
     GetWorkspacesResponse |
     CreateWorkspaceResponse |
     GetAnalysesResponse |
-    CreateAnalysisResponse
+    GetAnalysisResponse |
+    CreateAnalysisResponse |
+    GetAnalysisFilesResponse |
+    SetAnalysisFileResponse |
+    GetAnalysisFileResponse |
+    GetAnalysisRunsResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
         isGetWorkspacesResponse,
         isCreateWorkspaceResponse,
         isGetAnalysesResponse,
-        isCreateAnalysisResponse
+        isGetAnalysisResponse,
+        isCreateAnalysisResponse,
+        isGetAnalysisFilesResponse,
+        isSetAnalysisFileResponse,
+        isGetAnalysisFileResponse,
+        isGetAnalysisRunsResponse
     ])(x)
 }

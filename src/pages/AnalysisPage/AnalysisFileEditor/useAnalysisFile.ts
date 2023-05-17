@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { fetchAnalysisFile, setAnalysisFileContent } from "../../../dbInterface/dbInterface"
+import { fetchAnalysisFile, fetchDataBlob, setAnalysisFileContent } from "../../../dbInterface/dbInterface"
 
 const useAnalysisFile = (analysisId: string, fileName: string) => {
     const [refreshCode, setRefreshCode] = useState<number>(0)
@@ -12,7 +12,8 @@ const useAnalysisFile = (analysisId: string, fileName: string) => {
             const af = await fetchAnalysisFile(analysisId, fileName)
             if (canceled) return
             if (!af) return
-            setFileContent(af.fileContent)
+            const x = await fetchDataBlob(af.workspaceId, af.contentSha1)
+            setFileContent(x)
         })()
         return () => {
             canceled = true

@@ -1,14 +1,12 @@
-const removeIdField = (docs: any[]): any[] => {
-    const ret: any[] = []
-    for (const doc of docs) {
-        const x = {}
-        for (const key in doc) {
-            if (key === '_id') continue // skip _id
-            x[key] = doc[key]
-        }
-        ret.push(x)
+const removeIdField = (doc: any[] | any | null): any[] | any => {
+    if (!doc) return doc
+    if (Array.isArray(doc)) return doc.map(removeIdField)
+    const x = {}
+    for (const key in doc) {
+        if (key === '_id') continue // skip _id
+        x[key] = doc[key]
     }
-    return ret
+    return x
 }
 
 export default removeIdField

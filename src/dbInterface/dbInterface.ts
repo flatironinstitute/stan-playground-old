@@ -89,28 +89,11 @@ export const createAnalysis = async (workspaceId: string): Promise<string> => {
         timestampCreated: Date.now() / 1000,
         timestampModified: Date.now() / 1000
     })
-    db.analysisFiles.push({
-        analysisId,
-        workspaceId,
-        fileName: 'main.stan',
-        fileContent: defaultStanProgram,
-        timestampModified: Date.now() / 1000
-    })
-    db.analysisFiles.push({
-        analysisId,
-        workspaceId,
-        fileName: 'data.json',
-        fileContent: '{}',
-        timestampModified: Date.now() / 1000
-    })
-    db.analysisFiles.push({
-        analysisId,
-        workspaceId,
-        fileName: 'options.yaml',
-        fileContent: defaultOptionsYaml,
-        timestampModified: Date.now() / 1000
-    })
     setDatabase(db)
+
+    await setAnalysisFileContent(analysisId, 'main.stan', defaultStanProgram)
+    await setAnalysisFileContent(analysisId, 'data.json', '{}')
+    await setAnalysisFileContent(analysisId, 'options.yaml', defaultOptionsYaml)
     return analysisId
 }
 
@@ -124,12 +107,7 @@ export const fetchAnalysis = async (analysisId: string): Promise<SPAnalysis | un
 export const fetchAnalysisFiles = async (analysisId: string): Promise<SPAnalysisFile[]> => {
     await sleepMsec(100)
     const db = getDatabase()
-    const analysisFiles = db.analysisFiles.filter((a: SPAnalysisFile) => a.analysisId === analysisId).map((a: SPAnalysisFile) => (
-        {
-            ...a,
-            fileContent: undefined
-        }
-    ))
+    const analysisFiles = db.analysisFiles.filter((a: SPAnalysisFile) => a.analysisId === analysisId)
     return analysisFiles
 }
 
@@ -141,13 +119,24 @@ export const createAnalysisFile = async (analysisId: string, fileName: string, f
     const analysisFiles = db.analysisFiles.filter((a: SPAnalysisFile) => a.analysisId === analysisId)
     const existingFile = analysisFiles.find((a: SPAnalysisFile) => a.fileName === fileName)
     if (existingFile) return
+    const contentSha1 = sha1OfString(fileContent)
+    const contentSize = fileContent.length
     db.analysisFiles.push({
         analysisId,
         workspaceId: analysis.workspaceId,
         fileName,
-        fileContent,
+        contentSha1,
+        contentSize,
         timestampModified: Date.now() / 1000
     })
+    if (!db.dataBlobs.find((b: SPDataBlob) => b.sha1 === contentSha1)) {
+        db.dataBlobs.push({
+            workspaceId: analysis.workspaceId,
+            sha1: contentSha1,
+            size: contentSize,
+            content: fileContent
+        })
+    }
     setDatabase(db)
 }
 
@@ -159,13 +148,36 @@ export const fetchAnalysisFile = async (analysisId: string, fileName: string): P
     return analysisFile
 }
 
+export const fetchDataBlob = async (workspaceId: string, sha1: string): Promise<string | undefined> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const dataBlob = db.dataBlobs.find((b: SPDataBlob) => (b.workspaceId === workspaceId && b.sha1 === sha1))
+    if (!dataBlob) return undefined
+    return dataBlob.content
+}
+
 export const setAnalysisFileContent = async (analysisId: string, fileName: string, fileContent: string): Promise<void> => {
     await sleepMsec(100)
     const db = getDatabase()
-    const analysisFile = db.analysisFiles.find((a: SPAnalysisFile) => a.analysisId === analysisId && a.fileName === fileName)
-    if (!analysisFile) return
-    analysisFile.fileContent = fileContent
-    analysisFile.timestampModified = Date.now() / 1000
+    const existingAnalysisFile = db.analysisFiles.find((a: SPAnalysisFile) => a.analysisId === analysisId && a.fileName === fileName)
+    if (!existingAnalysisFile) {
+        await createAnalysisFile(analysisId, fileName, fileContent)
+        return
+    }
+
+    const contentSha1 = sha1OfString(fileContent)
+    const contentSize = fileContent.length
+    if (!db.dataBlobs.find((b: SPDataBlob) => b.sha1 === contentSha1)) {
+        db.dataBlobs.push({
+            workspaceId: existingAnalysisFile.workspaceId,
+            sha1: contentSha1,
+            size: contentSize,
+            content: fileContent
+        })
+    }
+    existingAnalysisFile.contentSha1 = contentSha1
+    existingAnalysisFile.contentSize = contentSize
+    existingAnalysisFile.timestampModified = Date.now() / 1000
     setDatabase(db)
 }
 
@@ -176,12 +188,13 @@ export const fetchAnalysisRuns = async (analysisId: string): Promise<SPAnalysisR
     return analysisRuns
 }
 
-export const setDataBlob = async (sha1: string, data: string): Promise<void> => {
+export const setDataBlob = async (workspaceId: string, sha1: string, data: string): Promise<void> => {
     await sleepMsec(100)
     const db = getDatabase()
     const existingBlob = db.dataBlobs.find((b: SPDataBlob) => b.sha1 === sha1)
     if (existingBlob) return
     db.dataBlobs.push({
+        workspaceId,
         sha1,
         size: data.length,
         content: data
@@ -196,23 +209,36 @@ export const createAnalysisRun = async (analysisId: string, o: {stanFileName: st
     if (!analysis) return ''
     const workspaceId = analysis.workspaceId
     const analysisRunId = randomAnalysisRunId()
+
     const stanProgramFile = await fetchAnalysisFile(analysisId, o.stanFileName)
+    if (!stanProgramFile) {
+        throw new Error('Stan program file not found')
+    }
+    const stanProgramContentSha1 = stanProgramFile.contentSha1
+
     const datasetFile = await fetchAnalysisFile(analysisId, o.datasetFileName)
-    const datasetSha1 = sha1OfString(datasetFile ? datasetFile.fileContent || '' : '')
-    await setDataBlob(datasetSha1, datasetFile ? datasetFile.fileContent || '' : '')
+    if (!datasetFile) {
+        throw new Error('Dataset file not found')
+    }
+    const datasetContentSha1 = datasetFile.contentSha1
+
     const optionsFile = await fetchAnalysisFile(analysisId, o.optionsFileName)
-    const optionsYaml = optionsFile ? optionsFile.fileContent || '' : ''
+    if (!optionsFile) {
+        throw new Error('Options file not found')
+    }
+    const optionsContentSha1 = optionsFile.contentSha1
+
     db.analysisRuns.push({
         analysisRunId,
         analysisId,
         workspaceId,
         timestampCreated: Date.now() / 1000,
         stanProgramFileName: o.stanFileName,
-        stanProgram: stanProgramFile ? stanProgramFile.fileContent || '' : '',
+        stanProgramContentSha1,
         datasetFileName: o.datasetFileName,
-        datasetSha1,
+        datasetContentSha1,
         optionsFileName: o.optionsFileName,
-        optionsYaml,
+        optionsContentSha1,
         status: 'pending',
         error: undefined,
         computeResourceId: o.computeResourceId

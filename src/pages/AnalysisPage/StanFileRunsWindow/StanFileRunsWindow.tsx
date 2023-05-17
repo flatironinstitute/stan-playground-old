@@ -1,5 +1,4 @@
 import { FunctionComponent } from "react";
-import { useAnalysis } from "../AnalysisPageContext";
 import CreateRunComponent from "./CreateRunComponent";
 import StanFileRunsTable from "./StanFileRunsTable";
 

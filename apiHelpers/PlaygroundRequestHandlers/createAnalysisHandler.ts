@@ -1,7 +1,8 @@
-import { CreateAnalysisRequest, CreateAnalysisResponse } from "../../src/types/PlaygroundRequest";
-import { SPAnalysis, SPAnalysisFile } from "../../src/types/stan-playground-types";
+import { CreateAnalysisRequest, CreateAnalysisResponse, SetAnalysisFileRequest } from "../../src/types/PlaygroundRequest";
+import { SPAnalysis } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
+import setAnalysisFileHandler from "./setAnalysisFileHandler";
 
 const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<CreateAnalysisResponse> => {
     const {verifiedUserId} = o
@@ -28,34 +29,30 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
 
     await analysesCollection.insertOne(analysis)
 
-    const analysesFilesToAdd: SPAnalysisFile[] = [
+    const filesToAdd = [
         {
-            analysisId,
-            workspaceId,
             fileName: 'main.stan',
-            fileContent: defaultStanProgram,
-            timestampModified: Date.now() / 1000
+            fileContent: defaultStanProgram
         },
         {
-            analysisId,
-            workspaceId,
             fileName: 'data.json',
-            fileContent: '{}',
-            timestampModified: Date.now() / 1000
+            fileContent: '{}'
         },
         {
-            analysisId,
-            workspaceId,
             fileName: 'options.yaml',
-            fileContent: defaultOptionsYaml,
-            timestampModified: Date.now() / 1000
+            fileContent: defaultOptionsYaml
         }
     ]
 
-    const analysisFilesCollection = client.db('stan-playground').collection('analysisFiles')
-
-    for (const af of analysesFilesToAdd) {
-        await analysisFilesCollection.insertOne(af)
+    for (const x of filesToAdd) {
+        const rr: SetAnalysisFileRequest = {
+            type: 'setAnalysisFile',
+            timestamp: Date.now() / 1000,
+            analysisId,
+            fileName: x.fileName,
+            fileContent: x.fileContent
+        }
+        await setAnalysisFileHandler(rr, o)
     }
 
     return {

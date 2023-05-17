@@ -48,7 +48,8 @@ export type SPAnalysisFile = {
     analysisId: string
     workspaceId: string
     fileName: string
-    fileContent?: string
+    contentSha1: string
+    contentSize: number
     timestampModified: number
 }
 
@@ -57,7 +58,8 @@ export const isSPAnalysisFile = (x: any): x is SPAnalysisFile => {
         analysisId: isString,
         workspaceId: isString,
         fileName: isString,
-        fileContent: optional(isString),
+        contentSha1: isString,
+        contentSize: isNumber,
         timestampModified: isNumber
     })
 }
@@ -90,11 +92,11 @@ export type SPAnalysisRun = {
     workspaceId: string
     timestampCreated: number
     stanProgramFileName: string
-    stanProgram: string
+    stanProgramContentSha1: string
     datasetFileName: string
-    datasetSha1: string
+    datasetContentSha1: string
     optionsFileName: string
-    optionsYaml: string
+    optionsContentSha1: string
     status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
     error?: string
     computeResourceId?: string
@@ -107,11 +109,11 @@ export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
         workspaceId: isString,
         timestampCreated: isNumber,
         stanProgramFileName: isString,
-        stanProgram: isString,
+        stanProgramContentSha1: isString,
         datasetFileName: isString,
-        datasetSha1: isString,
+        datasetContentSha1: isString,
         optionsFileName: isString,
-        optionsYaml: isString,
+        optionsContentSha1: isString,
         status: isOneOf([isEqualTo('pending'), isEqualTo('queued'), isEqualTo('running'), isEqualTo('completed'), isEqualTo('failed')]),
         error: optional(isString),
         computeResourceId: optional(isString)
@@ -120,6 +122,7 @@ export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
 
 
 export type SPDataBlob = {
+    workspaceId: string
     sha1: string
     size: number
     content: string
@@ -127,6 +130,7 @@ export type SPDataBlob = {
 
 export const isSPDataBlob = (x: any): x is SPDataBlob => {
     return validateObject(x, {
+        workspaceId: isString,
         sha1: isString,
         size: isNumber,
         content: isString
