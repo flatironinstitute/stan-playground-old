@@ -1,4 +1,4 @@
-import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../stan-playground-types";
+import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../types/stan-playground-types";
 import sha1 from 'crypto-js/sha1'
 
 type DB = {
@@ -184,7 +184,7 @@ export const setDataBlob = async (sha1: string, data: string): Promise<void> => 
     db.dataBlobs.push({
         sha1,
         size: data.length,
-        data
+        content: data
     })
     setDatabase(db)
 }

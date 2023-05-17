@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { createWorkspace, fetchWorkspaces } from '../../dbInterface/dbInterface';
-import { SPWorkspace } from '../../stan-playground-types';
+import { SPWorkspace } from '../../types/stan-playground-types';
 
 
 type HomePageContextType = {

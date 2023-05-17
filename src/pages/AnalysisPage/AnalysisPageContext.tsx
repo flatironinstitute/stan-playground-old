@@ -1,6 +1,6 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect } from 'react';
 import { createAnalysisRun, deleteAnalysisRun, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns } from '../../dbInterface/dbInterface';
-import { SPAnalysis, SPAnalysisFile, SPAnalysisRun } from '../../stan-playground-types';
+import { SPAnalysis, SPAnalysisFile, SPAnalysisRun } from '../../types/stan-playground-types';
 
 type Props = {
     analysisId: string

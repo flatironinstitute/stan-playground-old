@@ -2,7 +2,7 @@ import { Delete } from "@mui/icons-material";
 import { FunctionComponent, useCallback } from "react";
 import Hyperlink from "../../../components/Hyperlink";
 import { confirm } from "../../../confirm_prompt_alert";
-import { SPAnalysisRun } from "../../../stan-playground-types";
+import { SPAnalysisRun } from "../../../types/stan-playground-types";
 import { timeAgoString } from "../../../timeStrings";
 import { useAnalysis } from "../AnalysisPageContext";
 

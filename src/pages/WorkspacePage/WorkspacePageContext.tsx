@@ -1,6 +1,6 @@
 import React, { FunctionComponent, PropsWithChildren, useEffect, useMemo } from 'react';
 import { createAnalysis, fetchAnalyses } from '../../dbInterface/dbInterface';
-import { SPAnalysis } from '../../stan-playground-types';
+import { SPAnalysis } from '../../types/stan-playground-types';
 
 type Props = {
     workspaceId: string

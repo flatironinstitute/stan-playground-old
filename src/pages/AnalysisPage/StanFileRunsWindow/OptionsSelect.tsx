@@ -1,5 +1,5 @@
 import { FunctionComponent, useMemo } from "react";
-import { SPAnalysisFile } from "../../../stan-playground-types";
+import { SPAnalysisFile } from "../../../types/stan-playground-types";
 import { useAnalysis } from "../AnalysisPageContext";
 
 type Props = {
