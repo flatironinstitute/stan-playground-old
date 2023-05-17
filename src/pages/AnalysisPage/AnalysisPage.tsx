@@ -2,6 +2,7 @@ import { FunctionComponent } from "react";
 import Splitter from "../../components/Splitter";
 import TabWidget from "../../TabWidget/TabWidget";
 import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
+import AnalysisFileEditor from "./AnalysisFileEditor/AnalysisFileEditor";
 import { SetupAnalysisPage, useAnalysis } from "./AnalysisPageContext";
 import BackButton from "./BackButton";
 
@@ -44,7 +45,7 @@ const LeftPanel: FunctionComponent = () => {
 }
 
 const MainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
-    const {openFileNames, currentFileName, setCurrentFile} = useAnalysis()
+    const {openFileNames, currentFileName, setCurrentFile, closeFile} = useAnalysis()
     return (
         <TabWidget
             width={width}
@@ -58,9 +59,15 @@ const MainPanel: FunctionComponent<{width: number, height: number}> = ({width, h
             }
             currentTabId={currentFileName}
             setCurrentTabId={setCurrentFile}
+            onCloseTab={fileName => closeFile(fileName)}
         >
             {openFileNames.map(fileName => (
-                <div key={fileName}>{fileName}</div>
+                <AnalysisFileEditor
+                    key={fileName}
+                    fileName={fileName}
+                    width={0}
+                    height={0}
+                />
             ))}
         </TabWidget>
     )

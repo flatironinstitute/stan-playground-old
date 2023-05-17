@@ -3,14 +3,16 @@ import { FunctionComponent, useEffect } from 'react';
 
 type Props = {
     tabs: {
+        id: string
         label: string
         closeable: boolean
     }[]
     currentTabIndex: number | undefined
     onCurrentTabIndexChanged: (i: number) => void
+    onCloseTab: (id: string) => void
 }
 
-const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCurrentTabIndexChanged }) => {
+const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCurrentTabIndexChanged, onCloseTab }) => {
     useEffect(() => {
         if (currentTabIndex === undefined) {
             if (tabs.length > 0) {
@@ -26,7 +28,16 @@ const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCu
             onChange={(e, value) => {onCurrentTabIndexChanged(value)}}
         >
             {tabs.map((tab, i) => (
-                <Tab key={i} label={tab.label} sx={{minHeight: 0, height: 0, fontSize: 12}} />
+                <Tab key={i} label={
+                    tab.closeable ? (
+                        <span>
+                            {tab.label}
+                            &nbsp;&nbsp;<span onClick={() => {onCloseTab(tab.id)}}>✕</span>
+                        </span>
+                    ) : (
+                        tab.label
+                    )
+                } sx={{minHeight: 0, height: 0, fontSize: 12}} />
             ))}
         </Tabs>
     )

@@ -12,16 +12,20 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@monaco-editor/react": "^4.5.1",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.0",
     "chonky-icon-fontawesome": "^2.3.2",
     "chunky": "^0.0.0",
+    "crypto-js": "^4.1.1",
+    "monaco-editor": "^0.38.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
     "react-router-dom": "^6.11.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",

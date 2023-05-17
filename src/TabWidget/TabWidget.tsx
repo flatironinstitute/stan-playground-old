@@ -9,13 +9,14 @@ type Props = {
     }[]
     currentTabId: string | undefined
     setCurrentTabId: (id: string) => void
+    onCloseTab: (id: string) => void
     width: number
     height: number
 }
 
 const tabBarHeight = 30
 
-const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs, currentTabId, setCurrentTabId, width, height}) => {
+const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs, currentTabId, setCurrentTabId, onCloseTab, width, height}) => {
     const currentTabIndex = useMemo(() => {
         if (!currentTabId) return undefined
         const index = tabs.findIndex(t => t.id === currentTabId)
@@ -51,6 +52,7 @@ const TabWidget: FunctionComponent<PropsWithChildren<Props>> = ({children, tabs,
                     tabs={tabs}
                     currentTabIndex={currentTabIndex}
                     onCurrentTabIndexChanged={handleSetCurrentTabIndex}
+                    onCloseTab={onCloseTab}
                 />
             </div>
             {

@@ -43,18 +43,18 @@ export type SPAnalysisRun = {
     analysisId: string
     workspaceId: string
     timestampCreated: number
-    stanProgram: string
-    datasetSha1: string
-    options: unknown
     stanProgramFileName: string
+    stanProgram: string
     datasetFileName: string
+    datasetSha1: string
     optionsFileName: string
+    optionsYaml: unknown
     status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
     error?: string
-    computeResourceId?: string
+    computeResourceId: string
 }
 
-export type DataBlob = {
+export type SPDataBlob = {
     sha1: string
     size: number
     data: string

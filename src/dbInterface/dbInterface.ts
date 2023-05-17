@@ -1,17 +1,23 @@
-import { SPAnalysis, SPAnalysisFile, SPWorkspace } from "../stan-playground-types";
+import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../stan-playground-types";
+import sha1 from 'crypto-js/sha1'
 
 type DB = {
     workspaces: SPWorkspace[],
     analyses: SPAnalysis[],
     analysisFiles: SPAnalysisFile[]
+    analysisRuns: SPAnalysisRun[]
+    dataBlobs: SPDataBlob[]
 }
 
-const getDatabase = () => {
+const getDatabase = (): DB => {
     const a = localStorage.getItem('stan-playground-test-db')
     if (a === null) {
         return {
             workspaces: [],
-            analyses: []
+            analyses: [],
+            analysisFiles: [],
+            analysisRuns: [],
+            dataBlobs: []
         }
     }
     else {
@@ -24,6 +30,12 @@ const getDatabase = () => {
         }
         if (!x.analysisFiles) {
             x.analysisFiles = []
+        }
+        if (!x.analysisRuns) {
+            x.analysisRuns = []
+        }
+        if (!x.dataBlobs) {
+            x.dataBlobs = []
         }
         return x
     }
@@ -80,7 +92,6 @@ export const createAnalysis = async (workspaceId: string): Promise<string> => {
     db.analysisFiles.push({
         analysisId,
         workspaceId,
-        fileType: 'stan_program',
         fileName: 'main.stan',
         fileContent: defaultStanProgram,
         timestampModified: Date.now() / 1000
@@ -88,7 +99,6 @@ export const createAnalysis = async (workspaceId: string): Promise<string> => {
     db.analysisFiles.push({
         analysisId,
         workspaceId,
-        fileType: 'dataset',
         fileName: 'data.json',
         fileContent: '{}',
         timestampModified: Date.now() / 1000
@@ -96,7 +106,6 @@ export const createAnalysis = async (workspaceId: string): Promise<string> => {
     db.analysisFiles.push({
         analysisId,
         workspaceId,
-        fileType: 'options',
         fileName: 'options.yaml',
         fileContent: defaultOptionsYaml,
         timestampModified: Date.now() / 1000
@@ -142,6 +151,89 @@ export const createAnalysisFile = async (analysisId: string, fileName: string, f
     setDatabase(db)
 }
 
+export const fetchAnalysisFile = async (analysisId: string, fileName: string): Promise<SPAnalysisFile | undefined> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const analysisFile = db.analysisFiles.find((a: SPAnalysisFile) => a.analysisId === analysisId && a.fileName === fileName)
+    if (!analysisFile) return undefined
+    return analysisFile
+}
+
+export const setAnalysisFileContent = async (analysisId: string, fileName: string, fileContent: string): Promise<void> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const analysisFile = db.analysisFiles.find((a: SPAnalysisFile) => a.analysisId === analysisId && a.fileName === fileName)
+    if (!analysisFile) return
+    analysisFile.fileContent = fileContent
+    analysisFile.timestampModified = Date.now() / 1000
+    setDatabase(db)
+}
+
+export const fetchAnalysisRuns = async (analysisId: string): Promise<SPAnalysisRun[]> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const analysisRuns = db.analysisRuns.filter((a: SPAnalysisRun) => a.analysisId === analysisId)
+    return analysisRuns
+}
+
+export const setDataBlob = async (sha1: string, data: string): Promise<void> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const existingBlob = db.dataBlobs.find((b: SPDataBlob) => b.sha1 === sha1)
+    if (existingBlob) return
+    db.dataBlobs.push({
+        sha1,
+        size: data.length,
+        data
+    })
+    setDatabase(db)
+}
+
+export const createAnalysisRun = async (analysisId: string, o: {stanFileName: string, datasetFileName: string, optionsFileName: string, computeResourceId: string}): Promise<string> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const analysis = db.analyses.find((a: SPAnalysis) => a.analysisId === analysisId)
+    if (!analysis) return ''
+    const workspaceId = analysis.workspaceId
+    const analysisRunId = randomAnalysisRunId()
+    const stanProgramFile = await fetchAnalysisFile(analysisId, o.stanFileName)
+    const datasetFile = await fetchAnalysisFile(analysisId, o.datasetFileName)
+    const datasetSha1 = sha1OfString(datasetFile ? datasetFile.fileContent || '' : '')
+    await setDataBlob(datasetSha1, datasetFile ? datasetFile.fileContent || '' : '')
+    const optionsFile = await fetchAnalysisFile(analysisId, o.optionsFileName)
+    const optionsYaml = optionsFile ? optionsFile.fileContent || '' : ''
+    db.analysisRuns.push({
+        analysisRunId,
+        analysisId,
+        workspaceId,
+        timestampCreated: Date.now() / 1000,
+        stanProgramFileName: o.stanFileName,
+        stanProgram: stanProgramFile ? stanProgramFile.fileContent || '' : '',
+        datasetFileName: o.datasetFileName,
+        datasetSha1,
+        optionsFileName: o.optionsFileName,
+        optionsYaml,
+        status: 'pending',
+        error: undefined,
+        computeResourceId: o.computeResourceId
+    })
+    setDatabase(db)
+    return analysisRunId
+}
+
+export const deleteAnalysisRun = async (analysisRunId: string): Promise<void> => {
+    await sleepMsec(100)
+    const db = getDatabase()
+    const analysisRun = db.analysisRuns.find((a: SPAnalysisRun) => a.analysisRunId === analysisRunId)
+    if (!analysisRun) return
+    db.analysisRuns = db.analysisRuns.filter((a: SPAnalysisRun) => a.analysisRunId !== analysisRunId)
+    setDatabase(db)
+}
+
+const sha1OfString = (s: string) => {
+    return sha1(s).toString()
+}
+
 const sleepMsec = (msec: number) => {
     return new Promise(resolve => setTimeout(resolve, msec))
 }
@@ -157,6 +249,16 @@ const randomWorkspaceId = () => {
 }
 
 const randomAnalysisId = () => {
+    // lowercase alpha ID of length 8
+    const chars = 'abcdefghijklmnopqrstuvwxyz'
+    let id = ''
+    for (let i = 0; i < 8; i++) {
+        id += chars[Math.floor(Math.random() * chars.length)]
+    }
+    return id
+}
+
+const randomAnalysisRunId = () => {
     // lowercase alpha ID of length 8
     const chars = 'abcdefghijklmnopqrstuvwxyz'
     let id = ''
