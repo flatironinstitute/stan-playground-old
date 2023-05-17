@@ -6,60 +6,60 @@ type Props = {
     analysisId: string
 }
 
-type FileSelectionState = {
-    openFileNames: string[]
-    currentFileName: string | undefined
+type TabSelectionState = {
+    openTabNames: string[]
+    currentTabName: string | undefined
 }
 
-type FileSelectionAction = {
-    type: 'openFile'
-    fileName: string
+type TabSelectionAction = {
+    type: 'openTab'
+    tabName: string
 } | {
-    type: 'closeFile'
-    fileName: string
+    type: 'closeTab'
+    tabName: string
 } | {
-    type: 'closeAllFiles'
+    type: 'closeAllTabs'
 } | {
-    type: 'setCurrentFile'
-    fileName: string
+    type: 'setCurrentTab'
+    tabName: string
 }
 
-const fileSelectionReducer = (state: FileSelectionState, action: FileSelectionAction) => {
+const tabSelectionReducer = (state: TabSelectionState, action: TabSelectionAction) => {
     switch (action.type) {
-        case 'openFile':
-            if (state.openFileNames.includes(action.fileName)) {
+        case 'openTab':
+            if (state.openTabNames.includes(action.tabName)) {
                 return {
                     ...state,
-                    currentFileName: action.fileName
+                    currentTabName: action.tabName
                 }
             }
             return {
                 ...state,
-                openFileNames: [...state.openFileNames, action.fileName],
-                currentFileName: action.fileName
+                openTabNames: [...state.openTabNames, action.tabName],
+                currentTabName: action.tabName
             }
-        case 'closeFile':
-            if (!state.openFileNames.includes(action.fileName)) {
+        case 'closeTab':
+            if (!state.openTabNames.includes(action.tabName)) {
                 return state
             }
             return {
                 ...state,
-                openFileNames: state.openFileNames.filter(x => x !== action.fileName),
-                currentFileName: state.currentFileName === action.fileName ? state.openFileNames[0] : state.currentFileName
+                openTabNames: state.openTabNames.filter(x => x !== action.tabName),
+                currentTabName: state.currentTabName === action.tabName ? state.openTabNames[0] : state.currentTabName
             }
-        case 'closeAllFiles':
+        case 'closeAllTabs':
             return {
                 ...state,
-                openFileNames: [],
-                currentFileName: undefined
+                openTabNames: [],
+                currentTabName: undefined
             }
-        case 'setCurrentFile':
-            if (!state.openFileNames.includes(action.fileName)) {
+        case 'setCurrentTab':
+            if (!state.openTabNames.includes(action.tabName)) {
                 return state
             }
             return {
                 ...state,
-                currentFileName: action.fileName
+                currentTabName: action.tabName
             }
     }
 }
@@ -69,13 +69,13 @@ type AnalysisPageContextType = {
     workspaceId: string
     analysis?: SPAnalysis
     analysisFiles?: SPAnalysisFile[]
-    openFileNames: string[]
-    currentFileName?: string
+    openTabNames: string[]
+    currentTabName?: string
     analysisRuns?: SPAnalysisRun[]
-    openFile: (fileName: string) => void
-    closeFile: (fileName: string) => void
-    closeAllFiles: () => void
-    setCurrentFile: (fileName: string) => void
+    openTab: (tabName: string) => void
+    closeTab: (tabName: string) => void
+    closeAllTabs: () => void
+    setCurrentTab: (tabName: string) => void
     refreshFiles: () => void
     refreshRuns: () => void
     createAnalysisRun: (o: {stanFileName: string, datasetFileName: string, optionsFileName: string, computeResourceId: string}) => void
@@ -85,12 +85,12 @@ type AnalysisPageContextType = {
 const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
     analysisId: '',
     workspaceId: '',
-    openFileNames: [],
-    currentFileName: undefined,
-    openFile: () => {},
-    closeFile: () => {},
-    closeAllFiles: () => {},
-    setCurrentFile: () => {},
+    openTabNames: [],
+    currentTabName: undefined,
+    openTab: () => {},
+    closeTab: () => {},
+    closeAllTabs: () => {},
+    setCurrentTab: () => {},
     refreshFiles: () => {},
     refreshRuns: () => {},
     createAnalysisRun: () => {},
@@ -107,7 +107,7 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
     const [refreshRunsCode, setRefreshRunsCode] = React.useState(0)
     const refreshRuns = useCallback(() => setRefreshRunsCode(rfc => rfc + 1), [])
 
-    const [selectedFiles, selectedFilesDispatch] = React.useReducer(fileSelectionReducer, {openFileNames: [], currentFileName: undefined})
+    const [selectedTabs, selectedTabsDispatch] = React.useReducer(tabSelectionReducer, {openTabNames: [], currentTabName: undefined})
 
     useEffect(() => {
         (async () => {
@@ -149,17 +149,17 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         analysis,
         analysisFiles,
         analysisRuns,
-        openFileNames: selectedFiles.openFileNames,
-        currentFileName: selectedFiles.currentFileName,
-        openFile: (fileName: string) => selectedFilesDispatch({type: 'openFile', fileName}),
-        closeFile: (fileName: string) => selectedFilesDispatch({type: 'closeFile', fileName}),
-        closeAllFiles: () => selectedFilesDispatch({type: 'closeAllFiles'}),
-        setCurrentFile: (fileName: string) => selectedFilesDispatch({type: 'setCurrentFile', fileName}),
+        openTabNames: selectedTabs.openTabNames,
+        currentTabName: selectedTabs.currentTabName,
+        openTab: (tabName: string) => selectedTabsDispatch({type: 'openTab', tabName}),
+        closeTab: (tabName: string) => selectedTabsDispatch({type: 'closeTab', tabName}),
+        closeAllTabs: () => selectedTabsDispatch({type: 'closeAllTabs'}),
+        setCurrentTab: (tabName: string) => selectedTabsDispatch({type: 'setCurrentTab', tabName}),
         refreshFiles,
         refreshRuns,
         createAnalysisRun: createAnalysisRunHandler,
         deleteAnalysisRun: deleteAnalysisRunHandler
-    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedFiles, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler])
+    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler])
 
     return (
         <AnalysisPageContext.Provider value={value}>

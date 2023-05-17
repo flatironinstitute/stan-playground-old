@@ -1,5 +1,6 @@
 import { Delete } from "@mui/icons-material";
 import { FunctionComponent, useCallback } from "react";
+import Hyperlink from "../../../components/Hyperlink";
 import { confirm } from "../../../confirm_prompt_alert";
 import { SPAnalysisRun } from "../../../stan-playground-types";
 import { timeAgoString } from "../../../timeStrings";
@@ -10,13 +11,13 @@ type Props = {
 }
 
 const StanFileRunsTable: FunctionComponent<Props> = ({ fileName }) => {
-    const {analysisRuns} = useAnalysis()
+    const {analysisRuns, openTab} = useAnalysis()
     return (
         <table className="scientific-table" style={{fontSize: 12}}>
             <thead>
                 <tr>
                     <th />
-                    <th>Analysis run</th>
+                    <th>Run</th>
                     <th>Program</th>
                     <th>Dataset</th>
                     <th>Compute</th>
@@ -29,7 +30,11 @@ const StanFileRunsTable: FunctionComponent<Props> = ({ fileName }) => {
                     analysisRuns?.filter(ar => (ar.stanProgramFileName === fileName)).map((run) => (
                         <tr key={run.analysisRunId}>
                             <td><RunRowActions run={run} /></td>
-                            <td>{run.analysisRunId}</td>
+                            <td>
+                                <Hyperlink onClick={() => openTab(`run:${run.analysisRunId}`)}>
+                                    {run.analysisRunId}
+                                </Hyperlink>
+                            </td>
                             <td>{run.stanProgramFileName}</td>
                             <td>{run.datasetFileName}</td>
                             <td>{run.computeResourceId}</td>

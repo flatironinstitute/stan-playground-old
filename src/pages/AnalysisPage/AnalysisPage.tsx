@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback } from "react";
 import Splitter from "../../components/Splitter";
 import TabWidget from "../../TabWidget/TabWidget";
 import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
@@ -32,42 +32,57 @@ const WorkspacePage: FunctionComponent<Props> = ({analysisId, width, height}) =>
 }
 
 const LeftPanel: FunctionComponent = () => {
-    const {analysisId, openFile} = useAnalysis()
+    const {analysisId, openTab} = useAnalysis()
+    const handleOpenFile = useCallback((fileName: string) => {
+        openTab(`file:${fileName}`)
+    }, [openTab])
     return (
         <>
             <BackButton />
             <div>Analysis: {analysisId}</div>
             <AnalysisFileBrowser
-                onOpenFile={openFile}
+                onOpenFile={handleOpenFile}
             />
         </>
     )
 }
 
+const labelFromTabName = (tabName: string) => {
+    if (tabName.startsWith('file:')) {
+        return tabName.slice('file:'.length)
+    }
+    return tabName
+}
+
+
 const MainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
-    const {openFileNames, currentFileName, setCurrentFile, closeFile} = useAnalysis()
+    const {openTabNames, currentTabName, setCurrentTab, closeTab} = useAnalysis()
     return (
         <TabWidget
             width={width}
             height={height}
             tabs={
-                openFileNames.map(fileName => ({
-                    id: fileName,
-                    label: fileName,
+                openTabNames.map(tabName => ({
+                    id: tabName,
+                    label: labelFromTabName(tabName),
                     closeable: true
                 }))
             }
-            currentTabId={currentFileName}
-            setCurrentTabId={setCurrentFile}
-            onCloseTab={fileName => closeFile(fileName)}
+            currentTabId={currentTabName}
+            setCurrentTabId={setCurrentTab}
+            onCloseTab={fileName => closeTab(fileName)}
         >
-            {openFileNames.map(fileName => (
-                <AnalysisFileEditor
-                    key={fileName}
-                    fileName={fileName}
-                    width={0}
-                    height={0}
-                />
+            {openTabNames.map(tabName => (
+                tabName.startsWith('file:') ? (
+                    <AnalysisFileEditor
+                        key={tabName}
+                        fileName={tabName.slice('file:'.length)}
+                        width={0}
+                        height={0}
+                    />
+                ) : (
+                    <div key={tabName}>Not implemented</div>
+                )
             ))}
         </TabWidget>
     )
