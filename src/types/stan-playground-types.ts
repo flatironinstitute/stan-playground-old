@@ -93,10 +93,13 @@ export type SPAnalysisRun = {
     timestampCreated: number
     stanProgramFileName: string
     stanProgramContentSha1: string
+    stanProgramContentSize: number
     datasetFileName: string
     datasetContentSha1: string
+    datasetContentSize: number
     optionsFileName: string
     optionsContentSha1: string
+    optionsContentSize: number
     status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
     error?: string
     computeResourceId?: string
@@ -110,10 +113,13 @@ export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
         timestampCreated: isNumber,
         stanProgramFileName: isString,
         stanProgramContentSha1: isString,
+        stanProgramContentSize: isNumber,
         datasetFileName: isString,
         datasetContentSha1: isString,
+        datasetContentSize: isNumber,
         optionsFileName: isString,
         optionsContentSha1: isString,
+        optionsContentSize: isNumber,
         status: isOneOf([isEqualTo('pending'), isEqualTo('queued'), isEqualTo('running'), isEqualTo('completed'), isEqualTo('failed')]),
         error: optional(isString),
         computeResourceId: optional(isString)

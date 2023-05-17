@@ -215,18 +215,21 @@ export const createAnalysisRun = async (analysisId: string, o: {stanFileName: st
         throw new Error('Stan program file not found')
     }
     const stanProgramContentSha1 = stanProgramFile.contentSha1
+    const stanProgramContentSize = stanProgramFile.contentSize
 
     const datasetFile = await fetchAnalysisFile(analysisId, o.datasetFileName)
     if (!datasetFile) {
         throw new Error('Dataset file not found')
     }
     const datasetContentSha1 = datasetFile.contentSha1
+    const datasetContentSize = datasetFile.contentSize
 
     const optionsFile = await fetchAnalysisFile(analysisId, o.optionsFileName)
     if (!optionsFile) {
         throw new Error('Options file not found')
     }
     const optionsContentSha1 = optionsFile.contentSha1
+    const optionsContentSize = optionsFile.contentSize
 
     db.analysisRuns.push({
         analysisRunId,
@@ -235,10 +238,13 @@ export const createAnalysisRun = async (analysisId: string, o: {stanFileName: st
         timestampCreated: Date.now() / 1000,
         stanProgramFileName: o.stanFileName,
         stanProgramContentSha1,
+        stanProgramContentSize,
         datasetFileName: o.datasetFileName,
         datasetContentSha1,
+        datasetContentSize,
         optionsFileName: o.optionsFileName,
         optionsContentSha1,
+        optionsContentSize,
         status: 'pending',
         error: undefined,
         computeResourceId: o.computeResourceId
