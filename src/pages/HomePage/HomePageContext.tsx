@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { createWorkspace, fetchWorkspaces } from '../../dbInterface/dbInterface';
+import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPWorkspace } from '../../types/stan-playground-types';
 
 
@@ -14,10 +15,17 @@ export const SetupHomePage = (props: {children: React.ReactNode}) => {
     const [workspaces, setWorkspaces] = React.useState<SPWorkspace[]>([])
     const [refreshCode, setRefreshCode] = React.useState(0)
 
+    const {accessToken} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
+
     const createWorkspaceHandler = useCallback(async (workspaceName: string) => {
-        await createWorkspace(workspaceName)
+        if (!auth) {
+            console.warn('Not logged in.')
+            return
+        }
+        await createWorkspace(workspaceName, auth)
         setRefreshCode(rc => rc + 1)
-    }, [])
+    }, [auth])
 
     useEffect(() => {
         (async () => {

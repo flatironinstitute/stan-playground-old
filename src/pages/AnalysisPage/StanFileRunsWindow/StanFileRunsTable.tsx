@@ -20,7 +20,6 @@ const StanFileRunsTable: FunctionComponent<Props> = ({ fileName }) => {
                     <th>Run</th>
                     <th>Program</th>
                     <th>Dataset</th>
-                    <th>Compute</th>
                     <th>Status</th>
                     <th>Created</th>
                 </tr>
@@ -37,7 +36,6 @@ const StanFileRunsTable: FunctionComponent<Props> = ({ fileName }) => {
                             </td>
                             <td>{run.stanProgramFileName}</td>
                             <td>{run.datasetFileName}</td>
-                            <td>{run.computeResourceId}</td>
                             <td>{run.status}</td>
                             <td>{timeAgoString(run.timestampCreated)}</td>
                         </tr>

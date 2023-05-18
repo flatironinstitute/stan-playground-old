@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
 import createAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
+import createAnalysisRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
 import getAnalysesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
 import getAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
@@ -10,7 +11,7 @@ import getAnalysisRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getA
 import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
 import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest} from '../src/types/PlaygroundRequest'
+import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest, isCreateAnalysisRunRequest} from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -43,12 +44,12 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
 
     const { payload, fromClientId, signature, githubUserId, githubAccessToken } = request
     const { timestamp } = payload
-    const elapsed = Date.now() - timestamp
-    if ((elapsed > 30000) || (elapsed < -30000)) { 
+    const elapsed = (Date.now() / 1000) - timestamp
+    if ((elapsed > 30) || (elapsed < -30)) { 
         // Note the range used to be narrower, but was running into problems
-        // For example, got elapsed = -662
+        // For example, got elapsed = -0.662
         // Not sure the best way to do this check
-        throw Error(`Invalid timestamp. ${timestamp} ${Date.now()} ${elapsed}`)
+        throw Error(`Invalid timestamp. ${timestamp} ${Date.now() / 1000} ${elapsed}`)
     }
 
     (async () => {
@@ -95,6 +96,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isGetAnalysisRunsRequest(request)) {
             return await getAnalysisRunsHandler(request, {verifiedClientId, verifiedUserId})
+        }
+        else if (isCreateAnalysisRunRequest(request)) {
+            return await createAnalysisRunHandler(request, {verifiedClientId, verifiedUserId})
         }
         else {
             throw Error(`Unexpected request type: ${(request as any).payload.type}`)

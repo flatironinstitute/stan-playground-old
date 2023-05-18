@@ -1,5 +1,6 @@
-import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect } from 'react';
+import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { createAnalysisRun, deleteAnalysisRun, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns } from '../../dbInterface/dbInterface';
+import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun } from '../../types/stan-playground-types';
 
 type Props = {
@@ -78,7 +79,7 @@ type AnalysisPageContextType = {
     setCurrentTab: (tabName: string) => void
     refreshFiles: () => void
     refreshRuns: () => void
-    createAnalysisRun: (o: {stanFileName: string, datasetFileName: string, optionsFileName: string, computeResourceId: string}) => void
+    createAnalysisRun: (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => void
     deleteAnalysisRun: (analysisRunId: string) => void
 }
 
@@ -133,15 +134,28 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         })()
     }, [refreshRunsCode, analysisId])
 
-    const createAnalysisRunHandler = useCallback(async (o: {stanFileName: string, datasetFileName: string, optionsFileName: string, computeResourceId: string}) => {
-        await createAnalysisRun(analysisId, o)
+    const {accessToken} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
+
+    const createAnalysisRunHandler = useCallback(async (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => {
+        if (!analysis) return
+        if (!auth) {
+            console.warn('Not logged in.')
+            return
+        }
+        await createAnalysisRun(analysis.workspaceId, analysisId, o, auth)
         refreshRuns()
-    }, [analysisId, refreshRuns])
+    }, [analysis, analysisId, refreshRuns, auth])
 
     const deleteAnalysisRunHandler = useCallback(async (analysisRunId: string) => {
-        await deleteAnalysisRun(analysisRunId)
+        if (!analysis) return
+        if (!auth) {
+            console.warn('Not logged in.')
+            return
+        }
+        await deleteAnalysisRun(analysis.workspaceId, analysisId, analysisRunId, auth)
         refreshRuns()
-    }, [refreshRuns])
+    }, [analysis, analysisId, refreshRuns, auth])
 
     const value = React.useMemo(() => ({
         analysisId,

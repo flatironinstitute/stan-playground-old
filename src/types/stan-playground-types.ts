@@ -102,7 +102,6 @@ export type SPAnalysisRun = {
     optionsContentSize: number
     status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
     error?: string
-    computeResourceId?: string
 }
 
 export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
@@ -121,8 +120,7 @@ export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
         optionsContentSha1: isString,
         optionsContentSize: isNumber,
         status: isOneOf([isEqualTo('pending'), isEqualTo('queued'), isEqualTo('running'), isEqualTo('completed'), isEqualTo('failed')]),
-        error: optional(isString),
-        computeResourceId: optional(isString)
+        error: optional(isString)
     })
 }
 

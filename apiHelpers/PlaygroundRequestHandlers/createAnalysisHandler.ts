@@ -49,6 +49,7 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
             type: 'setAnalysisFile',
             timestamp: Date.now() / 1000,
             analysisId,
+            workspaceId,
             fileName: x.fileName,
             fileContent: x.fileContent
         }

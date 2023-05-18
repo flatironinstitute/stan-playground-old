@@ -173,6 +173,7 @@ export type SetAnalysisFileRequest = {
     type: 'setAnalysisFile'
     timestamp: number
     analysisId: string
+    workspaceId: string
     fileName: string
     fileContent: string
 }
@@ -182,6 +183,7 @@ export const isSetAnalysisFileRequest = (x: any): x is SetAnalysisFileRequest =>
         type: isEqualTo('setAnalysisFile'),
         timestamp: isNumber,
         analysisId: isString,
+        workspaceId: isString,
         fileName: isString,
         fileContent: isString
     })
@@ -285,6 +287,72 @@ export const isGetDataBlobResponse = (x: any): x is GetDataBlobResponse => {
     })
 }
 
+// createAnalysisRun
+
+export type CreateAnalysisRunRequest = {
+    type: 'createAnalysisRun'
+    timestamp: number
+    analysisId: string
+    workspaceId: string
+    stanProgramFileName: string
+    datasetFileName: string
+    optionsFileName: string
+}
+
+export const isCreateAnalysisRunRequest = (x: any): x is CreateAnalysisRunRequest => {
+    return validateObject(x, {
+        type: isEqualTo('createAnalysisRun'),
+        timestamp: isNumber,
+        analysisId: isString,
+        workspaceId: isString,
+        stanProgramFileName: isString,
+        datasetFileName: isString,
+        optionsFileName: isString
+    })
+}
+
+export type CreateAnalysisRunResponse = {
+    type: 'createAnalysisRun'
+    analysisRunId: string
+}
+
+export const isCreateAnalysisRunResponse = (x: any): x is CreateAnalysisRunResponse => {
+    return validateObject(x, {
+        type: isEqualTo('createAnalysisRun'),
+        analysisRunId: isString
+    })
+}
+
+// deleteAnalysisRun
+
+export type DeleteAnalysisRunRequest = {
+    type: 'deleteAnalysisRun'
+    timestamp: number
+    workspaceId: string
+    analysisId: string
+    analysisRunId: string
+}
+
+export const isDeleteAnalysisRunRequest = (x: any): x is DeleteAnalysisRunRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteAnalysisRun'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        analysisId: isString,
+        analysisRunId: isString
+    })
+}
+
+export type DeleteAnalysisRunResponse = {
+    type: 'deleteAnalysisRun'
+}
+
+export const isDeleteAnalysisRunResponse = (x: any): x is DeleteAnalysisRunResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteAnalysisRun')
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
@@ -296,7 +364,10 @@ export type PlaygroundRequestPayload =
     GetAnalysisFilesRequest |
     SetAnalysisFileRequest |
     GetAnalysisFileRequest |
-    GetAnalysisRunsRequest
+    GetAnalysisRunsRequest |
+    GetDataBlobRequest |
+    CreateAnalysisRunRequest |
+    DeleteAnalysisRunRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -308,7 +379,10 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetAnalysisFilesRequest,
         isSetAnalysisFileRequest,
         isGetAnalysisFileRequest,
-        isGetAnalysisRunsRequest
+        isGetAnalysisRunsRequest,
+        isGetDataBlobRequest,
+        isCreateAnalysisRunRequest,
+        isDeleteAnalysisRunRequest
     ])(x)
 }
 
@@ -343,7 +417,10 @@ export type PlaygroundResponse =
     GetAnalysisFilesResponse |
     SetAnalysisFileResponse |
     GetAnalysisFileResponse |
-    GetAnalysisRunsResponse
+    GetAnalysisRunsResponse |
+    GetDataBlobResponse |
+    CreateAnalysisRunResponse |
+    DeleteAnalysisRunResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -355,6 +432,9 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetAnalysisFilesResponse,
         isSetAnalysisFileResponse,
         isGetAnalysisFileResponse,
-        isGetAnalysisRunsResponse
+        isGetAnalysisRunsResponse,
+        isGetDataBlobResponse,
+        isCreateAnalysisRunResponse,
+        isDeleteAnalysisRunResponse
     ])(x)
 }

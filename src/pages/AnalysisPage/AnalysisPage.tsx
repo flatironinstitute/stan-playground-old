@@ -24,26 +24,36 @@ const WorkspacePage: FunctionComponent<Props> = ({analysisId, width, height}) =>
                 initialPosition={initialPosition}
                 direction='horizontal'
             >
-                <LeftPanel />
+                <LeftPanel width={0} height={0} />
                 <MainPanel width={0} height={0} />
             </Splitter>
         </SetupAnalysisPage>
     )
 }
 
-const LeftPanel: FunctionComponent = () => {
+type LeftPanelProps = {
+    width: number
+    height: number
+}
+
+const LeftPanel: FunctionComponent<LeftPanelProps> = ({width, height}) => {
     const {analysisId, openTab} = useAnalysis()
     const handleOpenFile = useCallback((fileName: string) => {
         openTab(`file:${fileName}`)
     }, [openTab])
+    const topHeight = 60
     return (
-        <>
-            <BackButton />
-            <div>Analysis: {analysisId}</div>
-            <AnalysisFileBrowser
-                onOpenFile={handleOpenFile}
-            />
-        </>
+        <div style={{position: 'absolute', width, height}}>
+            <div style={{position: 'absolute', width, height: topHeight}}>
+                <BackButton />
+                <div>Analysis: {analysisId}</div>
+            </div>
+            <div style={{position: 'absolute', width, top: topHeight, height: height - topHeight}}>
+                <AnalysisFileBrowser
+                    onOpenFile={handleOpenFile}
+                />
+            </div>
+        </div>
     )
 }
 

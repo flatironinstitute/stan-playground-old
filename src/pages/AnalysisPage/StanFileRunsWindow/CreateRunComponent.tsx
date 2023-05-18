@@ -1,6 +1,5 @@
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { useAnalysis } from "../AnalysisPageContext";
-import ComputeResourceSelect from "./ComputeResourceSelect";
 import DatasetSelect from "./DatasetSelect";
 import OptionsSelect from "./OptionsSelect";
 import "./table1.css";
@@ -44,16 +43,14 @@ const CreateRunComponent: FunctionComponent<Props> = ({ stanFileName }) => {
         }
     }, [optionsFiles, selectedOptionsFileName])
 
-    const [selectedComputeResourceId, setSelectedComputeResourceId] = useState<string>('default')
-
     const queueable = useMemo(() => {
         return selectedDatasetFileName !== undefined && selectedOptionsFileName !== undefined
     }, [selectedDatasetFileName, selectedOptionsFileName])
 
     const handleQueueRun = useCallback(async () => {
         if (selectedDatasetFileName === undefined || selectedOptionsFileName === undefined) return
-        createAnalysisRun({stanFileName, datasetFileName: selectedDatasetFileName, optionsFileName: selectedOptionsFileName, computeResourceId: selectedComputeResourceId})
-    }, [stanFileName, selectedDatasetFileName, selectedOptionsFileName, selectedComputeResourceId, createAnalysisRun])
+        createAnalysisRun({stanFileName, datasetFileName: selectedDatasetFileName, optionsFileName: selectedOptionsFileName})
+    }, [stanFileName, selectedDatasetFileName, selectedOptionsFileName, createAnalysisRun])
 
     return (
         <>
@@ -79,15 +76,6 @@ const CreateRunComponent: FunctionComponent<Props> = ({ stanFileName }) => {
                             <OptionsSelect
                                 selectedOptionsFileName={selectedOptionsFileName || ''}
                                 setSelectedOptionsFileName={setSelectedOptionsFileName}
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Compute resource:</td>
-                        <td>
-                            <ComputeResourceSelect
-                                selectedComputeResourceId={selectedComputeResourceId}
-                                setSelectedComputeResourceId={setSelectedComputeResourceId}
                             />
                         </td>
                     </tr>

@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { fetchAnalysisFile, fetchDataBlob, setAnalysisFileContent } from "../../../dbInterface/dbInterface"
+import { useGithubAuth } from "../../../GithubAuth/useGithubAuth"
 
-const useAnalysisFile = (analysisId: string, fileName: string) => {
+const useAnalysisFile = (workspaceId: string, analysisId: string, fileName: string) => {
     const [refreshCode, setRefreshCode] = useState<number>(0)
     const [fileContent, setFileContent] = useState<string | undefined>(undefined)
+
+    const {accessToken} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
 
     useEffect(() => {
         let canceled = false
@@ -21,9 +25,17 @@ const useAnalysisFile = (analysisId: string, fileName: string) => {
     }, [analysisId, fileName, refreshCode])
 
     const setFileContentHandler = useCallback(async (fileContent: string) => {
-        await setAnalysisFileContent(analysisId, fileName, fileContent)
+        if (!workspaceId) {
+            console.warn('No workspace ID')
+            return
+        }
+        if (!auth) {
+            console.warn('No auth')
+            return
+        }
+        await setAnalysisFileContent(workspaceId, analysisId, fileName, fileContent, auth)
         setRefreshCode(rc => rc + 1)
-    }, [analysisId, fileName])
+    }, [workspaceId, analysisId, fileName, auth])
 
     return {
         fileContent,

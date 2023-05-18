@@ -26,6 +26,9 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
         console.warn(analysis)
         throw new Error('Invalid analysis in database')
     }
+    if (analysis.workspaceId !== request.workspaceId) {
+        throw new Error('Incorrect workspace ID')
+    }
 
     const workspaceId = analysis.workspaceId
 

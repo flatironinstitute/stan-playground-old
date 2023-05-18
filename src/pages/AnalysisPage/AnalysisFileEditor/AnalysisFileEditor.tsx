@@ -11,9 +11,9 @@ type Props = {
 }
 
 const AnalysisFileEditor: FunctionComponent<Props> = ({fileName, width, height}) => {
-    const {analysisId} = useAnalysis()
+    const {analysis, analysisId} = useAnalysis()
 
-    const {fileContent, setFileContent} = useAnalysisFile(analysisId, fileName)
+    const {fileContent, setFileContent} = useAnalysisFile(analysis?.workspaceId || '', analysisId, fileName)
 
     if (fileName.endsWith('.stan')) {
         return (

@@ -1,5 +1,6 @@
 import React, { FunctionComponent, PropsWithChildren, useEffect, useMemo } from 'react';
 import { createAnalysis, fetchAnalyses } from '../../dbInterface/dbInterface';
+import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPAnalysis } from '../../types/stan-playground-types';
 
 type Props = {
@@ -18,11 +19,17 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const [analyses, setAnalyses] = React.useState<SPAnalysis[]>([])
     const [refreshCode, setRefreshCode] = React.useState(0)
 
+    const {accessToken} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
+
     const createAnalysisHandler = useMemo(() => (async (): Promise<string> => {
-        const analysisId = await createAnalysis(workspaceId)
+        if (!auth) {
+            throw Error('Not logged in')
+        }
+        const analysisId = await createAnalysis(workspaceId, auth)
         setRefreshCode(rc => rc + 1)
         return analysisId
-    }), [workspaceId])
+    }), [workspaceId, auth])
 
     useEffect(() => {
         (async () => {
