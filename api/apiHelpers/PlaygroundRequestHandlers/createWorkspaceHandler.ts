@@ -1,5 +1,5 @@
-import { CreateWorkspaceRequest, CreateWorkspaceResponse } from "../../src/types/PlaygroundRequest";
-import { SPWorkspace } from "../../src/types/stan-playground-types";
+import { CreateWorkspaceRequest, CreateWorkspaceResponse } from "../types/PlaygroundRequest";
+import { SPWorkspace } from "../types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
 

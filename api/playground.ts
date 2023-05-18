@@ -1,20 +1,22 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
-import createAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
-import createAnalysisRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
-import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
-import getAnalysesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
-import getAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
-import getAnalysisFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFilesHandler'
-import getAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisHandler'
-import getAnalysisRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisRunsHandler'
-import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
-import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
-import verifySignature from '../apiHelpers/verifySignature'
-import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest, isCreateAnalysisRunRequest} from '../src/types/PlaygroundRequest'
+import githubVerifyAccessToken from './apiHelpers/githubVerifyAccessToken'
+import createAnalysisHandler from './apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
+import createAnalysisRunHandler from './apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
+import createWorkspaceHandler from './apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
+import getAnalysesHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
+import getAnalysisFileHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
+import getAnalysisFilesHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisFilesHandler'
+import getAnalysisHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisHandler'
+import getAnalysisRunsHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisRunsHandler'
+import getWorkspacesHandler from './apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
+import setAnalysisFileHandler from './apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
+import verifySignature from './apiHelpers/verifySignature'
+import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest, isCreateAnalysisRunRequest} from './apiHelpers/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
+
+    console.log('--- request', request)
 
     // CORS ///////////////////////////////////
     res.setHeader('Access-Control-Allow-Credentials', 'true')
@@ -70,38 +72,38 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
             verifiedUserId = githubUserId
         }
 
-        if (isGetWorkspacesRequest(request)) {
-            return await getWorkspacesHandler(request, {verifiedClientId, verifiedUserId})
+        if (isGetWorkspacesRequest(payload)) {
+            return await getWorkspacesHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isCreateWorkspaceRequest(request)) {
-            return await createWorkspaceHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isCreateWorkspaceRequest(payload)) {
+            return await createWorkspaceHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysesRequest(request)) {
-            return await getAnalysesHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isGetAnalysesRequest(payload)) {
+            return await getAnalysesHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisRequest(request)) {
-            return await getAnalysisHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isGetAnalysisRequest(payload)) {
+            return await getAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isCreateAnalysisRequest(request)) {
-            return await createAnalysisHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isCreateAnalysisRequest(payload)) {
+            return await createAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisFilesRequest(request)) {
-            return await getAnalysisFilesHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isGetAnalysisFilesRequest(payload)) {
+            return await getAnalysisFilesHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isSetAnalysisFileRequest(request)) {
-            return await setAnalysisFileHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isSetAnalysisFileRequest(payload)) {
+            return await setAnalysisFileHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisFileRequest(request)) {
-            return await getAnalysisFileHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isGetAnalysisFileRequest(payload)) {
+            return await getAnalysisFileHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisRunsRequest(request)) {
-            return await getAnalysisRunsHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isGetAnalysisRunsRequest(payload)) {
+            return await getAnalysisRunsHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isCreateAnalysisRunRequest(request)) {
-            return await createAnalysisRunHandler(request, {verifiedClientId, verifiedUserId})
+        else if (isCreateAnalysisRunRequest(payload)) {
+            return await createAnalysisRunHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else {
-            throw Error(`Unexpected request type: ${(request as any).payload.type}`)
+            throw Error(`Unexpected request type: ${(payload as any).type}`)
         }
     })().then((response) => {
         res.json(response)

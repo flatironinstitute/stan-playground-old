@@ -1,4 +1,4 @@
-import { DeleteAnalysisRunRequest, DeleteAnalysisRunResponse } from "../../src/types/PlaygroundRequest";
+import { DeleteAnalysisRunRequest, DeleteAnalysisRunResponse } from "../types/PlaygroundRequest";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 

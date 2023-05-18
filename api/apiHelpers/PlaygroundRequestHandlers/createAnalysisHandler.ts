@@ -1,5 +1,5 @@
-import { CreateAnalysisRequest, CreateAnalysisResponse, SetAnalysisFileRequest } from "../../src/types/PlaygroundRequest";
-import { SPAnalysis } from "../../src/types/stan-playground-types";
+import { CreateAnalysisRequest, CreateAnalysisResponse, SetAnalysisFileRequest } from "../types/PlaygroundRequest";
+import { SPAnalysis } from "../types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
 import setAnalysisFileHandler from "./setAnalysisFileHandler";

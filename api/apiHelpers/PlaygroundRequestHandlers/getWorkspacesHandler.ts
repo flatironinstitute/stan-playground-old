@@ -1,5 +1,5 @@
-import { GetWorkspacesRequest, GetWorkspacesResponse } from "../../src/types/PlaygroundRequest";
-import { isSPWorkspace } from "../../src/types/stan-playground-types";
+import { GetWorkspacesRequest, GetWorkspacesResponse } from "../types/PlaygroundRequest";
+import { isSPWorkspace } from "../types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 

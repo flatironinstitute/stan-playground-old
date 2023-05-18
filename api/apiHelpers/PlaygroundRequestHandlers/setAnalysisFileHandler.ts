@@ -1,6 +1,6 @@
 import crypto from 'crypto';
-import { SetAnalysisFileRequest, SetAnalysisFileResponse } from "../../src/types/PlaygroundRequest";
-import { isSPAnalysis, isSPWorkspace, SPAnalysisFile } from "../../src/types/stan-playground-types";
+import { SetAnalysisFileRequest, SetAnalysisFileResponse } from "../types/PlaygroundRequest";
+import { isSPAnalysis, isSPWorkspace, SPAnalysisFile } from "../types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 

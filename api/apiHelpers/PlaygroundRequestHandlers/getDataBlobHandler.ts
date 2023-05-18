@@ -1,5 +1,5 @@
-import { GetDataBlobRequest, GetDataBlobResponse } from "../../src/types/PlaygroundRequest";
-import { isSPDataBlob } from "../../src/types/stan-playground-types";
+import { GetDataBlobRequest, GetDataBlobResponse } from "../types/PlaygroundRequest";
+import { isSPDataBlob } from "../types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 

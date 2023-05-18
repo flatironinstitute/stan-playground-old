@@ -20,7 +20,7 @@ export type GithubLoginStatus ={
 const GitHubLoginWindow: FunctionComponent<Props> = ({onClose, onChange, defaultScope}) => {
 	const [personalAccessTokenMode, setPersonalAccessTokenMode] = useState(false)
 	const [githubScope, setGithubScope] = useState<'' | 'repo'>(defaultScope)
-	const GITHUB_CLIENT_ID = import.meta.env.GITHUB_CLIENT_ID
+	const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID
 	const {userId, loginStatus, clearAccessToken, isPersonalAccessToken} = useGithubAuth()
 	const handleClearAccessToken = useCallback(() => {
 		clearAccessToken()

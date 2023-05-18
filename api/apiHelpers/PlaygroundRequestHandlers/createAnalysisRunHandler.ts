@@ -1,5 +1,5 @@
-import { CreateAnalysisRunRequest, CreateAnalysisRunResponse } from "../../src/types/PlaygroundRequest";
-import { SPAnalysisRun } from "../../src/types/stan-playground-types";
+import { CreateAnalysisRunRequest, CreateAnalysisRunResponse } from "../types/PlaygroundRequest";
+import { isSPAnalysisFile, SPAnalysisFile, SPAnalysisRun } from "../types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
@@ -35,7 +35,13 @@ const createAnalysisRunHandler = async (request: CreateAnalysisRunRequest, o: {v
     const analysisRunId = createRandomId(8)
 
     const analysisFilesCollection = client.db('stan-playground').collection('analysisFiles')
-    const analysisFiles = removeIdField(await analysisFilesCollection.find({analysisId: request.analysisId}).toArray())
+    const analysisFiles = removeIdField(await analysisFilesCollection.find({analysisId: request.analysisId}).toArray()) as SPAnalysisFile[]
+    for (const analysisFile of analysisFiles) {
+        if (!isSPAnalysisFile(analysisFile)) {
+            console.warn(analysisFile)
+            throw new Error('Invalid analysis file in database')
+        }
+    }
 
     const stanFile = analysisFiles.find(x => x.fileName === request.stanProgramFileName)
     if (!stanFile) {

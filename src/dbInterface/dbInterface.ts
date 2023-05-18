@@ -3,7 +3,7 @@ import sha1 from 'crypto-js/sha1'
 import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRunRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspacesRequest, SetAnalysisFileRequest } from "../types/PlaygroundRequest";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
-const productionMode = import.meta.env.PROD_MODE === '1'
+const vercelMode = import.meta.env.VITE_GITHUB_CLIENT_ID !== undefined
 
 type DevelopmentDatabase = {
     workspaces: SPWorkspace[],
@@ -51,7 +51,7 @@ const setDevelopmentDatabase = (db: DevelopmentDatabase) => {
 
 
 export const fetchWorkspaces = async (): Promise<SPWorkspace[]> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetWorkspacesRequest = {
             type: 'getWorkspaces',
             timestamp: Date.now() / 1000
@@ -74,7 +74,7 @@ type Auth = {
 }
 
 export const createWorkspace = async (workspaceName: string, auth: Auth): Promise<string> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: CreateWorkspaceRequest = {
             type: 'createWorkspace',
             timestamp: Date.now() / 1000,
@@ -107,7 +107,7 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
 }
 
 export const fetchAnalyses = async (workspaceId: string): Promise<SPAnalysis[]> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetAnalysesRequest = {
             type: 'getAnalyses',
             timestamp: Date.now() / 1000,
@@ -131,7 +131,7 @@ const defaultStanProgram = ``
 const defaultOptionsYaml = ``
 
 export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<string> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: CreateAnalysisRequest = {
             type: 'createAnalysis',
             timestamp: Date.now() / 1000,
@@ -168,7 +168,7 @@ export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<s
 }
 
 export const fetchAnalysis = async (analysisId: string): Promise<SPAnalysis | undefined> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetAnalysisRequest = {
             type: 'getAnalysis',
             timestamp: Date.now() / 1000,
@@ -189,7 +189,7 @@ export const fetchAnalysis = async (analysisId: string): Promise<SPAnalysis | un
 }
 
 export const fetchAnalysisFiles = async (analysisId: string): Promise<SPAnalysisFile[]> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetAnalysisFilesRequest = {
             type: 'getAnalysisFiles',
             timestamp: Date.now() / 1000,
@@ -210,7 +210,7 @@ export const fetchAnalysisFiles = async (analysisId: string): Promise<SPAnalysis
 }
 
 export const fetchAnalysisFile = async (analysisId: string, fileName: string): Promise<SPAnalysisFile | undefined> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetAnalysisFileRequest = {
             type: 'getAnalysisFile',
             timestamp: Date.now() / 1000,
@@ -233,7 +233,7 @@ export const fetchAnalysisFile = async (analysisId: string, fileName: string): P
 }
 
 export const fetchDataBlob = async (workspaceId: string, sha1: string): Promise<string | undefined> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetDataBlobRequest = {
             type: 'getDataBlob',
             timestamp: Date.now() / 1000,
@@ -256,7 +256,7 @@ export const fetchDataBlob = async (workspaceId: string, sha1: string): Promise<
 }
 
 export const setAnalysisFileContent = async (workspaceId: string, analysisId: string, fileName: string, fileContent: string, auth: Auth): Promise<void> => {
-    if (productionMode) {
+    if (vercelMode) {
         if (!auth.githubAccessToken) {
             throw Error('Must provide githubAccessToken to setAnalysisFileContent in production mode')
         }
@@ -312,7 +312,7 @@ export const setAnalysisFileContent = async (workspaceId: string, analysisId: st
 }
 
 export const fetchAnalysisRuns = async (analysisId: string): Promise<SPAnalysisRun[]> => {
-    if (productionMode) {
+    if (vercelMode) {
         const req: GetAnalysisRunsRequest = {
             type: 'getAnalysisRuns',
             timestamp: Date.now() / 1000,
@@ -333,7 +333,7 @@ export const fetchAnalysisRuns = async (analysisId: string): Promise<SPAnalysisR
 }
 
 export const createAnalysisRun = async (workspaceId: string, analysisId: string, o: {stanFileName: string, datasetFileName: string, optionsFileName: string}, auth: Auth): Promise<string> => {
-    if (productionMode) {
+    if (vercelMode) {
         if (!auth.githubAccessToken) {
             throw Error('Must provide githubAccessToken to createAnalysisRun in production mode')
         }
@@ -404,7 +404,7 @@ export const createAnalysisRun = async (workspaceId: string, analysisId: string,
 }
 
 export const deleteAnalysisRun = async (workspaceId: string, analysisId: string, analysisRunId: string, auth: Auth): Promise<void> => {
-    if (productionMode) {
+    if (vercelMode) {
         if (!auth.githubAccessToken) {
             throw Error('Must provide githubAccessToken to deleteAnalysisRun in production mode')
         }

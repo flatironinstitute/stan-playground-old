@@ -1,5 +1,5 @@
-import { GetAnalysisFileRequest, GetAnalysisFileResponse } from "../../src/types/PlaygroundRequest";
-import { isSPAnalysisFile } from "../../src/types/stan-playground-types";
+import { GetAnalysisFileRequest, GetAnalysisFileResponse } from "../types/PlaygroundRequest";
+import { isSPAnalysisFile } from "../types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
