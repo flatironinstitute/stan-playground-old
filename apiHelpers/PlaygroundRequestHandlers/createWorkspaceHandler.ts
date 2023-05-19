@@ -17,6 +17,9 @@ const createWorkspaceHandler = async (request: CreateWorkspaceRequest, o: {verif
         ownerId: verifiedUserId,
         name: request.name,
         description: '',
+        publiclyViewable: true,
+        publiclyEditable: false,
+        users: [],
         timestampCreated: Date.now() / 1000,
         timestampModified: Date.now() / 1000
     }

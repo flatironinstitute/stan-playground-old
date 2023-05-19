@@ -41,7 +41,7 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
     }
     if (!isSPWorkspace(workspace)) {
         console.warn(workspace)
-        throw new Error('Invalid workspace in database')
+        throw new Error('Invalid workspace in database (2)')
     }
     if (workspace.ownerId !== verifiedUserId) {
         throw new Error('Must be the owner of the workspace to set an analysis file')

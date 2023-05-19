@@ -2,19 +2,21 @@ import { VercelRequest, VercelResponse } from '@vercel/node'
 import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
 import createAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
 import createAnalysisRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
-import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
+import deleteAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteAnalysisHandler'
+import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
 import getAnalysesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
 import getAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
 import getAnalysisFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFilesHandler'
 import getAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisHandler'
 import getAnalysisRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisRunsHandler'
+import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
+import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
 import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
 import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
-import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
-import deleteAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteAnalysisHandler'
+import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest, isCreateAnalysisRunRequest, isGetDataBlobRequest, isDeleteWorkspaceRequest, isDeleteAnalysisRequest} from '../src/types/PlaygroundRequest'
+import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetDataBlobRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isSetAnalysisFileRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -76,6 +78,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         if (isGetWorkspacesRequest(payload)) {
             return await getWorkspacesHandler(payload, {verifiedClientId, verifiedUserId})
         }
+        else if (isGetWorkspaceRequest(payload)) {
+            return await getWorkspaceHandler(payload, {verifiedClientId, verifiedUserId})
+        }
         else if (isCreateWorkspaceRequest(payload)) {
             return await createWorkspaceHandler(payload, {verifiedClientId, verifiedUserId})
         }
@@ -105,6 +110,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isCreateAnalysisRunRequest(payload)) {
             return await createAnalysisRunHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isSetWorkspaceUsersRequest(payload)) {
+            return await setWorkspaceUsersHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isGetDataBlobRequest(payload)) {
             return await getDataBlobHandler(payload, {verifiedClientId, verifiedUserId})

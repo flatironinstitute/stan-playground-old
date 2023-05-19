@@ -1,7 +1,8 @@
 import { CreateAnalysisRequest, CreateAnalysisResponse, SetAnalysisFileRequest } from "../../src/types/PlaygroundRequest";
-import { SPAnalysis } from "../../src/types/stan-playground-types";
+import { isSPWorkspace, SPAnalysis } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
+import removeIdField from "../removeIdField";
 import setAnalysisFileHandler from "./setAnalysisFileHandler";
 
 const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<CreateAnalysisResponse> => {
@@ -15,6 +16,21 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
 
     const workspaceId = request.workspaceId
 
+    const client = await getMongoClient()
+
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId}))
+    if (!workspace) {
+        throw new Error('Workspace not found')
+    }
+    if (!isSPWorkspace(workspace)) {
+        console.warn(workspace)
+        throw new Error('Invalid workspace in database (**)')
+    }
+    if (workspace.ownerId !== verifiedUserId) {
+        throw new Error('Only the owner of a workspace can create an analysis in the workspace')
+    }
+
     const analysis: SPAnalysis = {
         analysisId,
         workspaceId,
@@ -24,7 +40,6 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
         timestampModified: Date.now() / 1000
     }
 
-    const client = await getMongoClient()
     const analysesCollection = client.db('stan-playground').collection('analyses')
 
     await analysesCollection.insertOne(analysis)

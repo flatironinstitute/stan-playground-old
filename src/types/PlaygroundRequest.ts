@@ -27,6 +27,34 @@ export const isGetWorkspacesResponse = (x: any): x is GetWorkspacesResponse => {
     })
 }
 
+// getWorkspace
+
+export type GetWorkspaceRequest = {
+    type: 'getWorkspace'
+    timestamp: number
+    workspaceId: string
+}
+
+export const isGetWorkspaceRequest = (x: any): x is GetWorkspaceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getWorkspace'),
+        timestamp: isNumber,
+        workspaceId: isString
+    })
+}
+
+export type GetWorkspaceResponse = {
+    type: 'getWorkspace'
+    workspace: SPWorkspace
+}
+
+export const isGetWorkspaceResponse = (x: any): x is GetWorkspaceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getWorkspace'),
+        workspace: isSPWorkspace
+    })
+}
+
 // createWorkspace
 
 export type CreateWorkspaceRequest = {
@@ -162,6 +190,40 @@ export type DeleteWorkspaceResponse = {
 export const isDeleteWorkspaceResponse = (x: any): x is DeleteWorkspaceResponse => {
     return validateObject(x, {
         type: isEqualTo('deleteWorkspace')
+    })
+}
+
+// setWorkspaceUsers
+
+export type SetWorkspaceUsersRequest = {
+    type: 'setWorkspaceUsers'
+    timestamp: number
+    workspaceId: string
+    users: {
+        userId: string
+        role: 'admin' | 'editor' | 'viewer'
+    }[]
+}
+
+export const isSetWorkspaceUsersRequest = (x: any): x is SetWorkspaceUsersRequest => {
+    return validateObject(x, {
+        type: isEqualTo('setWorkspaceUsers'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        users: isArrayOf(y => (validateObject(y, {
+            userId: isString,
+            role: isOneOf([isEqualTo('admin'), isEqualTo('editor'), isEqualTo('viewer')])
+        })))
+    })
+}
+
+export type SetWorkspaceUsersResponse = {
+    type: 'setWorkspaceUsers'
+}
+
+export const isSetWorkspaceUsersResponse = (x: any): x is SetWorkspaceUsersResponse => {
+    return validateObject(x, {
+        type: isEqualTo('setWorkspaceUsers')
     })
 }
 
@@ -413,10 +475,12 @@ export const isDeleteAnalysisResponse = (x: any): x is DeleteAnalysisResponse =>
 
 export type PlaygroundRequestPayload =
     GetWorkspacesRequest |
+    GetWorkspaceRequest |
     CreateWorkspaceRequest |
     GetAnalysesRequest |
     GetAnalysisRequest |
     CreateAnalysisRequest |
+    SetWorkspaceUsersRequest |
     DeleteWorkspaceRequest |
     GetAnalysisFilesRequest |
     SetAnalysisFileRequest |
@@ -430,10 +494,12 @@ export type PlaygroundRequestPayload =
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
         isGetWorkspacesRequest,
+        isGetWorkspaceRequest,
         isCreateWorkspaceRequest,
         isGetAnalysesRequest,
         isGetAnalysisRequest,
         isCreateAnalysisRequest,
+        isSetWorkspaceUsersRequest,
         isDeleteWorkspaceRequest,
         isGetAnalysisFilesRequest,
         isSetAnalysisFileRequest,
@@ -470,10 +536,12 @@ export const isPlaygroundRequest = (x: any): x is PlaygroundRequest => {
 
 export type PlaygroundResponse =
     GetWorkspacesResponse |
+    GetWorkspaceResponse |
     CreateWorkspaceResponse |
     GetAnalysesResponse |
     GetAnalysisResponse |
     CreateAnalysisResponse |
+    SetWorkspaceUsersResponse |
     DeleteWorkspaceResponse |
     GetAnalysisFilesResponse |
     SetAnalysisFileResponse |
@@ -487,10 +555,12 @@ export type PlaygroundResponse =
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
         isGetWorkspacesResponse,
+        isGetWorkspaceResponse,
         isCreateWorkspaceResponse,
         isGetAnalysesResponse,
         isGetAnalysisResponse,
         isCreateAnalysisResponse,
+        isSetWorkspaceUsersResponse,
         isDeleteWorkspaceResponse,
         isGetAnalysisFilesResponse,
         isSetAnalysisFileResponse,

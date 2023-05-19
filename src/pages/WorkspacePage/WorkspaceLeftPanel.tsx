@@ -1,8 +1,9 @@
-import { FunctionComponent, useCallback } from "react";
-import { confirm } from "../../confirm_prompt_alert";
-import useRoute from "../../useRoute";
+import { FunctionComponent } from "react";
+import { useModalDialog } from "../../ApplicationBar";
+import ModalWindow from "../../components/ModalWindow/ModalWindow";
 import BackButton from "./BackButton";
 import { useWorkspace } from "./WorkspacePageContext";
+import WorkspaceSettingsWindow from "./WorkspaceSettingsWindow";
 
 type Props = {
     width: number
@@ -10,23 +11,22 @@ type Props = {
 }
 
 const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
-    const {workspaceId, deleteWorkspace} = useWorkspace()
-    const {setRoute} = useRoute()
-
-    const handleDeleteWorkspace = useCallback(async () => {
-        const okay = await confirm('Are you sure you want to delete this workspace?')
-        if (!okay) return
-        await deleteWorkspace()
-        setRoute({page: 'home'})
-    }, [deleteWorkspace, setRoute])
+    const {workspaceId} = useWorkspace()
+    const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
     return (
         <div>
             <BackButton />
             <div>Workspace: {workspaceId}</div>
             <hr />
-            <button onClick={handleDeleteWorkspace}>Delete workspace</button>
+            <button onClick={() => openSettingsWindow()}>Workspace Settings</button>
+            <ModalWindow
+                open={settingsWindowVisible}
+                onClose={closeSettingsWindow}
+            >
+                <WorkspaceSettingsWindow />
+            </ModalWindow>
         </div>
     )
 }
 
-export default WorkspaceLeftPanel;
+export default WorkspaceLeftPanel

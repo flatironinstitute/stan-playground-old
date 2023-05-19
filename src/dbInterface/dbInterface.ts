@@ -1,6 +1,6 @@
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../types/stan-playground-types";
 import sha1 from 'crypto-js/sha1'
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspacesRequest, SetAnalysisFileRequest } from "../types/PlaygroundRequest";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, SetAnalysisFileRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 const vercelMode = import.meta.env.VITE_GITHUB_CLIENT_ID !== undefined
@@ -69,6 +69,30 @@ export const fetchWorkspaces = async (): Promise<SPWorkspace[]> => {
     }
 }
 
+export const fetchWorkspace = async (workspaceId: string): Promise<SPWorkspace | undefined> => {
+    if (vercelMode) {
+        const req: GetWorkspaceRequest = {
+            type: 'getWorkspace',
+            timestamp: Date.now() / 1000,
+            workspaceId
+        }
+        const resp = await postPlaygroundRequest(req, {})
+        if (resp.type !== 'getWorkspace') {
+            throw Error(`Unexpected response type ${resp.type}. Expected getWorkspace.`)
+        }
+        return resp.workspace
+    }
+    else {
+        await sleepMsec(100)
+        const db = getDevelopmentDatabase()
+        const workspace = db.workspaces.find((w: SPWorkspace) => w.workspaceId === workspaceId)
+        if (!workspace) {
+            throw new Error('Workspace not found')
+        }
+        return workspace
+    }
+}
+
 type Auth = {
     githubAccessToken?: string
 }
@@ -98,6 +122,9 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
             ownerId: 'test-user',
             name: workspaceName,
             description: '',
+            publiclyViewable: true,
+            publiclyEditable: false,
+            users: [],
             timestampCreated: Date.now() / 1000,
             timestampModified: Date.now() / 1000
         })
@@ -164,6 +191,37 @@ export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<s
         await setAnalysisFileContent(workspaceId, analysisId, 'data.json', '{}', auth)
         await setAnalysisFileContent(workspaceId, analysisId, 'options.yaml', defaultOptionsYaml, auth)
         return analysisId
+    }
+}
+
+export const setWorkspaceUsers = async (workspaceId: string, users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[], auth: Auth): Promise<void> => {
+    if (vercelMode) {
+        if (!auth.githubAccessToken) {
+            throw Error('Must provide githubAccessToken to setWorkspaceUsers in production mode')
+        }
+        const req: SetWorkspaceUsersRequest = {
+            type: 'setWorkspaceUsers',
+            timestamp: Date.now() / 1000,
+            workspaceId,
+            users
+        }
+        const resp = await postPlaygroundRequest(req, {...auth})
+        if (resp.type !== 'setWorkspaceUsers') {
+            throw Error(`Unexpected response type ${resp.type}. Expected setWorkspaceUsers.`)
+        }
+    }
+    else {
+        await sleepMsec(100)
+        const db = getDevelopmentDatabase()
+        const workspace = db.workspaces.find((w: SPWorkspace) => w.workspaceId === workspaceId)
+        if (!workspace) {
+            throw new Error('Workspace not found')
+        }
+        if (workspace.ownerId !== 'test-user') {
+            throw new Error('Only the owner of a workspace can set the workspace users')
+        }
+        workspace.users = users
+        setDevelopmentDatabase(db)
     }
 }
 
