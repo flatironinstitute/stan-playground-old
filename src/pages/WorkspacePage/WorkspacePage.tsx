@@ -1,22 +1,29 @@
 import { FunctionComponent } from "react";
-import AnalysesMenuBar from "./AnalysesMenuBar";
-import AnalysesTable from "./AnalysesTable";
-import BackButton from "./BackButton";
+import Splitter from "../../components/Splitter";
+import WorkspaceLeftPanel from "./WorkspaceLeftPanel";
+import WorkspaceMainPanel from "./WorkspaceMainPanel";
 import { SetupWorkspacePage } from "./WorkspacePageContext";
 
 type Props = {
     workspaceId: string
+    width: number
+    height: number
 }
 
-const WorkspacePage: FunctionComponent<Props> = ({workspaceId}) => {
+const WorkspacePage: FunctionComponent<Props> = ({workspaceId, width, height}) => {
     return (
         <SetupWorkspacePage
             workspaceId={workspaceId}
         >
-            <BackButton />
-            <div>Workspace: {workspaceId}</div>
-            <AnalysesMenuBar />
-            <AnalysesTable />
+            <Splitter
+                direction="horizontal"
+                width={width}
+                height={height}
+                initialPosition={Math.min(250, width / 2)}
+            >
+                <WorkspaceLeftPanel width={0} height={0} />
+                <WorkspaceMainPanel width={0} height={0} />
+            </Splitter>
         </SetupWorkspacePage>
     )
 }

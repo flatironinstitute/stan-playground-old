@@ -1,5 +1,5 @@
-import { GetAnalysisFilesRequest, GetAnalysisFilesResponse } from "../types/PlaygroundRequest";
-import { isSPAnalysisFile } from "../types/stan-playground-types";
+import { GetAnalysisFilesRequest, GetAnalysisFilesResponse } from "../../src/types/PlaygroundRequest";
+import { isSPAnalysisFile } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
@@ -13,7 +13,14 @@ const getAnalysisFilesHandler = async (request: GetAnalysisFilesRequest, o: {ver
     for (const analysisFile of analysisFiles) {
         if (!isSPAnalysisFile(analysisFile)) {
             console.warn(analysisFile)
-            throw new Error('Invalid analysis file in database')
+
+            // // during development only:
+            // await analysisFilesCollection.deleteOne({
+            //     analysisId: request.analysisId,
+            //     fileName: analysisFile.fileName
+            // })
+
+            throw new Error('Invalid analysis file in database (3)')
         }
     }
     return {

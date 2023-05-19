@@ -1,5 +1,5 @@
-import { CreateAnalysisRunRequest, CreateAnalysisRunResponse } from "../types/PlaygroundRequest";
-import { isSPAnalysisFile, SPAnalysisFile, SPAnalysisRun } from "../types/stan-playground-types";
+import { CreateAnalysisRunRequest, CreateAnalysisRunResponse } from "../../src/types/PlaygroundRequest";
+import { isSPAnalysisFile, SPAnalysisFile, SPAnalysisRun } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
@@ -39,7 +39,7 @@ const createAnalysisRunHandler = async (request: CreateAnalysisRunRequest, o: {v
     for (const analysisFile of analysisFiles) {
         if (!isSPAnalysisFile(analysisFile)) {
             console.warn(analysisFile)
-            throw new Error('Invalid analysis file in database')
+            throw new Error('Invalid analysis file in database (1)')
         }
     }
 

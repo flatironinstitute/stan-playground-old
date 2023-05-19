@@ -65,10 +65,10 @@ const useSetupGithubAuth = (): GithubAuthData => {
 				}).then(resp => {
 					setGitHubTokenInfoToLocalStorage({
 						...tokenInfo,
-						userId: resp.login,
+						userId: 'github|' + resp.login,
 						userIdTimestamp: Date.now()
 					})
-					setUserName(resp.login)
+					setUserName('github|' + resp.login)
 				}).catch(err => {
 					console.warn(err.message)
 					setGitHubTokenInfoToLocalStorage({})

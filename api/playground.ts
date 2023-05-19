@@ -1,22 +1,23 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import githubVerifyAccessToken from './apiHelpers/githubVerifyAccessToken'
-import createAnalysisHandler from './apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
-import createAnalysisRunHandler from './apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
-import createWorkspaceHandler from './apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
-import getAnalysesHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
-import getAnalysisFileHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
-import getAnalysisFilesHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisFilesHandler'
-import getAnalysisHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisHandler'
-import getAnalysisRunsHandler from './apiHelpers/PlaygroundRequestHandlers/getAnalysisRunsHandler'
-import getWorkspacesHandler from './apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
-import setAnalysisFileHandler from './apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
-import verifySignature from './apiHelpers/verifySignature'
-import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest, isCreateAnalysisRunRequest} from './apiHelpers/types/PlaygroundRequest'
+import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
+import createAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
+import createAnalysisRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
+import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
+import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
+import getAnalysesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
+import getAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
+import getAnalysisFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFilesHandler'
+import getAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisHandler'
+import getAnalysisRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisRunsHandler'
+import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
+import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
+import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
+import deleteAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteAnalysisHandler'
+import verifySignature from '../apiHelpers/verifySignature'
+import {isSetAnalysisFileRequest, isCreateAnalysisRequest, isCreateWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetWorkspacesRequest, isPlaygroundRequest, isGetAnalysisFileRequest, isGetAnalysisRunsRequest, isCreateAnalysisRunRequest, isGetDataBlobRequest, isDeleteWorkspaceRequest, isDeleteAnalysisRequest} from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
-
-    console.log('--- request', request)
 
     // CORS ///////////////////////////////////
     res.setHeader('Access-Control-Allow-Credentials', 'true')
@@ -44,7 +45,7 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         return
     }
 
-    const { payload, fromClientId, signature, githubUserId, githubAccessToken } = request
+    const { payload, fromClientId, signature, userId, githubAccessToken } = request
     const { timestamp } = payload
     const elapsed = (Date.now() / 1000) - timestamp
     if ((elapsed > 30) || (elapsed < -30)) { 
@@ -65,11 +66,11 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
 
         let verifiedUserId: string | undefined = undefined
-        if (githubUserId) {
-            if (!(await githubVerifyAccessToken(githubUserId, githubAccessToken))) {
+        if ((userId) && (userId.startsWith('github|')) && (githubAccessToken)) {
+            if (!(await githubVerifyAccessToken(userId.slice('github|'.length), githubAccessToken))) {
                 throw Error('Unable to verify github user ID')
             }
-            verifiedUserId = githubUserId
+            verifiedUserId = userId
         }
 
         if (isGetWorkspacesRequest(payload)) {
@@ -87,6 +88,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         else if (isCreateAnalysisRequest(payload)) {
             return await createAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
         }
+        else if (isDeleteWorkspaceRequest(payload)) {
+            return await deleteWorkspaceHandler(payload, {verifiedClientId, verifiedUserId})
+        }
         else if (isGetAnalysisFilesRequest(payload)) {
             return await getAnalysisFilesHandler(payload, {verifiedClientId, verifiedUserId})
         }
@@ -101,6 +105,12 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isCreateAnalysisRunRequest(payload)) {
             return await createAnalysisRunHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isGetDataBlobRequest(payload)) {
+            return await getDataBlobHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isDeleteAnalysisRequest(payload)) {
+            return await deleteAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else {
             throw Error(`Unexpected request type: ${(payload as any).type}`)

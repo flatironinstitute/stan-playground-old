@@ -1,4 +1,4 @@
-import { DeleteAnalysisRunRequest, DeleteAnalysisRunResponse } from "../types/PlaygroundRequest";
+import { DeleteAnalysisRunRequest, DeleteAnalysisRunResponse } from "../../src/types/PlaygroundRequest";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
@@ -6,7 +6,7 @@ const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {v
     const {verifiedUserId} = o
 
     if (!verifiedUserId) {
-        throw new Error('Must be logged in to create an analysis')
+        throw new Error('Must be logged in to delete an analysis run')
     }
 
     const client = await getMongoClient()

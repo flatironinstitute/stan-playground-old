@@ -23,7 +23,7 @@ const MainWindow: FunctionComponent<Props> = () => {
                     route.page === 'home' ? (
                         <HomePage />
                     ) : route.page === 'workspace' ? (
-                        <WorkspacePage workspaceId={route.workspaceId} />
+                        <WorkspacePage workspaceId={route.workspaceId} width={width} height={height - applicationBarHeight} />
                     ) : route.page === 'analysis' ? (
                         <AnalysisPage analysisId={route.analysisId} width={width} height={height - applicationBarHeight} />
                     ) : (

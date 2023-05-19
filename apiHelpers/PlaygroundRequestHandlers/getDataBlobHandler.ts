@@ -1,5 +1,5 @@
-import { GetDataBlobRequest, GetDataBlobResponse } from "../types/PlaygroundRequest";
-import { isSPDataBlob } from "../types/stan-playground-types";
+import { GetDataBlobRequest, GetDataBlobResponse } from "../../src/types/PlaygroundRequest";
+import { isSPDataBlob } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
@@ -9,6 +9,7 @@ const getDataBlobHandler = async (request: GetDataBlobRequest, o: {verifiedClien
     
     const dataBlob = removeIdField(await dataBlobsCollection.findOne({
         workspaceId: request.workspaceId,
+        analysisId: request.analysisId,
         sha1: request.sha1
     }))
     if (!dataBlob) {

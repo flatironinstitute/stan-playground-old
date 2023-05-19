@@ -1,6 +1,6 @@
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../types/stan-playground-types";
 import sha1 from 'crypto-js/sha1'
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRunRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspacesRequest, SetAnalysisFileRequest } from "../types/PlaygroundRequest";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspacesRequest, SetAnalysisFileRequest } from "../types/PlaygroundRequest";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 const vercelMode = import.meta.env.VITE_GITHUB_CLIENT_ID !== undefined
@@ -83,7 +83,7 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
         if (!auth.githubAccessToken) {
             throw Error('Must provide githubAccessToken to createWorkspace in production mode')
         }
-        const resp = await postPlaygroundRequest(req, {githubAccessToken: auth.githubAccessToken})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'createWorkspace') {
             throw Error(`Unexpected response type ${resp.type}. Expected createWorkspace.`)
         }
@@ -140,7 +140,7 @@ export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<s
         if (!auth.githubAccessToken) {
             throw Error('Must provide githubAccessToken to createAnalysis in production mode')
         }
-        const resp = await postPlaygroundRequest(req, {githubAccessToken: auth.githubAccessToken})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'createAnalysis') {
             throw Error(`Unexpected response type ${resp.type}. Expected createAnalysis.`)
         }
@@ -164,6 +164,33 @@ export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<s
         await setAnalysisFileContent(workspaceId, analysisId, 'data.json', '{}', auth)
         await setAnalysisFileContent(workspaceId, analysisId, 'options.yaml', defaultOptionsYaml, auth)
         return analysisId
+    }
+}
+
+export const deleteWorkspace = async (workspaceId: string, auth: Auth): Promise<void> => {
+    if (vercelMode) {
+        if (!auth.githubAccessToken) {
+            throw Error('Must provide githubAccessToken to deleteWorkspace in production mode')
+        }
+        const req: DeleteWorkspaceRequest = {
+            type: 'deleteWorkspace',
+            timestamp: Date.now() / 1000,
+            workspaceId
+        }
+        const resp = await postPlaygroundRequest(req, {...auth})
+        if (resp.type !== 'deleteWorkspace') {
+            throw Error(`Unexpected response type ${resp.type}. Expected deleteWorkspace.`)
+        }
+    }
+    else {
+        await sleepMsec(100)
+        const db = getDevelopmentDatabase()
+        db.workspaces = db.workspaces.filter((w: SPWorkspace) => w.workspaceId !== workspaceId)
+        db.analyses = db.analyses.filter((a: SPAnalysis) => a.workspaceId !== workspaceId)
+        db.analysisFiles = db.analysisFiles.filter((a: SPAnalysisFile) => a.workspaceId !== workspaceId)
+        db.analysisRuns = db.analysisRuns.filter((a: SPAnalysisRun) => a.workspaceId !== workspaceId)
+        db.dataBlobs = db.dataBlobs.filter((b: SPDataBlob) => b.workspaceId !== workspaceId)
+        setDevelopmentDatabase(db)
     }
 }
 
@@ -232,12 +259,13 @@ export const fetchAnalysisFile = async (analysisId: string, fileName: string): P
     }
 }
 
-export const fetchDataBlob = async (workspaceId: string, sha1: string): Promise<string | undefined> => {
+export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha1: string): Promise<string | undefined> => {
     if (vercelMode) {
         const req: GetDataBlobRequest = {
             type: 'getDataBlob',
             timestamp: Date.now() / 1000,
             workspaceId,
+            analysisId,
             sha1
         }
         const resp = await postPlaygroundRequest(req, {})
@@ -249,7 +277,7 @@ export const fetchDataBlob = async (workspaceId: string, sha1: string): Promise<
     else {
         await sleepMsec(100)
         const db = getDevelopmentDatabase()
-        const dataBlob = db.dataBlobs.find((b: SPDataBlob) => (b.workspaceId === workspaceId && b.sha1 === sha1))
+        const dataBlob = db.dataBlobs.find((b: SPDataBlob) => (b.workspaceId === workspaceId && b.analysisId === analysisId && b.sha1 === sha1))
         if (!dataBlob) return undefined
         return dataBlob.content
     }
@@ -268,7 +296,7 @@ export const setAnalysisFileContent = async (workspaceId: string, analysisId: st
             fileName,
             fileContent
         }
-        const resp = await postPlaygroundRequest(req, {githubAccessToken: auth.githubAccessToken})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'setAnalysisFile') {
             throw Error(`Unexpected response type ${resp.type}. Expected setAnalysisFile.`)
         }
@@ -285,6 +313,7 @@ export const setAnalysisFileContent = async (workspaceId: string, analysisId: st
         if (!db.dataBlobs.find((b: SPDataBlob) => b.sha1 === contentSha1)) {
             db.dataBlobs.push({
                 workspaceId: analysis.workspaceId,
+                analysisId,
                 sha1: contentSha1,
                 size: contentSize,
                 content: fileContent
@@ -346,7 +375,7 @@ export const createAnalysisRun = async (workspaceId: string, analysisId: string,
             datasetFileName: o.datasetFileName,
             optionsFileName: o.optionsFileName
         }
-        const resp = await postPlaygroundRequest(req, {githubAccessToken: auth.githubAccessToken})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'createAnalysisRun') {
             throw Error(`Unexpected response type ${resp.type}. Expected createAnalysisRun.`)
         }
@@ -415,7 +444,7 @@ export const deleteAnalysisRun = async (workspaceId: string, analysisId: string,
             analysisId,
             analysisRunId
         }
-        const resp = await postPlaygroundRequest(req, {githubAccessToken: auth.githubAccessToken})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'deleteAnalysisRun') {
             throw Error(`Unexpected response type ${resp.type}. Expected deleteAnalysisRun.`)
         }
@@ -426,6 +455,33 @@ export const deleteAnalysisRun = async (workspaceId: string, analysisId: string,
         const analysisRun = db.analysisRuns.find((a: SPAnalysisRun) => a.analysisRunId === analysisRunId)
         if (!analysisRun) return
         db.analysisRuns = db.analysisRuns.filter((a: SPAnalysisRun) => a.analysisRunId !== analysisRunId)
+        setDevelopmentDatabase(db)
+    }
+}
+
+export const deleteAnalysis = async (workspaceId: string, analysisId: string, auth: Auth): Promise<void> => {
+    if (vercelMode) {
+        if (!auth.githubAccessToken) {
+            throw Error('Must provide githubAccessToken to deleteAnalysis in production mode')
+        }
+        const req: DeleteAnalysisRequest = {
+            type: 'deleteAnalysis',
+            timestamp: Date.now() / 1000,
+            workspaceId,
+            analysisId
+        }
+        const resp = await postPlaygroundRequest(req, {...auth})
+        if (resp.type !== 'deleteAnalysis') {
+            throw Error(`Unexpected response type ${resp.type}. Expected deleteAnalysis.`)
+        }
+    }
+    else {
+        await sleepMsec(100)
+        const db = getDevelopmentDatabase()
+        db.analyses = db.analyses.filter((a: SPAnalysis) => a.analysisId !== analysisId)
+        db.analysisFiles = db.analysisFiles.filter((a: SPAnalysisFile) => a.analysisId !== analysisId)
+        db.analysisRuns = db.analysisRuns.filter((a: SPAnalysisRun) => a.analysisId !== analysisId)
+        db.dataBlobs = db.dataBlobs.filter((b: SPDataBlob) => b.analysisId !== analysisId)
         setDevelopmentDatabase(db)
     }
 }

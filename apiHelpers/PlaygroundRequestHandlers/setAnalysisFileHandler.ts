@@ -1,6 +1,6 @@
 import crypto from 'crypto';
-import { SetAnalysisFileRequest, SetAnalysisFileResponse } from "../types/PlaygroundRequest";
-import { isSPAnalysis, isSPWorkspace, SPAnalysisFile } from "../types/stan-playground-types";
+import { SetAnalysisFileRequest, SetAnalysisFileResponse } from "../../src/types/PlaygroundRequest";
+import { isSPAnalysis, isSPWorkspace, SPAnalysisFile } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
@@ -52,11 +52,13 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
     const contentSize = request.fileContent.length
     const dataBlob = await dataBlobsCollection.findOne({
         workspaceId,
+        analysisId,
         sha1: contentSha1
     })
     if (!dataBlob) {
         await dataBlobsCollection.insertOne({
             workspaceId,
+            analysisId,
             sha1: contentSha1,
             size: contentSize,
             content: request.fileContent
@@ -86,7 +88,8 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
             fileName: request.fileName
         }, {
             $set: {
-                fileContent: request.fileContent,
+                contentSha1,
+                contentSize,
                 timestampModified: Date.now() / 1000
             }
         })

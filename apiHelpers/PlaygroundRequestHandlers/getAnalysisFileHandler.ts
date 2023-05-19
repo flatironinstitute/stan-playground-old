@@ -1,5 +1,5 @@
-import { GetAnalysisFileRequest, GetAnalysisFileResponse } from "../types/PlaygroundRequest";
-import { isSPAnalysisFile } from "../types/stan-playground-types";
+import { GetAnalysisFileRequest, GetAnalysisFileResponse } from "../../src/types/PlaygroundRequest";
+import { isSPAnalysisFile } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import removeIdField from "../removeIdField";
 
@@ -16,7 +16,7 @@ const getAnalysisFileHandler = async (request: GetAnalysisFileRequest, o: {verif
     }
     if (!isSPAnalysisFile(analysisFile)) {
         console.warn(analysisFile)
-        throw new Error('Invalid analysis file in database')
+        throw new Error('Invalid analysis file in database (2)')
     }
     return {
         type: 'getAnalysisFile',

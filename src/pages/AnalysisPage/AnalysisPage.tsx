@@ -1,10 +1,8 @@
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent } from "react";
 import Splitter from "../../components/Splitter";
-import TabWidget from "../../TabWidget/TabWidget";
-import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
-import AnalysisFileEditor from "./AnalysisFileEditor/AnalysisFileEditor";
-import { SetupAnalysisPage, useAnalysis } from "./AnalysisPageContext";
-import BackButton from "./BackButton";
+import AnalysisLeftPanel from "./AnalysisLeftPanel";
+import AnalysisMainPanel from "./AnalysisMainPanel";
+import { SetupAnalysisPage } from "./AnalysisPageContext";
 
 type Props = {
     width: number
@@ -24,77 +22,10 @@ const WorkspacePage: FunctionComponent<Props> = ({analysisId, width, height}) =>
                 initialPosition={initialPosition}
                 direction='horizontal'
             >
-                <LeftPanel width={0} height={0} />
-                <MainPanel width={0} height={0} />
+                <AnalysisLeftPanel width={0} height={0} />
+                <AnalysisMainPanel width={0} height={0} />
             </Splitter>
         </SetupAnalysisPage>
-    )
-}
-
-type LeftPanelProps = {
-    width: number
-    height: number
-}
-
-const LeftPanel: FunctionComponent<LeftPanelProps> = ({width, height}) => {
-    const {analysisId, openTab} = useAnalysis()
-    const handleOpenFile = useCallback((fileName: string) => {
-        openTab(`file:${fileName}`)
-    }, [openTab])
-    const topHeight = 60
-    return (
-        <div style={{position: 'absolute', width, height}}>
-            <div style={{position: 'absolute', width, height: topHeight}}>
-                <BackButton />
-                <div>Analysis: {analysisId}</div>
-            </div>
-            <div style={{position: 'absolute', width, top: topHeight, height: height - topHeight}}>
-                <AnalysisFileBrowser
-                    onOpenFile={handleOpenFile}
-                />
-            </div>
-        </div>
-    )
-}
-
-const labelFromTabName = (tabName: string) => {
-    if (tabName.startsWith('file:')) {
-        return tabName.slice('file:'.length)
-    }
-    return tabName
-}
-
-
-const MainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
-    const {openTabNames, currentTabName, setCurrentTab, closeTab} = useAnalysis()
-    return (
-        <TabWidget
-            width={width}
-            height={height}
-            tabs={
-                openTabNames.map(tabName => ({
-                    id: tabName,
-                    label: labelFromTabName(tabName),
-                    closeable: true
-                }))
-            }
-            currentTabId={currentTabName}
-            setCurrentTabId={setCurrentTab}
-            onCloseTab={fileName => closeTab(fileName)}
-        >
-            {openTabNames.map(tabName => (
-                tabName.startsWith('file:') ? (
-                    <AnalysisFileEditor
-                        key={tabName}
-                        fileName={tabName.slice('file:'.length)}
-                        width={0}
-                        height={0}
-                    />
-                ) : (
-                    <div key={tabName}>Not implemented</div>
-                )
-            ))}
-        </TabWidget>
     )
 }
 

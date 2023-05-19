@@ -15,8 +15,8 @@ export const SetupHomePage = (props: {children: React.ReactNode}) => {
     const [workspaces, setWorkspaces] = React.useState<SPWorkspace[]>([])
     const [refreshCode, setRefreshCode] = React.useState(0)
 
-    const {accessToken} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
+    const {accessToken, userId} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : undefined), [accessToken, userId])
 
     const createWorkspaceHandler = useCallback(async (workspaceName: string) => {
         if (!auth) {

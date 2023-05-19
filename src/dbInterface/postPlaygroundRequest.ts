@@ -1,11 +1,12 @@
 import { isPlaygroundResponse, PlaygroundRequest, PlaygroundRequestPayload, PlaygroundResponse } from "../types/PlaygroundRequest";
 
-const postPlaygroundRequest = async (req: PlaygroundRequestPayload, o: {githubAccessToken?: string}): Promise<PlaygroundResponse> => {
+const postPlaygroundRequest = async (req: PlaygroundRequestPayload, o: {userId?: string, githubAccessToken?: string}): Promise<PlaygroundResponse> => {
     const rr: PlaygroundRequest = {
         payload: req
     }
-    if (o.githubAccessToken) {
+    if ((o.userId) && (o.githubAccessToken)) {
         rr.githubAccessToken = o.githubAccessToken
+        rr.userId = o.userId
     }
     const resp = await fetch('/api/playground', {
         method: 'POST',

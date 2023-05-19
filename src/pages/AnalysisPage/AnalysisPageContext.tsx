@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createAnalysisRun, deleteAnalysisRun, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns } from '../../dbInterface/dbInterface';
+import { createAnalysisRun, deleteAnalysis, deleteAnalysisRun, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun } from '../../types/stan-playground-types';
 
@@ -81,6 +81,7 @@ type AnalysisPageContextType = {
     refreshRuns: () => void
     createAnalysisRun: (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => void
     deleteAnalysisRun: (analysisRunId: string) => void
+    deleteAnalysis: () => Promise<void>
 }
 
 const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
@@ -95,7 +96,8 @@ const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
     refreshFiles: () => {},
     refreshRuns: () => {},
     createAnalysisRun: () => {},
-    deleteAnalysisRun: () => {}
+    deleteAnalysisRun: () => {},
+    deleteAnalysis: async () => {}
 })
 
 export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({children, analysisId}) => {
@@ -134,8 +136,8 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         })()
     }, [refreshRunsCode, analysisId])
 
-    const {accessToken} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
+    const {accessToken, userId} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : undefined), [accessToken, userId])
 
     const createAnalysisRunHandler = useCallback(async (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => {
         if (!analysis) return
@@ -157,6 +159,15 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         refreshRuns()
     }, [analysis, analysisId, refreshRuns, auth])
 
+    const deleteAnalysisHandler = useMemo(() => (async () => {
+        if (!analysis) return
+        if (!auth) {
+            console.warn('Not logged in.')
+            return
+        }
+        await deleteAnalysis(analysis.workspaceId, analysisId, auth)
+    }), [analysis, analysisId, auth])
+
     const value = React.useMemo(() => ({
         analysisId,
         workspaceId: analysis?.workspaceId ?? '',
@@ -172,8 +183,9 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         refreshFiles,
         refreshRuns,
         createAnalysisRun: createAnalysisRunHandler,
-        deleteAnalysisRun: deleteAnalysisRunHandler
-    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler])
+        deleteAnalysisRun: deleteAnalysisRunHandler,
+        deleteAnalysis: deleteAnalysisHandler
+    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler])
 
     return (
         <AnalysisPageContext.Provider value={value}>

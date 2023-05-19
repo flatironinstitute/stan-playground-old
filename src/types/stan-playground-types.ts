@@ -127,6 +127,7 @@ export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
 
 export type SPDataBlob = {
     workspaceId: string
+    analysisId: string
     sha1: string
     size: number
     content: string
@@ -135,6 +136,7 @@ export type SPDataBlob = {
 export const isSPDataBlob = (x: any): x is SPDataBlob => {
     return validateObject(x, {
         workspaceId: isString,
+        analysisId: isString,
         sha1: isString,
         size: isNumber,
         content: isString

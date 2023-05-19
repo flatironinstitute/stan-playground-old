@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useEffect, useMemo } from 'react';
-import { createAnalysis, fetchAnalyses } from '../../dbInterface/dbInterface';
+import { createAnalysis, deleteWorkspace, fetchAnalyses } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPAnalysis } from '../../types/stan-playground-types';
 
@@ -11,16 +11,22 @@ type WorkspacePageContextType = {
     workspaceId: string
     analyses: SPAnalysis[]
     createAnalysis: () => Promise<string>
+    deleteWorkspace: () => Promise<void>
 }
 
-const WorkspacePageContext = React.createContext<WorkspacePageContextType>({workspaceId: '', analyses: [], createAnalysis: async () => {return ''}})
+const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
+    workspaceId: '',
+    analyses: [],
+    createAnalysis: async () => {return ''},
+    deleteWorkspace: async () => {}
+})
 
 export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = ({children, workspaceId}) => {
     const [analyses, setAnalyses] = React.useState<SPAnalysis[]>([])
     const [refreshCode, setRefreshCode] = React.useState(0)
 
-    const {accessToken} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken} : undefined), [accessToken])
+    const {accessToken, userId} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : undefined), [accessToken, userId])
 
     const createAnalysisHandler = useMemo(() => (async (): Promise<string> => {
         if (!auth) {
@@ -29,6 +35,13 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         const analysisId = await createAnalysis(workspaceId, auth)
         setRefreshCode(rc => rc + 1)
         return analysisId
+    }), [workspaceId, auth])
+
+    const deleteWorkspaceHandler = useMemo(() => (async () => {
+        if (!auth) {
+            throw Error('Not logged in')
+        }
+        await deleteWorkspace(workspaceId, auth)
     }), [workspaceId, auth])
 
     useEffect(() => {
@@ -42,8 +55,9 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const value = React.useMemo(() => ({
         workspaceId,
         analyses,
-        createAnalysis: createAnalysisHandler
-    }), [analyses, createAnalysisHandler, workspaceId])
+        createAnalysis: createAnalysisHandler,
+        deleteWorkspace: deleteWorkspaceHandler
+    }), [analyses, createAnalysisHandler, deleteWorkspaceHandler, workspaceId])
 
     return (
         <WorkspacePageContext.Provider value={value}>
@@ -57,6 +71,7 @@ export const useWorkspace = () => {
     return {
         workspaceId: context.workspaceId,
         analyses: context.analyses,
-        createAnalysis: context.createAnalysis
+        createAnalysis: context.createAnalysis,
+        deleteWorkspace: context.deleteWorkspace
     }
 }

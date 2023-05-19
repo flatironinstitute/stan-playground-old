@@ -139,6 +139,32 @@ export const isCreateAnalysisResponse = (x: any): x is CreateAnalysisResponse =>
     })
 }
 
+// deleteWorkspace
+
+export type DeleteWorkspaceRequest = {
+    type: 'deleteWorkspace'
+    timestamp: number
+    workspaceId: string
+}
+
+export const isDeleteWorkspaceRequest = (x: any): x is DeleteWorkspaceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteWorkspace'),
+        timestamp: isNumber,
+        workspaceId: isString
+    })
+}
+
+export type DeleteWorkspaceResponse = {
+    type: 'deleteWorkspace'
+}
+
+export const isDeleteWorkspaceResponse = (x: any): x is DeleteWorkspaceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteWorkspace')
+    })
+}
+
 // getAnalysisFiles
 
 export type GetAnalysisFilesRequest = {
@@ -263,6 +289,7 @@ export type GetDataBlobRequest = {
     type: 'getDataBlob'
     timestamp: number
     workspaceId: string
+    analysisId: string
     sha1: string
 }
 
@@ -271,6 +298,7 @@ export const isGetDataBlobRequest = (x: any): x is GetDataBlobRequest => {
         type: isEqualTo('getDataBlob'),
         timestamp: isNumber,
         workspaceId: isString,
+        analysisId: isString,
         sha1: isString
     })
 }
@@ -353,6 +381,34 @@ export const isDeleteAnalysisRunResponse = (x: any): x is DeleteAnalysisRunRespo
     })
 }
 
+// deletaAnalysis
+
+export type DeleteAnalysisRequest = {
+    type: 'deleteAnalysis'
+    timestamp: number
+    workspaceId: string
+    analysisId: string
+}
+
+export const isDeleteAnalysisRequest = (x: any): x is DeleteAnalysisRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteAnalysis'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        analysisId: isString
+    })
+}
+
+export type DeleteAnalysisResponse = {
+    type: 'deleteAnalysis'
+}
+
+export const isDeleteAnalysisResponse = (x: any): x is DeleteAnalysisResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteAnalysis')
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
@@ -361,13 +417,15 @@ export type PlaygroundRequestPayload =
     GetAnalysesRequest |
     GetAnalysisRequest |
     CreateAnalysisRequest |
+    DeleteWorkspaceRequest |
     GetAnalysisFilesRequest |
     SetAnalysisFileRequest |
     GetAnalysisFileRequest |
     GetAnalysisRunsRequest |
     GetDataBlobRequest |
     CreateAnalysisRunRequest |
-    DeleteAnalysisRunRequest
+    DeleteAnalysisRunRequest |
+    DeleteAnalysisRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -376,13 +434,15 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetAnalysesRequest,
         isGetAnalysisRequest,
         isCreateAnalysisRequest,
+        isDeleteWorkspaceRequest,
         isGetAnalysisFilesRequest,
         isSetAnalysisFileRequest,
         isGetAnalysisFileRequest,
         isGetAnalysisRunsRequest,
         isGetDataBlobRequest,
         isCreateAnalysisRunRequest,
-        isDeleteAnalysisRunRequest
+        isDeleteAnalysisRunRequest,
+        isDeleteAnalysisRequest
     ])(x)
 }
 
@@ -392,7 +452,7 @@ export type PlaygroundRequest = {
     payload: PlaygroundRequestPayload
     fromClientId?: string
     signature?: string
-    githubUserId?: string
+    userId?: string
     githubAccessToken?: string
 }
 
@@ -401,7 +461,7 @@ export const isPlaygroundRequest = (x: any): x is PlaygroundRequest => {
         payload: isPlaygroundRequestPayload,
         fromClientId: optional(isString),
         signature: optional(isString),
-        githubUserId: optional(isString),
+        userId: optional(isString),
         githubAccessToken: optional(isString)
     })
 }
@@ -414,13 +474,15 @@ export type PlaygroundResponse =
     GetAnalysesResponse |
     GetAnalysisResponse |
     CreateAnalysisResponse |
+    DeleteWorkspaceResponse |
     GetAnalysisFilesResponse |
     SetAnalysisFileResponse |
     GetAnalysisFileResponse |
     GetAnalysisRunsResponse |
     GetDataBlobResponse |
     CreateAnalysisRunResponse |
-    DeleteAnalysisRunResponse
+    DeleteAnalysisRunResponse |
+    DeleteAnalysisResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -429,12 +491,14 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetAnalysesResponse,
         isGetAnalysisResponse,
         isCreateAnalysisResponse,
+        isDeleteWorkspaceResponse,
         isGetAnalysisFilesResponse,
         isSetAnalysisFileResponse,
         isGetAnalysisFileResponse,
         isGetAnalysisRunsResponse,
         isGetDataBlobResponse,
         isCreateAnalysisRunResponse,
-        isDeleteAnalysisRunResponse
+        isDeleteAnalysisRunResponse,
+        isDeleteAnalysisResponse
     ])(x)
 }
