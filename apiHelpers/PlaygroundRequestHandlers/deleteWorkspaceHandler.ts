@@ -1,5 +1,6 @@
 import { DeleteWorkspaceRequest, DeleteWorkspaceResponse } from "../../src/types/PlaygroundRequest";
 import { getMongoClient } from "../getMongoClient";
+import { userCanDeleteWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteWorkspaceResponse> => {
@@ -16,9 +17,8 @@ const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verif
     if (!workspace) {
         throw new Error('Workspace not found')
     }
-
-    if (workspace.ownerId !== verifiedUserId) {
-        throw new Error('Only the owner of a workspace can delete the workspace')
+    if (!userCanDeleteWorkspace(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to delete a workspace')
     }
 
     const analysesCollection = client.db('stan-playground').collection('analyses')

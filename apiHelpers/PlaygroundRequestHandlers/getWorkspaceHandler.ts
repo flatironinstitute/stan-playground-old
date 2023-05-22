@@ -1,6 +1,7 @@
 import { GetWorkspaceRequest, GetWorkspaceResponse } from "../../src/types/PlaygroundRequest";
 import { isSPWorkspace } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import { userCanReadWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const getWorkspaceHandler = async (request: GetWorkspaceRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<GetWorkspaceResponse> => {
@@ -16,6 +17,11 @@ const getWorkspaceHandler = async (request: GetWorkspaceRequest, o: {verifiedCli
         console.warn(workspace)
         throw new Error('Invalid workspace in database (3)')
     }
+
+    if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
+        throw new Error('User does not have permission to read this workspace')
+    }
+
     return {
         type: 'getWorkspace',
         workspace

@@ -1,6 +1,6 @@
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../types/stan-playground-types";
 import sha1 from 'crypto-js/sha1'
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, SetAnalysisFileRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, SetAnalysisFileRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 const vercelMode = import.meta.env.VITE_GITHUB_CLIENT_ID !== undefined
@@ -122,9 +122,9 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
             ownerId: 'test-user',
             name: workspaceName,
             description: '',
-            publiclyViewable: true,
-            publiclyEditable: false,
             users: [],
+            anonymousUserRole: 'viewer',
+            loggedInUserRole: 'viewer',
             timestampCreated: Date.now() / 1000,
             timestampModified: Date.now() / 1000
         })
@@ -224,6 +224,47 @@ export const setWorkspaceUsers = async (workspaceId: string, users: {userId: str
         setDevelopmentDatabase(db)
     }
 }
+
+export const setWorkspaceProperty = async (workspaceId: string, property: 'anonymousUserRole' | 'loggedInUserRole', value: any, auth: Auth): Promise<void> => {
+    if (vercelMode) {
+        if (!auth.githubAccessToken) {
+            throw Error('Must provide githubAccessToken to setWorkspaceProperty in production mode')
+        }
+        const req: SetWorkspacePropertyRequest = {
+            type: 'setWorkspaceProperty',
+            timestamp: Date.now() / 1000,
+            workspaceId,
+            property,
+            value
+        }
+        const resp = await postPlaygroundRequest(req, {...auth})
+        if (resp.type !== 'setWorkspaceProperty') {
+            throw Error(`Unexpected response type ${resp.type}. Expected setWorkspaceProperty.`)
+        }
+    }
+    else {
+        await sleepMsec(100)
+        const db = getDevelopmentDatabase()
+        const workspace = db.workspaces.find((w: SPWorkspace) => w.workspaceId === workspaceId)
+        if (!workspace) {
+            throw new Error('Workspace not found')
+        }
+        if (workspace.ownerId !== 'test-user') {
+            throw new Error('Only the owner of a workspace can set the workspace properties')
+        }
+        if (property === 'anonymousUserRole') {
+            workspace.anonymousUserRole = value
+        }
+        else if (property === 'loggedInUserRole') {
+            workspace.loggedInUserRole = value
+        }
+        else {
+            throw new Error('Invalid property')
+        }
+        setDevelopmentDatabase(db)
+    }
+}
+
 
 export const deleteWorkspace = async (workspaceId: string, auth: Auth): Promise<void> => {
     if (vercelMode) {

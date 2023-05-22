@@ -2,12 +2,16 @@ import { CreateWorkspaceRequest, CreateWorkspaceResponse } from "../../src/types
 import { SPWorkspace } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
+import { userCanCreateWorkspace } from "../permissions";
 
 const createWorkspaceHandler = async (request: CreateWorkspaceRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<CreateWorkspaceResponse> => {
     const {verifiedUserId} = o
 
+    if (!userCanCreateWorkspace(verifiedUserId)) {
+        throw new Error('User does not have permission to create a workspace')
+    }
     if (!verifiedUserId) {
-        throw new Error('Must be logged in to create a workspace')
+        throw Error('Unexpected: no user ID')
     }
 
     const workspaceId = createRandomId(8)
@@ -17,9 +21,9 @@ const createWorkspaceHandler = async (request: CreateWorkspaceRequest, o: {verif
         ownerId: verifiedUserId,
         name: request.name,
         description: '',
-        publiclyViewable: true,
-        publiclyEditable: false,
         users: [],
+        anonymousUserRole: 'viewer',
+        loggedInUserRole: 'viewer',
         timestampCreated: Date.now() / 1000,
         timestampModified: Date.now() / 1000
     }

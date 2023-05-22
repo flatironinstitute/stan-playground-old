@@ -9,12 +9,12 @@ export type SPWorkspace = {
     ownerId: string
     name: string
     description: string
-    publiclyViewable: boolean
-    publiclyEditable: boolean
     users: {
         userId: string
         role: 'admin' | 'editor' | 'viewer'
     }[]
+    anonymousUserRole: 'viewer' | 'editor' | 'none'
+    loggedInUserRole: 'viewer' | 'editor' | 'none'
     timestampCreated: number
     timestampModified: number
 }
@@ -25,12 +25,12 @@ export const isSPWorkspace = (x: any): x is SPWorkspace => {
         ownerId: isString,
         name: isString,
         description: isString,
-        publiclyViewable: isBoolean,
-        publiclyEditable: isBoolean,
         users: isArrayOf(y => (validateObject(y, {
             userId: isString,
             role: isOneOf([isEqualTo('admin'), isEqualTo('editor'), isEqualTo('viewer')])
         }))),
+        anonymousUserRole: isOneOf([isEqualTo('viewer'), isEqualTo('editor'), isEqualTo('none')]),
+        loggedInUserRole: isOneOf([isEqualTo('viewer'), isEqualTo('editor'), isEqualTo('none')]),
         timestampCreated: isNumber,
         timestampModified: isNumber
     })

@@ -12,11 +12,8 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedC
         if (!isSPWorkspace(workspace)) {
             console.warn(workspace)
 
-            // // during development only, one-off correction:
-            // workspace.publiclyViewable = true
-            // workspace.publiclyEditable = false
-            // workspace.users = []
-            // await workspacesCollection.updateOne({workspaceId: workspace.workspaceId}, {$set: workspace})
+            // // during development only, one-off deletion
+            // await workspacesCollection.deleteOne({workspaceId: workspace.workspaceId})
 
             throw new Error('Invalid workspace in database (1)')
         }

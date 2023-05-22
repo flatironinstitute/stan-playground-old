@@ -14,9 +14,10 @@ import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataB
 import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
 import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
 import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
+import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetDataBlobRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isSetAnalysisFileRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetDataBlobRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isSetAnalysisFileRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -113,6 +114,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isSetWorkspaceUsersRequest(payload)) {
             return await setWorkspaceUsersHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isSetWorkspacePropertyRequest(payload)) {
+            return await setWorkspacePropertyHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isGetDataBlobRequest(payload)) {
             return await getDataBlobHandler(payload, {verifiedClientId, verifiedUserId})

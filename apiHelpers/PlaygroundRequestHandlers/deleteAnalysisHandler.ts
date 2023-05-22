@@ -1,13 +1,10 @@
 import { DeleteAnalysisRequest, DeleteAnalysisResponse } from "../../src/types/PlaygroundRequest";
 import { getMongoClient } from "../getMongoClient";
+import { userCanDeleteAnalysis } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const deleteAnalysisHandler = async (request: DeleteAnalysisRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteAnalysisResponse> => {
     const {verifiedUserId} = o
-
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to delete an analysis')
-    }
 
     const client = await getMongoClient()
 
@@ -16,9 +13,8 @@ const deleteAnalysisHandler = async (request: DeleteAnalysisRequest, o: {verifie
     if (!workspace) {
         throw new Error('Workspace not found')
     }
-
-    if (workspace.ownerId !== verifiedUserId) {
-        throw new Error('Only the owner of a workspace can delete an analysis in the workspace')
+    if (!userCanDeleteAnalysis(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to delete an analysis in this workspace')
     }
 
     const analysesCollection = client.db('stan-playground').collection('analyses')

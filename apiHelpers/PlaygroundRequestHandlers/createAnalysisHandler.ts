@@ -2,15 +2,12 @@ import { CreateAnalysisRequest, CreateAnalysisResponse, SetAnalysisFileRequest }
 import { isSPWorkspace, SPAnalysis } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
+import { userCanCreateAnalysis } from "../permissions";
 import removeIdField from "../removeIdField";
 import setAnalysisFileHandler from "./setAnalysisFileHandler";
 
 const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<CreateAnalysisResponse> => {
     const {verifiedUserId} = o
-
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to create an analysis')
-    }
 
     const analysisId = createRandomId(8)
 
@@ -27,6 +24,11 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
         console.warn(workspace)
         throw new Error('Invalid workspace in database (**)')
     }
+
+    if (!userCanCreateAnalysis(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to create an analysis in this workspace')
+    }
+
     if (workspace.ownerId !== verifiedUserId) {
         throw new Error('Only the owner of a workspace can create an analysis in the workspace')
     }

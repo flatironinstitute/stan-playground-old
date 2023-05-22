@@ -1,5 +1,6 @@
 import { DeleteAnalysisRunRequest, DeleteAnalysisRunResponse } from "../../src/types/PlaygroundRequest";
 import { getMongoClient } from "../getMongoClient";
+import { userCanDeleteAnalysis, userCanDeleteAnalysisRun } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteAnalysisRunResponse> => {
@@ -11,19 +12,23 @@ const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {v
 
     const client = await getMongoClient()
 
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId: request.workspaceId}))
+    if (!workspace) {
+        throw new Error('Workspace not found')
+    }
+    if (!userCanDeleteAnalysisRun(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to delete an analysis run in this workspace')
+    }
+
     const analysesCollection = client.db('stan-playground').collection('analyses')
     const analysis = removeIdField(await analysesCollection.findOne({analysisId: request.analysisId}))
     if (!analysis) {
         throw new Error('Analysis not found')
     }
+    // important to check this
     if (analysis.workspaceId !== request.workspaceId) {
         throw new Error('Incorrect workspace ID')
-    }
-
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId: analysis.workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
     }
 
     if (workspace.ownerId !== verifiedUserId) {

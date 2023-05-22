@@ -227,6 +227,36 @@ export const isSetWorkspaceUsersResponse = (x: any): x is SetWorkspaceUsersRespo
     })
 }
 
+// setWorkspaceProperty
+
+export type SetWorkspacePropertyRequest = {
+    type: 'setWorkspaceProperty'
+    timestamp: number
+    workspaceId: string
+    property: 'anonymousUserRole' | 'loggedInUserRole'
+    value: any
+}
+
+export const isSetWorkspacePropertyRequest = (x: any): x is SetWorkspacePropertyRequest => {
+    return validateObject(x, {
+        type: isEqualTo('setWorkspaceProperty'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        property: isOneOf([isEqualTo('anonymousUserRole'), isEqualTo('loggedInUserRole')]),
+        value: () => (true)
+    })
+}
+
+export type SetWorkspacePropertyResponse = {
+    type: 'setWorkspaceProperty'
+}
+
+export const isSetWorkspacePropertyResponse = (x: any): x is SetWorkspacePropertyResponse => {
+    return validateObject(x, {
+        type: isEqualTo('setWorkspaceProperty')
+    })
+}
+
 // getAnalysisFiles
 
 export type GetAnalysisFilesRequest = {
@@ -481,6 +511,7 @@ export type PlaygroundRequestPayload =
     GetAnalysisRequest |
     CreateAnalysisRequest |
     SetWorkspaceUsersRequest |
+    SetWorkspacePropertyRequest |
     DeleteWorkspaceRequest |
     GetAnalysisFilesRequest |
     SetAnalysisFileRequest |
@@ -500,6 +531,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetAnalysisRequest,
         isCreateAnalysisRequest,
         isSetWorkspaceUsersRequest,
+        isSetWorkspacePropertyRequest,
         isDeleteWorkspaceRequest,
         isGetAnalysisFilesRequest,
         isSetAnalysisFileRequest,
@@ -542,6 +574,7 @@ export type PlaygroundResponse =
     GetAnalysisResponse |
     CreateAnalysisResponse |
     SetWorkspaceUsersResponse |
+    SetWorkspacePropertyResponse |
     DeleteWorkspaceResponse |
     GetAnalysisFilesResponse |
     SetAnalysisFileResponse |
@@ -561,6 +594,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetAnalysisResponse,
         isCreateAnalysisResponse,
         isSetWorkspaceUsersResponse,
+        isSetWorkspacePropertyResponse,
         isDeleteWorkspaceResponse,
         isGetAnalysisFilesResponse,
         isSetAnalysisFileResponse,

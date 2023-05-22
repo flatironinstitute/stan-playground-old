@@ -1,13 +1,14 @@
 import { SetWorkspaceUsersRequest, SetWorkspaceUsersResponse } from "../../src/types/PlaygroundRequest";
 import { isSPWorkspace } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import { userCanSetWorkspaceUsers } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const setWorkspaceUsersHandler = async (request: SetWorkspaceUsersRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetWorkspaceUsersResponse> => {
     const {verifiedUserId} = o
 
     if (!verifiedUserId) {
-        throw new Error('Must be logged in to create an analysis')
+        throw new Error('Must be logged in to set workspace users')
     }
 
     const workspaceId = request.workspaceId
@@ -23,8 +24,8 @@ const setWorkspaceUsersHandler = async (request: SetWorkspaceUsersRequest, o: {v
         console.warn(workspace)
         throw new Error('Invalid workspace in database (*)')
     }
-    if (workspace.ownerId !== verifiedUserId) {
-        throw new Error('Only the owner of a workspace can set the users of a workspace')
+    if (!userCanSetWorkspaceUsers(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to set workspace users')
     }
 
     workspace.users = request.users

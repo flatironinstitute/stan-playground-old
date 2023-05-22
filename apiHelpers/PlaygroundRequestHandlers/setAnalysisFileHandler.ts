@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { SetAnalysisFileRequest, SetAnalysisFileResponse } from "../../src/types/PlaygroundRequest";
 import { isSPAnalysis, isSPWorkspace, SPAnalysisFile } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import { userCanSetAnalysisFile } from '../permissions';
 import removeIdField from "../removeIdField";
 
 const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetAnalysisFileResponse> => {
@@ -43,8 +44,8 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
         console.warn(workspace)
         throw new Error('Invalid workspace in database (2)')
     }
-    if (workspace.ownerId !== verifiedUserId) {
-        throw new Error('Must be the owner of the workspace to set an analysis file')
+    if (!userCanSetAnalysisFile(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to set an analysis file in this workspace')
     }
 
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
