@@ -1,9 +1,9 @@
 import { CreateAnalysisRequest, CreateAnalysisResponse, SetAnalysisFileRequest } from "../../src/types/PlaygroundRequest";
-import { isSPWorkspace, SPAnalysis } from "../../src/types/stan-playground-types";
+import { SPAnalysis } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace from "../getWorkspace";
 import { userCanCreateAnalysis } from "../permissions";
-import removeIdField from "../removeIdField";
 import setAnalysisFileHandler from "./setAnalysisFileHandler";
 
 const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<CreateAnalysisResponse> => {
@@ -15,15 +15,7 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
 
     const client = await getMongoClient()
 
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
-    if (!isSPWorkspace(workspace)) {
-        console.warn(workspace)
-        throw new Error('Invalid workspace in database (**)')
-    }
+    const workspace = await getWorkspace(workspaceId, {useCache: false})
 
     if (!userCanCreateAnalysis(workspace, verifiedUserId)) {
         throw new Error('User does not have permission to create an analysis in this workspace')

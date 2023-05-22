@@ -1,6 +1,8 @@
 import { GetAnalysisFilesRequest, GetAnalysisFilesResponse } from "../../src/types/PlaygroundRequest";
-import { isSPAnalysis, isSPAnalysisFile, isSPWorkspace } from "../../src/types/stan-playground-types";
+import { isSPAnalysisFile } from "../../src/types/stan-playground-types";
+import getAnalysis from "../getAnalysis";
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace from "../getWorkspace";
 import { userCanReadWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
@@ -8,26 +10,10 @@ const getAnalysisFilesHandler = async (request: GetAnalysisFilesRequest, o: {ver
     const client = await getMongoClient()
     const analysisFilesCollection = client.db('stan-playground').collection('analysisFiles')
 
-    const analysesCollection = client.db('stan-playground').collection('analyses')
-    const analysis = removeIdField(await analysesCollection.findOne({analysisId: request.analysisId}))
-    if (!analysis) {
-        throw new Error('Analysis not found')
-    }
-    if (!isSPAnalysis(analysis)) {
-        console.warn(analysis)
-        throw new Error('Invalid analysis in database')
-    }
+    const analysis = await getAnalysis(request.analysisId, {useCache: true})
     
     const workspaceId = analysis.workspaceId
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
-    if (!isSPWorkspace(workspace)) {
-        console.warn(workspace)
-        throw new Error('Invalid workspace in database')
-    }
+    const workspace = await getWorkspace(workspaceId, {useCache: true})
     if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
         throw new Error('User does not have permission to read this workspace')
     }

@@ -1,8 +1,7 @@
 import { SetWorkspacePropertyRequest, SetWorkspacePropertyResponse } from "../../src/types/PlaygroundRequest";
-import { isSPWorkspace } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace, { invalidateWorkspaceCache } from "../getWorkspace";
 import { userCanSetWorkspaceProperty } from "../permissions";
-import removeIdField from "../removeIdField";
 
 const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetWorkspacePropertyResponse> => {
     const {verifiedUserId} = o
@@ -15,17 +14,9 @@ const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest,
 
     const client = await getMongoClient()
 
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
-    if (!isSPWorkspace(workspace)) {
-        console.warn(workspace)
-        throw new Error('Invalid workspace in database (***)')
-    }
-    if (userCanSetWorkspaceProperty(workspace, verifiedUserId)) {
-        throw new Error('User does not have permission to set workspace properties')
+    const workspace = await getWorkspace(request.workspaceId, {useCache: false})
+    if (!userCanSetWorkspaceProperty(workspace, verifiedUserId)) {
+        throw new Error(`User ${verifiedUserId} does not have permission to set workspace properties (owner: ${workspace.ownerId})`)
     }
 
     if (request.property === 'anonymousUserRole') {
@@ -38,7 +29,11 @@ const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest,
         throw new Error('Invalid property')
     }
 
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+
     await workspacesCollection.updateOne({workspaceId}, {$set: workspace})
+
+    invalidateWorkspaceCache(workspaceId)
 
     return {
         type: 'setWorkspaceProperty'

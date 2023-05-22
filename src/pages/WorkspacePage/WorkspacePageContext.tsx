@@ -34,7 +34,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const [workspaceRefreshCode, setWorkspaceRefreshCode] = React.useState(0)
 
     const {accessToken, userId} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : undefined), [accessToken, userId])
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
     const createAnalysisHandler = useMemo(() => (async (): Promise<string> => {
         if (!auth) {
@@ -71,18 +71,20 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     useEffect(() => {
         (async () => {
             setAnalyses([])
-            const analyses = await fetchAnalyses(workspaceId)
+            if (!workspaceId) return
+            const analyses = await fetchAnalyses(workspaceId, auth)
             setAnalyses(analyses)
         })()
-    }, [analysesRefreshCode, workspaceId])
+    }, [analysesRefreshCode, workspaceId, auth])
 
     useEffect(() => {
         (async () => {
             setWorkspace(undefined)
-            const workspace = await fetchWorkspace(workspaceId)
+            if (!workspaceId) return
+            const workspace = await fetchWorkspace(workspaceId, auth)
             setWorkspace(workspace)
         })()
-    }, [workspaceId, workspaceRefreshCode])
+    }, [workspaceId, workspaceRefreshCode, auth])
 
     const value = React.useMemo(() => ({
         workspaceId,

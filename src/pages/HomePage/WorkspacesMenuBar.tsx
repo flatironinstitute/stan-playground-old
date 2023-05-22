@@ -1,6 +1,7 @@
 import { FunctionComponent, useCallback } from "react";
 import Hyperlink from "../../components/Hyperlink";
 import { prompt } from "../../confirm_prompt_alert";
+import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import { useHome } from "./HomePageContext";
 
 type Props = {
@@ -18,10 +19,18 @@ const WorkspacesMenuBar: FunctionComponent<Props> = () => {
             }
         })()
     }, [createWorkspace])
+
+    const {userId} = useGithubAuth()
     
     return (
         <div>
-            <Hyperlink onClick={handleCreateWorkspace}>Add Workspace</Hyperlink>
+            {
+                userId ? (
+                    <Hyperlink onClick={handleCreateWorkspace}>Add Workspace</Hyperlink>
+                ) : (
+                    <span style={{color: '#aaf', cursor: 'default'}}>Login to create your own workspace</span>
+                )
+            }
         </div>
     )
 }

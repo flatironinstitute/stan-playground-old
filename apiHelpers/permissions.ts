@@ -54,18 +54,20 @@ export const userCanDeleteWorkspace = (workspace: SPWorkspace, userId: string | 
 }
 
 export const userCanReadWorkspace = (workspace: SPWorkspace, userId: string | undefined): boolean => {
-    if (workspace.anonymousUserRole === 'viewer') {
-        return true
-    }
     if (userId) {
         if (workspace.ownerId === userId) {
+            return true
+        }
+        if (workspace.loggedInUserRole === 'editor' || workspace.loggedInUserRole === 'viewer') {
             return true
         }
         const user = workspace.users.find(x => x.userId === userId)
         if (user && (user.role === 'admin' || user.role === 'editor' || user.role === 'viewer')) {
             return true
         }
-        if (user && (workspace.loggedInUserRole === 'editor' || workspace.loggedInUserRole === 'viewer')) {
+    }
+    else {
+        if ((workspace.anonymousUserRole === 'viewer') || (workspace.anonymousUserRole === 'editor')) {
             return true
         }
     }
@@ -100,6 +102,27 @@ export const userCanSetWorkspaceUsers = (workspace: SPWorkspace, userId: string 
     const user = workspace.users.find(x => x.userId === userId)
     if (user && user.role === 'admin') {
         return true
+    }
+    return false
+}
+
+export const userCanSetAnalysisProperty = (workspace: SPWorkspace, userId: string | undefined, property: string): boolean => {
+    if (workspace.ownerId === userId) {
+        return true
+    }
+    if (userId) {
+        const user = workspace.users.find(x => x.userId === userId)
+        if (user && (user.role === 'admin' || user.role === 'editor')) {
+            return true
+        }
+        if (user && (workspace.loggedInUserRole === 'editor')) {
+            return true
+        }
+    }
+    else {
+        if (workspace.anonymousUserRole === 'editor') {
+            return true
+        }
     }
     return false
 }

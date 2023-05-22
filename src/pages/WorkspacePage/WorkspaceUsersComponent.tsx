@@ -99,8 +99,18 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
                 </tbody>
             </table>
             <hr />
-            <AnonymousUsersComponent role={workspace?.anonymousUserRole} setRole={setAnonymousUserRoleHandler} />
-            <LoggedInUsersComponent role={workspace?.loggedInUserRole} setRole={setLoggedInUserRoleHandler} />
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Anonymous users:</td>
+                        <td><AnonymousUsersComponent role={workspace?.anonymousUserRole} setRole={setAnonymousUserRoleHandler} /></td>
+                    </tr>
+                    <tr>
+                        <td>Logged-in users:</td>
+                        <td><LoggedInUsersComponent role={workspace?.loggedInUserRole} setRole={setLoggedInUserRoleHandler} /></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     )
 }

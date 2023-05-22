@@ -9,12 +9,23 @@ type Props = {
 }
 
 const WorkspaceSettingsWindow: FunctionComponent<Props> = () => {
-    const {workspaceId} = useWorkspace()
+    const {workspaceId, workspace} = useWorkspace()
 
     return (
         <div>
-            <h3>Workspace Settings</h3>
-            <div>Workspace ID: {workspaceId}</div>
+            <h3>Workspace Settings for {workspace?.name}</h3>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>ID:</td>
+                        <td>{workspaceId}</td>
+                    </tr>
+                    <tr>
+                        <td>Owner:</td>
+                        <td>{workspace?.ownerId}</td>
+                    </tr>
+                </tbody>
+            </table>
             <hr />
             <WorkspaceUsersComponent />
             <hr />

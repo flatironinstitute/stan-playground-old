@@ -1,8 +1,7 @@
 import { SetWorkspaceUsersRequest, SetWorkspaceUsersResponse } from "../../src/types/PlaygroundRequest";
-import { isSPWorkspace } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace, { invalidateWorkspaceCache } from "../getWorkspace";
 import { userCanSetWorkspaceUsers } from "../permissions";
-import removeIdField from "../removeIdField";
 
 const setWorkspaceUsersHandler = async (request: SetWorkspaceUsersRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetWorkspaceUsersResponse> => {
     const {verifiedUserId} = o
@@ -15,22 +14,18 @@ const setWorkspaceUsersHandler = async (request: SetWorkspaceUsersRequest, o: {v
 
     const client = await getMongoClient()
 
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
-    if (!isSPWorkspace(workspace)) {
-        console.warn(workspace)
-        throw new Error('Invalid workspace in database (*)')
-    }
+    const workspace = await getWorkspace(workspaceId, {useCache: false})
     if (!userCanSetWorkspaceUsers(workspace, verifiedUserId)) {
         throw new Error('User does not have permission to set workspace users')
     }
 
     workspace.users = request.users
 
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+
     await workspacesCollection.updateOne({workspaceId}, {$set: workspace})
+
+    invalidateWorkspaceCache(workspaceId)
 
     return {
         type: 'setWorkspaceUsers'

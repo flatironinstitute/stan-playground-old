@@ -14,10 +14,11 @@ import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataB
 import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
 import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
 import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
+import setAnalysisPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisPropertyHandler'
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetDataBlobRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isSetAnalysisFileRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetDataBlobRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isSetAnalysisFileRequest, isSetAnalysisPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -123,6 +124,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isDeleteAnalysisRequest(payload)) {
             return await deleteAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isSetAnalysisPropertyRequest(payload)) {
+            return await setAnalysisPropertyHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else {
             throw Error(`Unexpected request type: ${(payload as any).type}`)

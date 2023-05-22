@@ -1,6 +1,7 @@
 import { GetAnalysesRequest, GetAnalysesResponse } from "../../src/types/PlaygroundRequest";
-import { isSPAnalysis, isSPWorkspace } from "../../src/types/stan-playground-types";
+import { isSPAnalysis } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace from "../getWorkspace";
 import { userCanReadWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
@@ -8,15 +9,7 @@ const getAnalysesHandler = async (request: GetAnalysesRequest, o: {verifiedClien
     const client = await getMongoClient()
     const analysesCollection = client.db('stan-playground').collection('analyses')
 
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId: request.workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
-    if (!isSPWorkspace(workspace)) {
-        console.warn(workspace)
-        throw new Error('Invalid workspace in database')
-    }
+    const workspace = await getWorkspace(request.workspaceId, {useCache: true})
     if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
         throw new Error('User does not have permission to read this workspace')
     }

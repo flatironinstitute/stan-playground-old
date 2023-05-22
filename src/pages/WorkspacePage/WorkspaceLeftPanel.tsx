@@ -11,14 +11,33 @@ type Props = {
 }
 
 const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
-    const {workspaceId} = useWorkspace()
+    const {workspaceId, workspace} = useWorkspace()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
+    const padding = 10
+    const W = width - 2 * padding
+    const H = height - 2 * padding
     return (
-        <div>
-            <BackButton />
-            <div>Workspace: {workspaceId}</div>
+        <div style={{position: 'absolute', left: padding, top: padding, width: W, height: H}}>
+            <div>
+                <BackButton />
+                <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
+                    Workspace: {workspace?.name}
+                </div>
+            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>ID:</td>
+                        <td>{workspaceId}</td>
+                    </tr>
+                    <tr>
+                        <td>Owner:</td>
+                        <td>{workspace?.ownerId}</td>
+                    </tr>
+                </tbody>
+            </table>
             <hr />
-            <button onClick={() => openSettingsWindow()}>Workspace Settings</button>
+            <button onClick={() => openSettingsWindow()}>Settings</button>
             <ModalWindow
                 open={settingsWindowVisible}
                 onClose={closeSettingsWindow}

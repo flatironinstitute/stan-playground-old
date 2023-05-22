@@ -1,6 +1,7 @@
 import { ChonkyActions, ChonkyFileActionData, FileArray, FileBrowser as ChonkyFileBrowser, FileList } from 'chonky';
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { fetchAnalysisFiles } from '../../../dbInterface/dbInterface';
+import { useGithubAuth } from '../../../GithubAuth/useGithubAuth';
 import { useAnalysis } from '../AnalysisPageContext';
 
 type Props = {
@@ -20,11 +21,15 @@ const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile}) => {
         return ret
     }, [])
 
+    const {accessToken, userId} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
+
     useEffect(() => {
         setFiles([])
         let canceled = false
         ;(async () => {
-            const analysisFiles = await fetchAnalysisFiles(analysisId)
+            if (!analysisId) return
+            const analysisFiles = await fetchAnalysisFiles(analysisId, auth)
             if (canceled) return
             const ff: FileArray = []
             for (const x of analysisFiles) {
@@ -37,7 +42,7 @@ const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile}) => {
             setFiles(ff)
         })()
         return () => {canceled = true}
-    }, [analysisId])
+    }, [analysisId, auth])
 
     const handleFileAction = useCallback((data: ChonkyFileActionData) => {
         if (data.id === ChonkyActions.OpenFiles.id) {

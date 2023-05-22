@@ -1,5 +1,10 @@
+import { Edit } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import Hyperlink from "../../components/Hyperlink";
+import { prompt } from "../../confirm_prompt_alert";
 import useRoute from "../../useRoute";
+import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
 import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
 import { useAnalysis } from "./AnalysisPageContext";
 import BackButton from "./BackButton";
@@ -10,7 +15,8 @@ type Props = {
 }
 
 const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
-    const {analysisId, workspaceId, openTab, deleteAnalysis, analysisFiles} = useAnalysis()
+    const {analysisId, analysis, workspaceId, openTab, deleteAnalysis, analysisFiles, setAnalysisProperty} = useAnalysis()
+    const {workspace} = useWorkspace()
     const {setRoute} = useRoute()
     const handleOpenFile = useCallback((fileName: string) => {
         openTab(`file:${fileName}`)
@@ -35,20 +41,44 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         setInitialized(true)
     }, [analysisFiles, openTab, initialized])
 
-    const topHeight = 60
+    const handleEditAnalysisName = useCallback(async () => {
+        const newName = await prompt('Enter new analysis name:', analysis?.name || '')
+        if (!newName) return
+        if (!analysis) return
+        setAnalysisProperty('name', newName)
+    }, [analysis, setAnalysisProperty])
+
+    const topHeight = 100
     const bottomHeight = 60
+    const padding = 10
+    const W = width - 2 * padding
+    const H = height - 2 * padding
     return (
-        <div style={{position: 'absolute', width, height}}>
-            <div style={{position: 'absolute', width, height: topHeight}}>
+        <div style={{position: 'absolute', left: padding, top: padding, width: W, height: H}}>
+            <div style={{position: 'absolute', width: W, height: topHeight}}>
                 <BackButton />
-                <div>Analysis: {analysisId}</div>
+                <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
+                    Analysis: {analysis?.name} <IconButton onClick={handleEditAnalysisName}><Edit fontSize="small" /></IconButton>
+                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>ID:</td>
+                            <td>{analysisId}</td>
+                        </tr>
+                        <tr>
+                            <td>Workspace:</td>
+                            <td><Hyperlink onClick={() => {setRoute({page: 'workspace', workspaceId})}}>{workspace?.name}</Hyperlink></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div style={{position: 'absolute', width, top: topHeight, height: height - topHeight - bottomHeight}}>
+            <div style={{position: 'absolute', width: W, top: topHeight, height: H - topHeight - bottomHeight}}>
                 <AnalysisFileBrowser
                     onOpenFile={handleOpenFile}
                 />
             </div>
-            <div style={{position: 'absolute', width, top: height - bottomHeight, height: bottomHeight}}>
+            <div style={{position: 'absolute', width: W, top: H - bottomHeight, height: bottomHeight}}>
                 <button onClick={handleDeleteAnalysis}>Delete analysis</button>
             </div>
         </div>

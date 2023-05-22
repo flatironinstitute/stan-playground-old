@@ -7,22 +7,23 @@ const useAnalysisFile = (workspaceId: string, analysisId: string, fileName: stri
     const [fileContent, setFileContent] = useState<string | undefined>(undefined)
 
     const {accessToken, userId} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : undefined), [accessToken, userId])
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
     useEffect(() => {
         let canceled = false
         setFileContent(undefined)
         ;(async () => {
-            const af = await fetchAnalysisFile(analysisId, fileName)
+            if (!analysisId) return
+            const af = await fetchAnalysisFile(analysisId, fileName, auth)
             if (canceled) return
             if (!af) return
-            const x = await fetchDataBlob(af.workspaceId, analysisId, af.contentSha1)
+            const x = await fetchDataBlob(af.workspaceId, analysisId, af.contentSha1, auth)
             setFileContent(x)
         })()
         return () => {
             canceled = true
         }
-    }, [analysisId, fileName, refreshCode])
+    }, [analysisId, fileName, refreshCode, auth])
 
     const setFileContentHandler = useCallback(async (fileContent: string) => {
         if (!workspaceId) {

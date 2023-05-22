@@ -501,6 +501,36 @@ export const isDeleteAnalysisResponse = (x: any): x is DeleteAnalysisResponse =>
     })
 }
 
+// setAnalysisProperty
+
+export type SetAnalysisPropertyRequest = {
+    type: 'setAnalysisProperty'
+    timestamp: number
+    analysisId: string
+    property: 'name'
+    value: any
+}
+
+export const isSetAnalysisPropertyRequest = (x: any): x is SetAnalysisPropertyRequest => {
+    return validateObject(x, {
+        type: isEqualTo('setAnalysisProperty'),
+        timestamp: isNumber,
+        analysisId: isString,
+        property: isEqualTo('name'),
+        value: () => (true)
+    })
+}
+
+export type SetAnalysisPropertyResponse = {
+    type: 'setAnalysisProperty'
+}
+
+export const isSetAnalysisPropertyResponse = (x: any): x is SetAnalysisPropertyResponse => {
+    return validateObject(x, {
+        type: isEqualTo('setAnalysisProperty')
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
@@ -520,7 +550,8 @@ export type PlaygroundRequestPayload =
     GetDataBlobRequest |
     CreateAnalysisRunRequest |
     DeleteAnalysisRunRequest |
-    DeleteAnalysisRequest
+    DeleteAnalysisRequest |
+    SetAnalysisPropertyRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -540,7 +571,8 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetDataBlobRequest,
         isCreateAnalysisRunRequest,
         isDeleteAnalysisRunRequest,
-        isDeleteAnalysisRequest
+        isDeleteAnalysisRequest,
+        isSetAnalysisPropertyRequest
     ])(x)
 }
 
@@ -583,7 +615,8 @@ export type PlaygroundResponse =
     GetDataBlobResponse |
     CreateAnalysisRunResponse |
     DeleteAnalysisRunResponse |
-    DeleteAnalysisResponse
+    DeleteAnalysisResponse |
+    SetAnalysisPropertyResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -603,6 +636,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetDataBlobResponse,
         isCreateAnalysisRunResponse,
         isDeleteAnalysisRunResponse,
-        isDeleteAnalysisResponse
+        isDeleteAnalysisResponse,
+        isSetAnalysisPropertyResponse
     ])(x)
 }

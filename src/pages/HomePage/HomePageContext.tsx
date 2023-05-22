@@ -16,7 +16,7 @@ export const SetupHomePage = (props: {children: React.ReactNode}) => {
     const [refreshCode, setRefreshCode] = React.useState(0)
 
     const {accessToken, userId} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : undefined), [accessToken, userId])
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
     const createWorkspaceHandler = useCallback(async (workspaceName: string) => {
         if (!auth) {
@@ -30,10 +30,10 @@ export const SetupHomePage = (props: {children: React.ReactNode}) => {
     useEffect(() => {
         (async () => {
             setWorkspaces([])
-            const workspaces = await fetchWorkspaces()
+            const workspaces = await fetchWorkspaces(auth)
             setWorkspaces(workspaces)
         })()
-    }, [refreshCode])
+    }, [refreshCode, auth])
 
     const value = React.useMemo(() => ({
         workspaces,

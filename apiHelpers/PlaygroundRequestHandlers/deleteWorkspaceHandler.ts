@@ -1,7 +1,7 @@
 import { DeleteWorkspaceRequest, DeleteWorkspaceResponse } from "../../src/types/PlaygroundRequest";
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace from "../getWorkspace";
 import { userCanDeleteWorkspace } from "../permissions";
-import removeIdField from "../removeIdField";
 
 const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteWorkspaceResponse> => {
     const {verifiedUserId} = o
@@ -12,13 +12,9 @@ const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verif
 
     const client = await getMongoClient()
 
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({workspaceId: request.workspaceId}))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
+    const workspace = await getWorkspace(request.workspaceId, {useCache: false})
     if (!userCanDeleteWorkspace(workspace, verifiedUserId)) {
-        throw new Error('User does not have permission to delete a workspace')
+        throw new Error('User does not have permission to delete this workspace')
     }
 
     const analysesCollection = client.db('stan-playground').collection('analyses')
@@ -33,6 +29,7 @@ const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verif
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     dataBlobsCollection.deleteMany({workspaceId: request.workspaceId})
 
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
     await workspacesCollection.deleteOne({workspaceId: request.workspaceId})
 
     return {

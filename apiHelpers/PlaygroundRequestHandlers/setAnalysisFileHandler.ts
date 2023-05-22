@@ -1,9 +1,10 @@
 import crypto from 'crypto';
 import { SetAnalysisFileRequest, SetAnalysisFileResponse } from "../../src/types/PlaygroundRequest";
-import { isSPAnalysis, isSPWorkspace, SPAnalysisFile } from "../../src/types/stan-playground-types";
+import { SPAnalysisFile } from "../../src/types/stan-playground-types";
+import getAnalysis from '../getAnalysis';
 import { getMongoClient } from "../getMongoClient";
+import getWorkspace from '../getWorkspace';
 import { userCanSetAnalysisFile } from '../permissions';
-import removeIdField from "../removeIdField";
 
 const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetAnalysisFileResponse> => {
     const {verifiedUserId} = o
@@ -16,34 +17,14 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
 
     const client = await getMongoClient()
 
-    const analysesCollection = client.db('stan-playground').collection('analyses')
-    const analysis = removeIdField(await analysesCollection.findOne({
-        analysisId
-    }))
-    if (!analysis) {
-        throw new Error('Analysis not found')
-    }
-    if (!isSPAnalysis(analysis)) {
-        console.warn(analysis)
-        throw new Error('Invalid analysis in database')
-    }
+    const analysis = await getAnalysis(analysisId, {useCache: false})
     if (analysis.workspaceId !== request.workspaceId) {
         throw new Error('Incorrect workspace ID')
     }
 
     const workspaceId = analysis.workspaceId
 
-    const workspacesCollection = client.db('stan-playground').collection('workspaces')
-    const workspace = removeIdField(await workspacesCollection.findOne({
-        workspaceId
-    }))
-    if (!workspace) {
-        throw new Error('Workspace not found')
-    }
-    if (!isSPWorkspace(workspace)) {
-        console.warn(workspace)
-        throw new Error('Invalid workspace in database (2)')
-    }
+    const workspace = await getWorkspace(analysis.workspaceId, {useCache: true})
     if (!userCanSetAnalysisFile(workspace, verifiedUserId)) {
         throw new Error('User does not have permission to set an analysis file in this workspace')
     }

@@ -19,7 +19,7 @@ const WorkspacePage: FunctionComponent<Props> = ({workspaceId, width, height}) =
                 direction="horizontal"
                 width={width}
                 height={height}
-                initialPosition={Math.min(250, width / 2)}
+                initialPosition={Math.min(300, width / 2)}
             >
                 <WorkspaceLeftPanel width={0} height={0} />
                 <WorkspaceMainPanel width={0} height={0} />

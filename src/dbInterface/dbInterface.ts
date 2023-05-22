@@ -1,6 +1,6 @@
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPDataBlob, SPWorkspace } from "../types/stan-playground-types";
 import sha1 from 'crypto-js/sha1'
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, SetAnalysisFileRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 const vercelMode = import.meta.env.VITE_GITHUB_CLIENT_ID !== undefined
@@ -50,13 +50,13 @@ const setDevelopmentDatabase = (db: DevelopmentDatabase) => {
 }
 
 
-export const fetchWorkspaces = async (): Promise<SPWorkspace[]> => {
+export const fetchWorkspaces = async (auth: Auth): Promise<SPWorkspace[]> => {
     if (vercelMode) {
         const req: GetWorkspacesRequest = {
             type: 'getWorkspaces',
             timestamp: Date.now() / 1000
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getWorkspaces') {
             throw Error(`Unexpected response type ${resp.type}. Expected getWorkspaces.`)
         }
@@ -69,14 +69,14 @@ export const fetchWorkspaces = async (): Promise<SPWorkspace[]> => {
     }
 }
 
-export const fetchWorkspace = async (workspaceId: string): Promise<SPWorkspace | undefined> => {
+export const fetchWorkspace = async (workspaceId: string, auth: Auth): Promise<SPWorkspace | undefined> => {
     if (vercelMode) {
         const req: GetWorkspaceRequest = {
             type: 'getWorkspace',
             timestamp: Date.now() / 1000,
             workspaceId
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getWorkspace') {
             throw Error(`Unexpected response type ${resp.type}. Expected getWorkspace.`)
         }
@@ -87,7 +87,7 @@ export const fetchWorkspace = async (workspaceId: string): Promise<SPWorkspace |
         const db = getDevelopmentDatabase()
         const workspace = db.workspaces.find((w: SPWorkspace) => w.workspaceId === workspaceId)
         if (!workspace) {
-            throw new Error('Workspace not found')
+            throw new Error(`Workspace ${workspaceId} not found (2)`)
         }
         return workspace
     }
@@ -133,14 +133,14 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
     }
 }
 
-export const fetchAnalyses = async (workspaceId: string): Promise<SPAnalysis[]> => {
+export const fetchAnalyses = async (workspaceId: string, auth: Auth): Promise<SPAnalysis[]> => {
     if (vercelMode) {
         const req: GetAnalysesRequest = {
             type: 'getAnalyses',
             timestamp: Date.now() / 1000,
             workspaceId
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getAnalyses') {
             throw Error(`Unexpected response type ${resp.type}. Expected getAnalyses.`)
         }
@@ -215,7 +215,7 @@ export const setWorkspaceUsers = async (workspaceId: string, users: {userId: str
         const db = getDevelopmentDatabase()
         const workspace = db.workspaces.find((w: SPWorkspace) => w.workspaceId === workspaceId)
         if (!workspace) {
-            throw new Error('Workspace not found')
+            throw new Error(`Workspace ${workspaceId} not found (3)`)
         }
         if (workspace.ownerId !== 'test-user') {
             throw new Error('Only the owner of a workspace can set the workspace users')
@@ -247,7 +247,7 @@ export const setWorkspaceProperty = async (workspaceId: string, property: 'anony
         const db = getDevelopmentDatabase()
         const workspace = db.workspaces.find((w: SPWorkspace) => w.workspaceId === workspaceId)
         if (!workspace) {
-            throw new Error('Workspace not found')
+            throw new Error(`Workspace ${workspaceId} not found (4)`)
         }
         if (workspace.ownerId !== 'test-user') {
             throw new Error('Only the owner of a workspace can set the workspace properties')
@@ -293,14 +293,14 @@ export const deleteWorkspace = async (workspaceId: string, auth: Auth): Promise<
     }
 }
 
-export const fetchAnalysis = async (analysisId: string): Promise<SPAnalysis | undefined> => {
+export const fetchAnalysis = async (analysisId: string, auth: Auth): Promise<SPAnalysis | undefined> => {
     if (vercelMode) {
         const req: GetAnalysisRequest = {
             type: 'getAnalysis',
             timestamp: Date.now() / 1000,
             analysisId
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getAnalysis') {
             throw Error(`Unexpected response type ${resp.type}. Expected getAnalysis.`)
         }
@@ -314,14 +314,14 @@ export const fetchAnalysis = async (analysisId: string): Promise<SPAnalysis | un
     }
 }
 
-export const fetchAnalysisFiles = async (analysisId: string): Promise<SPAnalysisFile[]> => {
+export const fetchAnalysisFiles = async (analysisId: string, auth: Auth): Promise<SPAnalysisFile[]> => {
     if (vercelMode) {
         const req: GetAnalysisFilesRequest = {
             type: 'getAnalysisFiles',
             timestamp: Date.now() / 1000,
             analysisId
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getAnalysisFiles') {
             throw Error(`Unexpected response type ${resp.type}. Expected getAnalysisFiles.`)
         }
@@ -335,7 +335,7 @@ export const fetchAnalysisFiles = async (analysisId: string): Promise<SPAnalysis
     }
 }
 
-export const fetchAnalysisFile = async (analysisId: string, fileName: string): Promise<SPAnalysisFile | undefined> => {
+export const fetchAnalysisFile = async (analysisId: string, fileName: string, auth: Auth): Promise<SPAnalysisFile | undefined> => {
     if (vercelMode) {
         const req: GetAnalysisFileRequest = {
             type: 'getAnalysisFile',
@@ -343,7 +343,7 @@ export const fetchAnalysisFile = async (analysisId: string, fileName: string): P
             analysisId,
             fileName
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getAnalysisFile') {
             throw Error(`Unexpected response type ${resp.type}. Expected getAnalysisFile.`)
         }
@@ -358,7 +358,7 @@ export const fetchAnalysisFile = async (analysisId: string, fileName: string): P
     }
 }
 
-export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha1: string): Promise<string | undefined> => {
+export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha1: string, auth: Auth): Promise<string | undefined> => {
     if (vercelMode) {
         const req: GetDataBlobRequest = {
             type: 'getDataBlob',
@@ -367,7 +367,7 @@ export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha
             analysisId,
             sha1
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getDataBlob') {
             throw Error(`Unexpected response type ${resp.type}. Expected getDataBlob.`)
         }
@@ -403,7 +403,7 @@ export const setAnalysisFileContent = async (workspaceId: string, analysisId: st
     else {
         await sleepMsec(100)
 
-        const analysis = await fetchAnalysis(analysisId)
+        const analysis = await fetchAnalysis(analysisId, auth)
         if (!analysis) throw Error(`Analysis ${analysisId} not found`)
 
         const db = getDevelopmentDatabase()
@@ -439,14 +439,14 @@ export const setAnalysisFileContent = async (workspaceId: string, analysisId: st
     }
 }
 
-export const fetchAnalysisRuns = async (analysisId: string): Promise<SPAnalysisRun[]> => {
+export const fetchAnalysisRuns = async (analysisId: string, auth: Auth): Promise<SPAnalysisRun[]> => {
     if (vercelMode) {
         const req: GetAnalysisRunsRequest = {
             type: 'getAnalysisRuns',
             timestamp: Date.now() / 1000,
             analysisId
         }
-        const resp = await postPlaygroundRequest(req, {})
+        const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'getAnalysisRuns') {
             throw Error(`Unexpected response type ${resp.type}. Expected getAnalysisRuns.`)
         }
@@ -488,21 +488,21 @@ export const createAnalysisRun = async (workspaceId: string, analysisId: string,
         const workspaceId = analysis.workspaceId
         const analysisRunId = randomAnalysisRunId()
 
-        const stanProgramFile = await fetchAnalysisFile(analysisId, o.stanFileName)
+        const stanProgramFile = await fetchAnalysisFile(analysisId, o.stanFileName, auth)
         if (!stanProgramFile) {
             throw new Error('Stan program file not found')
         }
         const stanProgramContentSha1 = stanProgramFile.contentSha1
         const stanProgramContentSize = stanProgramFile.contentSize
 
-        const datasetFile = await fetchAnalysisFile(analysisId, o.datasetFileName)
+        const datasetFile = await fetchAnalysisFile(analysisId, o.datasetFileName, auth)
         if (!datasetFile) {
             throw new Error('Dataset file not found')
         }
         const datasetContentSha1 = datasetFile.contentSha1
         const datasetContentSize = datasetFile.contentSize
 
-        const optionsFile = await fetchAnalysisFile(analysisId, o.optionsFileName)
+        const optionsFile = await fetchAnalysisFile(analysisId, o.optionsFileName, auth)
         if (!optionsFile) {
             throw new Error('Options file not found')
         }
@@ -581,6 +581,37 @@ export const deleteAnalysis = async (workspaceId: string, analysisId: string, au
         db.analysisFiles = db.analysisFiles.filter((a: SPAnalysisFile) => a.analysisId !== analysisId)
         db.analysisRuns = db.analysisRuns.filter((a: SPAnalysisRun) => a.analysisId !== analysisId)
         db.dataBlobs = db.dataBlobs.filter((b: SPDataBlob) => b.analysisId !== analysisId)
+        setDevelopmentDatabase(db)
+    }
+}
+
+export const setAnalysisProperty = async (analysisId: string, property: 'name', value: any, auth: Auth): Promise<void> => {
+    if (vercelMode) {
+        const req: SetAnalysisPropertyRequest = {
+            type: 'setAnalysisProperty',
+            timestamp: Date.now() / 1000,
+            analysisId,
+            property,
+            value
+        }
+        const resp = await postPlaygroundRequest(req, {...auth})
+        if (resp.type !== 'setAnalysisProperty') {
+            throw Error(`Unexpected response type ${resp.type}. Expected setAnalysisProperty.`)
+        }
+    }
+    else {
+        await sleepMsec(100)
+        const db = getDevelopmentDatabase()
+        const analysis = db.analyses.find((a: SPAnalysis) => a.analysisId === analysisId)
+        if (!analysis) {
+            throw new Error('Analysis not found')
+        }
+        if (property === 'name') {
+            analysis.name = value
+        }
+        else {
+            throw new Error('Invalid property')
+        }
         setDevelopmentDatabase(db)
     }
 }
