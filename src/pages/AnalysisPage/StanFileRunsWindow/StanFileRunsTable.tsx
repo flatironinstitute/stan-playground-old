@@ -5,6 +5,7 @@ import { confirm } from "../../../confirm_prompt_alert";
 import { SPAnalysisRun } from "../../../types/stan-playground-types";
 import { timeAgoString } from "../../../timeStrings";
 import { useAnalysis } from "../AnalysisPageContext";
+import { useWorkspace } from "../../WorkspacePage/WorkspacePageContext";
 
 type Props = {
     fileName: string
@@ -12,6 +13,7 @@ type Props = {
 
 const StanFileRunsTable: FunctionComponent<Props> = ({ fileName }) => {
     const {analysisRuns, openTab} = useAnalysis()
+    const {workspaceRole} = useWorkspace()
     return (
         <table className="scientific-table" style={{fontSize: 12}}>
             <thead>
@@ -28,7 +30,11 @@ const StanFileRunsTable: FunctionComponent<Props> = ({ fileName }) => {
                 {
                     analysisRuns?.filter(ar => (ar.stanProgramFileName === fileName)).map((run) => (
                         <tr key={run.analysisRunId}>
-                            <td><RunRowActions run={run} /></td>
+                            <td>{
+                                (workspaceRole === 'admin' || workspaceRole === 'editor') && (
+                                    <RunRowActions run={run} />
+                                )
+                            }</td>
                             <td>
                                 <Hyperlink onClick={() => openTab(`run:${run.analysisRunId}`)}>
                                     {run.analysisRunId}

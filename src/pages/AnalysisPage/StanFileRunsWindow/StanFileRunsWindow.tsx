@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react";
+import { useWorkspace } from "../../WorkspacePage/WorkspacePageContext";
 import CreateRunComponent from "./CreateRunComponent";
 import StanFileRunsTable from "./StanFileRunsTable";
 
@@ -9,11 +10,18 @@ type Props = {
 }
 
 const StanFileRunsWindow: FunctionComponent<Props> = ({ width, height, fileName }) => {
+    const {workspaceRole} = useWorkspace()
     return (
         <>
-            <CreateRunComponent
-                stanFileName={fileName}
-            />
+            {
+                (workspaceRole === 'admin' || workspaceRole === 'editor') ? (
+                    <CreateRunComponent
+                        stanFileName={fileName}
+                    />
+                ) : (
+                    <p>You do not have permission to create analysis runs for this analysis.</p>
+                )
+            }
             <StanFileRunsTable
                 fileName={fileName}
             />

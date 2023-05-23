@@ -9,18 +9,17 @@ type Props = {
     fileName: string
     fileContent: string
     setFileContent: (text: string) => void
+    readOnly: boolean
     width: number
     height: number
 }
 
-const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, width, height}) => {
+const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, width, height}) => {
     const [editedText, setEditedText] = useState<string>(fileContent)
     const [editedStanTextOverrider, setEditedStanTextOverrider] = useState<(text: string) => void>()
     const handleEditedTextOverrider = useCallback((overrider: (text: string) => void) => {
         setEditedStanTextOverrider(() => overrider)
     }, [])
-
-    const readOnly = false
 
     const handleAutoFormat = useCallback(() => {
         if (editedText === undefined) return

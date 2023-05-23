@@ -1,12 +1,15 @@
 import { Edit } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
+import ModalWindow from "../../components/ModalWindow/ModalWindow";
 import { prompt } from "../../confirm_prompt_alert";
 import useRoute from "../../useRoute";
 import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
 import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
 import { useAnalysis } from "./AnalysisPageContext";
+import AnalysisSettingsWindow from "./AnalysisSettingsWindow";
 import BackButton from "./BackButton";
 
 type Props = {
@@ -15,19 +18,13 @@ type Props = {
 }
 
 const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
-    const {analysisId, analysis, workspaceId, openTab, deleteAnalysis, analysisFiles, setAnalysisProperty} = useAnalysis()
-    const {workspace} = useWorkspace()
+    const {analysisId, analysis, workspaceId, openTab, analysisFiles, setAnalysisProperty} = useAnalysis()
+    const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
+    const {workspace, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
     const handleOpenFile = useCallback((fileName: string) => {
         openTab(`file:${fileName}`)
     }, [openTab])
-
-    const handleDeleteAnalysis = useCallback(async () => {
-        const okay = await confirm('Are you sure you want to delete this analysis?')
-        if (!okay) return
-        await deleteAnalysis()
-        setRoute({page: 'workspace', workspaceId})
-    }, [deleteAnalysis, setRoute, workspaceId])
 
     const [initialized, setInitialized] = useState(false)
 
@@ -49,7 +46,7 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
     }, [analysis, setAnalysisProperty])
 
     const topHeight = 100
-    const bottomHeight = 60
+    const bottomHeight = 20
     const padding = 10
     const W = width - 2 * padding
     const H = height - 2 * padding
@@ -58,17 +55,22 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
             <div style={{position: 'absolute', width: W, height: topHeight}}>
                 <BackButton />
                 <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
-                    Analysis: {analysis?.name} <IconButton onClick={handleEditAnalysisName}><Edit fontSize="small" /></IconButton>
+                    Analysis: {analysis?.name}&nbsp;
+                    {
+                        (workspaceRole === 'admin' || workspaceRole === 'editor') && (
+                            <IconButton onClick={handleEditAnalysisName}><Edit fontSize="small" /></IconButton>
+                        )
+                    }
                 </div>
                 <table>
                     <tbody>
                         <tr>
                             <td>ID:</td>
-                            <td>{analysisId}</td>
+                            <td style={{whiteSpace: 'nowrap'}}>{analysisId}</td>
                         </tr>
                         <tr>
                             <td>Workspace:</td>
-                            <td><Hyperlink onClick={() => {setRoute({page: 'workspace', workspaceId})}}>{workspace?.name}</Hyperlink></td>
+                            <td style={{whiteSpace: 'nowrap'}}><Hyperlink onClick={() => {setRoute({page: 'workspace', workspaceId})}}>{workspace?.name}</Hyperlink></td>
                         </tr>
                     </tbody>
                 </table>
@@ -78,9 +80,15 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                     onOpenFile={handleOpenFile}
                 />
             </div>
-            <div style={{position: 'absolute', width: W, top: H - bottomHeight, height: bottomHeight}}>
-                <button onClick={handleDeleteAnalysis}>Delete analysis</button>
+            <div style={{position: 'absolute', width: W, top: H - bottomHeight + 5, height: bottomHeight}}>
+                <button onClick={openSettingsWindow}>Settings</button>
             </div>
+            <ModalWindow
+                open={settingsWindowVisible}
+                onClose={closeSettingsWindow}
+            >
+                <AnalysisSettingsWindow />
+            </ModalWindow>
         </div>
     )
 }

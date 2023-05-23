@@ -38,7 +38,7 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
                 </tbody>
             </table>
             <hr />
-            <button onClick={() => openSettingsWindow()}>Settings</button>
+            <button onClick={openSettingsWindow}>Settings</button>
             <ModalWindow
                 open={settingsWindowVisible}
                 onClose={closeSettingsWindow}

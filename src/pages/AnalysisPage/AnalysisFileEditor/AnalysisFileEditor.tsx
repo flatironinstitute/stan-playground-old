@@ -6,11 +6,12 @@ import useAnalysisFile from "./useAnalysisFile";
 
 type Props = {
     fileName: string
+    readOnly: boolean
     width: number
     height: number
 }
 
-const AnalysisFileEditor: FunctionComponent<Props> = ({fileName, width, height}) => {
+const AnalysisFileEditor: FunctionComponent<Props> = ({fileName, readOnly, width, height}) => {
     const {analysis, analysisId} = useAnalysis()
 
     const {fileContent, setFileContent} = useAnalysisFile(analysis?.workspaceId || '', analysisId, fileName)
@@ -21,6 +22,7 @@ const AnalysisFileEditor: FunctionComponent<Props> = ({fileName, width, height})
                 fileName={fileName}
                 fileContent={fileContent || ''}
                 setFileContent={setFileContent}
+                readOnly={readOnly}
                 width={width}
                 height={height}
             />
@@ -32,6 +34,7 @@ const AnalysisFileEditor: FunctionComponent<Props> = ({fileName, width, height})
                 fileName={fileName}
                 fileContent={fileContent || ''}
                 setFileContent={setFileContent}
+                readOnly={readOnly}
                 width={width}
                 height={height}
             />

@@ -1,10 +1,13 @@
 import { FunctionComponent } from "react";
 import TabWidget from "../../TabWidget/TabWidget";
+import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
 import AnalysisFileEditor from "./AnalysisFileEditor/AnalysisFileEditor";
 import { useAnalysis } from "./AnalysisPageContext";
 
 const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
     const {openTabNames, currentTabName, setCurrentTab, closeTab} = useAnalysis()
+    const {workspaceRole} = useWorkspace()
+    const canEdit = workspaceRole === 'admin' || workspaceRole === 'editor'
     return (
         <TabWidget
             width={width}
@@ -25,6 +28,7 @@ const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({
                     <AnalysisFileEditor
                         key={tabName}
                         fileName={tabName.slice('file:'.length)}
+                        readOnly={!canEdit}
                         width={0}
                         height={0}
                     />

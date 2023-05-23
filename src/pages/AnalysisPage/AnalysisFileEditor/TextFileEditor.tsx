@@ -5,13 +5,12 @@ type Props = {
     fileName: string
     fileContent: string
     setFileContent: (text: string) => void
+    readOnly: boolean
     width: number
     height: number
 }
 
-const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, width, height}) => {
-    const readOnly = false
-
+const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, width, height}) => {
     const language = fileName.endsWith('.json') ? (
         'json'
     ) : fileName.endsWith('.yaml') ? (

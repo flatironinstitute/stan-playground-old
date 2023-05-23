@@ -74,7 +74,14 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
     }
 }
 
-const defaultStanProgram = ``
+const defaultStanProgram = `data {
+}
+
+parameters {
+}
+
+model {
+}`
 
 const defaultOptionsYaml = ``
 
