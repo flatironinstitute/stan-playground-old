@@ -1,4 +1,4 @@
-import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
+import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 export type SPUser = {
     userId: string
@@ -17,6 +17,7 @@ export type SPWorkspace = {
     loggedInUserRole: 'viewer' | 'editor' | 'none'
     timestampCreated: number
     timestampModified: number
+    computeResourceId?: string
 }
 
 export const isSPWorkspace = (x: any): x is SPWorkspace => {
@@ -32,7 +33,8 @@ export const isSPWorkspace = (x: any): x is SPWorkspace => {
         anonymousUserRole: isOneOf([isEqualTo('viewer'), isEqualTo('editor'), isEqualTo('none')]),
         loggedInUserRole: isOneOf([isEqualTo('viewer'), isEqualTo('editor'), isEqualTo('none')]),
         timestampCreated: isNumber,
-        timestampModified: isNumber
+        timestampModified: isNumber,
+        computeResourceId: optional(isString)
     })
 }
 
@@ -152,5 +154,21 @@ export const isSPDataBlob = (x: any): x is SPDataBlob => {
         sha1: isString,
         size: isNumber,
         content: isString
+    })
+}
+
+export type SPComputeResource = {
+    computeResourceId: string
+    ownerId: string
+    name: string
+    timestampCreated: number
+}
+
+export const isSPComputeResource = (x: any): x is SPComputeResource => {
+    return validateObject(x, {
+        computeResourceId: isString,
+        ownerId: isString,
+        name: isString,
+        timestampCreated: isNumber
     })
 }

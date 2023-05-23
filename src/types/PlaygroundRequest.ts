@@ -1,4 +1,4 @@
-import { isSPAnalysis, isSPAnalysisFile, isSPAnalysisRun, isSPWorkspace, SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPWorkspace } from "./stan-playground-types"
+import { isSPAnalysis, isSPAnalysisFile, isSPAnalysisRun, isSPComputeResource, isSPWorkspace, SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPWorkspace } from "./stan-playground-types"
 import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 // getWorkspaces
@@ -235,7 +235,7 @@ export type SetWorkspacePropertyRequest = {
     type: 'setWorkspaceProperty'
     timestamp: number
     workspaceId: string
-    property: 'anonymousUserRole' | 'loggedInUserRole'
+    property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId'
     value: any
 }
 
@@ -244,7 +244,7 @@ export const isSetWorkspacePropertyRequest = (x: any): x is SetWorkspaceProperty
         type: isEqualTo('setWorkspaceProperty'),
         timestamp: isNumber,
         workspaceId: isString,
-        property: isOneOf([isEqualTo('anonymousUserRole'), isEqualTo('loggedInUserRole')]),
+        property: isOneOf([isEqualTo('anonymousUserRole'), isEqualTo('loggedInUserRole'), isEqualTo('computeResourceId')]),
         value: () => (true)
     })
 }
@@ -533,6 +533,88 @@ export const isSetAnalysisPropertyResponse = (x: any): x is SetAnalysisPropertyR
     })
 }
 
+// getComputeResources
+
+export type GetComputeResourcesRequest = {
+    type: 'getComputeResources'
+    timestamp: number
+}
+
+export const isGetComputeResourcesRequest = (x: any): x is GetComputeResourcesRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getComputeResources'),
+        timestamp: isNumber
+    })
+}
+
+export type GetComputeResourcesResponse = {
+    type: 'getComputeResources'
+    computeResources: SPComputeResource[]
+}
+
+export const isGetComputeResourcesResponse = (x: any): x is GetComputeResourcesResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getComputeResources'),
+        computeResources: isArrayOf(isSPComputeResource)
+    })
+}
+
+// registerComputeResource
+
+export type RegisterComputeResourceRequest = {
+    type: 'registerComputeResource'
+    timestamp: number
+    computeResourceId: string
+    resourceCode: string
+    name: string
+}
+
+export const isRegisterComputeResourceRequest = (x: any): x is RegisterComputeResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('registerComputeResource'),
+        timestamp: isNumber,
+        computeResourceId: isString,
+        resourceCode: isString,
+        name: isString
+    })
+}
+
+export type RegisterComputeResourceResponse = {
+    type: 'registerComputeResource'
+}
+
+export const isRegisterComputeResourceResponse = (x: any): x is RegisterComputeResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('registerComputeResource')
+    })
+}
+
+// deleteComputeResource
+
+export type DeleteComputeResourceRequest = {
+    type: 'deleteComputeResource'
+    timestamp: number
+    computeResourceId: string
+}
+
+export const isDeleteComputeResourceRequest = (x: any): x is DeleteComputeResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteComputeResource'),
+        timestamp: isNumber,
+        computeResourceId: isString
+    })
+}
+
+export type DeleteComputeResourceResponse = {
+    type: 'deleteComputeResource'
+}
+
+export const isDeleteComputeResourceResponse = (x: any): x is DeleteComputeResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteComputeResource')
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
@@ -553,7 +635,10 @@ export type PlaygroundRequestPayload =
     CreateAnalysisRunRequest |
     DeleteAnalysisRunRequest |
     DeleteAnalysisRequest |
-    SetAnalysisPropertyRequest
+    SetAnalysisPropertyRequest |
+    GetComputeResourcesRequest |
+    RegisterComputeResourceRequest |
+    DeleteComputeResourceRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -574,7 +659,10 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isCreateAnalysisRunRequest,
         isDeleteAnalysisRunRequest,
         isDeleteAnalysisRequest,
-        isSetAnalysisPropertyRequest
+        isSetAnalysisPropertyRequest,
+        isGetComputeResourcesRequest,
+        isRegisterComputeResourceRequest,
+        isDeleteComputeResourceRequest
     ])(x)
 }
 
@@ -618,7 +706,10 @@ export type PlaygroundResponse =
     CreateAnalysisRunResponse |
     DeleteAnalysisRunResponse |
     DeleteAnalysisResponse |
-    SetAnalysisPropertyResponse
+    SetAnalysisPropertyResponse |
+    GetComputeResourcesResponse |
+    RegisterComputeResourceResponse |
+    DeleteComputeResourceResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -639,6 +730,9 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isCreateAnalysisRunResponse,
         isDeleteAnalysisRunResponse,
         isDeleteAnalysisResponse,
-        isSetAnalysisPropertyResponse
+        isSetAnalysisPropertyResponse,
+        isGetComputeResourcesResponse,
+        isRegisterComputeResourceResponse,
+        isDeleteComputeResourceResponse
     ])(x)
 }

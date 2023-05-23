@@ -14,7 +14,7 @@ type WorkspacePageContextType = {
     createAnalysis: (analysisName: string) => Promise<string>
     deleteWorkspace: () => Promise<void>
     setWorkspaceUsers: (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => Promise<void>
-    setWorkspaceProperty: (property: 'anonymousUserRole' | 'loggedInUserRole', value: any) => Promise<void>
+    setWorkspaceProperty: (property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any) => Promise<void>
     workspaceRole: 'none' | 'admin' | 'editor' | 'viewer' | undefined
 }
 

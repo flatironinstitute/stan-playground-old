@@ -2,6 +2,7 @@ import { FunctionComponent, useCallback } from "react";
 import { confirm } from "../../confirm_prompt_alert";
 import UserIdComponent from "../../UserIdComponent";
 import useRoute from "../../useRoute";
+import WorkspaceComputeResourceComponent from "./WorkspaceComputeResourceComponent";
 import { useWorkspace } from "./WorkspacePageContext";
 import WorkspaceUsersComponent from "./WorkspaceUsersComponent";
 
@@ -29,6 +30,8 @@ const WorkspaceSettingsWindow: FunctionComponent<Props> = () => {
             </table>
             <hr />
             <WorkspaceUsersComponent />
+            <hr />
+            <WorkspaceComputeResourceComponent />
             <hr />
             {
                 workspaceRole === 'admin' && (

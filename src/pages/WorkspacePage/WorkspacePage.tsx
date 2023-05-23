@@ -1,5 +1,6 @@
 import { FunctionComponent } from "react";
 import Splitter from "../../components/Splitter";
+import { SetupComputeResources } from "../ComputeResourcesPage/ComputeResourcesContext";
 import WorkspaceLeftPanel from "./WorkspaceLeftPanel";
 import WorkspaceMainPanel from "./WorkspaceMainPanel";
 import { SetupWorkspacePage } from "./WorkspacePageContext";
@@ -15,15 +16,17 @@ const WorkspacePage: FunctionComponent<Props> = ({workspaceId, width, height}) =
         <SetupWorkspacePage
             workspaceId={workspaceId}
         >
-            <Splitter
-                direction="horizontal"
-                width={width}
-                height={height}
-                initialPosition={Math.min(300, width / 2)}
-            >
-                <WorkspaceLeftPanel width={0} height={0} />
-                <WorkspaceMainPanel width={0} height={0} />
-            </Splitter>
+            <SetupComputeResources>
+                <Splitter
+                    direction="horizontal"
+                    width={width}
+                    height={height}
+                    initialPosition={Math.min(300, width / 2)}
+                >
+                    <WorkspaceLeftPanel width={0} height={0} />
+                    <WorkspaceMainPanel width={0} height={0} />
+                </Splitter>
+            </SetupComputeResources>
         </SetupWorkspacePage>
     )
 }

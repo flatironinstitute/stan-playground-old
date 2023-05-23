@@ -25,6 +25,9 @@ const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest,
     else if (request.property === 'loggedInUserRole') {
         workspace.loggedInUserRole = request.value
     }
+    else if (request.property === 'computeResourceId') {
+        workspace.computeResourceId = request.value
+    }
     else {
         throw new Error('Invalid property')
     }

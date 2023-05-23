@@ -11,6 +11,12 @@ export type Route = {
     workspaceId: string
 } | {
     page: 'github-auth'
+} | {
+    page: 'compute-resources'
+} | {
+    page: 'register-compute-resource'
+    computeResourceId: string
+    resourceCode: string
 }
 
 const useRoute = () => {
@@ -39,6 +45,21 @@ const useRoute = () => {
                 page: 'github-auth'
             }
         }
+        else if (p === '/compute-resources') {
+            return {
+                page: 'compute-resources'
+            }
+        }
+        else if (p.startsWith('/register-compute-resource/')) {
+            const a = p.split('/')
+            const computeResourceId = a[2]
+            const resourceCode = a[3]
+            return {
+                page: 'register-compute-resource',
+                computeResourceId,
+                resourceCode
+            }
+        }
         else {
             return {
                 page: 'home'
@@ -58,6 +79,12 @@ const useRoute = () => {
         }
         else if (r.page === 'github-auth') {
             navigate('/github/auth')
+        }
+        else if (r.page === 'compute-resources') {
+            navigate('/compute-resources')
+        }
+        else if (r.page === 'register-compute-resource') {
+            navigate(`/register-compute-resource/${r.computeResourceId}/${r.resourceCode}`)
         }
     }, [navigate])
 

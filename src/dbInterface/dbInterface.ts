@@ -1,5 +1,5 @@
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
-import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPWorkspace } from "../types/stan-playground-types";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteComputeResourceRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 export const fetchWorkspaces = async (auth: Auth): Promise<SPWorkspace[]> => {
@@ -248,5 +248,43 @@ export const setAnalysisProperty = async (analysisId: string, property: 'name', 
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'setAnalysisProperty') {
         throw Error(`Unexpected response type ${resp.type}. Expected setAnalysisProperty.`)
+    }
+}
+
+export const fetchComputeResources = async (auth: Auth): Promise<SPComputeResource[]> => {
+    const req: GetComputeResourcesRequest = {
+        type: 'getComputeResources',
+        timestamp: Date.now() / 1000
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'getComputeResources') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getComputeResources.`)
+    }
+    return resp.computeResources
+}
+
+export const registerComputeResource = async (computeResourceId: string, resourceCode: string, name: string, auth: Auth): Promise<void> => {
+    const req: RegisterComputeResourceRequest = {
+        type: 'registerComputeResource',
+        timestamp: Date.now() / 1000,
+        computeResourceId,
+        resourceCode,
+        name
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'registerComputeResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected registerComputeResource.`)
+    }
+}
+
+export const deleteComputeResource = async (computeResourceId: string, auth: Auth): Promise<void> => {
+    const req: DeleteComputeResourceRequest = {
+        type: 'deleteComputeResource',
+        timestamp: Date.now() / 1000,
+        computeResourceId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'deleteComputeResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteComputeResource.`)
     }
 }

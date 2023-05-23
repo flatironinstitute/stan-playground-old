@@ -1,0 +1,1 @@
+from .register_compute_resource import register_compute_resource
