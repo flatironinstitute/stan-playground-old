@@ -12,7 +12,7 @@ const HomePage: FunctionComponent<Props> = () => {
     return (
         <SetupHomePage>
             <div className="homepage">
-                <h1>Welcome to Stan Playground!</h1>
+                <h1>Welcome to Stan Playground</h1>
                 <p>
                     Stan Playground is an interactive website designed to help you learn, 
                     experiment with and share your work in the Stan programming language. Here, 
@@ -20,7 +20,7 @@ const HomePage: FunctionComponent<Props> = () => {
                     user-friendly environment.
                 </p>
 
-                <h2>Your Workspaces</h2>
+                <h2>Workspaces</h2>
                 <WorkspacesMenuBar />
                 <WorkspacesTable />
             </div>

@@ -67,6 +67,12 @@ const createAnalysisRunHandler = async (request: CreateAnalysisRunRequest, o: {v
     const analysisRunsCollection = client.db('stan-playground').collection('analysisRuns')
     await analysisRunsCollection.insertOne(analysisRun)
 
+    const analysesCollection = client.db('stan-playground').collection('analyses')
+    await analysesCollection.updateOne({analysisId: request.analysisId}, {$set: {timestampModified: analysis.timestampModified}})
+
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+    await workspacesCollection.updateOne({workspaceId: request.workspaceId}, {$set: {timestampModified: Date.now() / 1000}})
+
     return {
         type: 'createAnalysisRun',
         analysisRunId

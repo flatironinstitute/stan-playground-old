@@ -29,6 +29,8 @@ const setAnalysisPropertyHandler = async (request: SetAnalysisPropertyRequest, o
         throw new Error('Invalid property')
     }
 
+    analysis.timestampModified = Date.now() / 1000
+
     const analysesCollection = client.db('stan-playground').collection('analyses')
     await analysesCollection.updateOne({analysisId}, {$set: analysis})
 

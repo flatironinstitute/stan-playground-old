@@ -29,6 +29,8 @@ const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest,
         throw new Error('Invalid property')
     }
 
+    workspace.timestampModified = Date.now() / 1000
+
     const workspacesCollection = client.db('stan-playground').collection('workspaces')
 
     await workspacesCollection.updateOne({workspaceId}, {$set: workspace})

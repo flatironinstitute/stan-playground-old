@@ -11,10 +11,11 @@ type WorkspacePageContextType = {
     workspaceId: string
     workspace: SPWorkspace | undefined
     analyses: SPAnalysis[]
-    createAnalysis: () => Promise<string>
+    createAnalysis: (analysisName: string) => Promise<string>
     deleteWorkspace: () => Promise<void>
     setWorkspaceUsers: (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => Promise<void>
     setWorkspaceProperty: (property: 'anonymousUserRole' | 'loggedInUserRole', value: any) => Promise<void>
+    workspaceRole: 'none' | 'admin' | 'editor' | 'viewer' | undefined
 }
 
 const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
@@ -25,6 +26,7 @@ const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
     deleteWorkspace: async () => {},
     setWorkspaceUsers: async () => {},
     setWorkspaceProperty: async () => {},
+    workspaceRole: undefined
 })
 
 export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = ({children, workspaceId}) => {
@@ -36,11 +38,8 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const {accessToken, userId} = useGithubAuth()
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
-    const createAnalysisHandler = useMemo(() => (async (): Promise<string> => {
-        if (!auth) {
-            throw Error('Not logged in')
-        }
-        const analysisId = await createAnalysis(workspaceId, auth)
+    const createAnalysisHandler = useMemo(() => (async (analysisName: string): Promise<string> => {
+        const analysisId = await createAnalysis(workspaceId, analysisName, auth)
         setAnalysesRefreshCode(rc => rc + 1)
         return analysisId
     }), [workspaceId, auth])
@@ -86,6 +85,22 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         })()
     }, [workspaceId, workspaceRefreshCode, auth])
 
+    const workspaceRole = useMemo(() => {
+        if (!workspace) return undefined
+        if (!userId) {
+            return workspace.anonymousUserRole
+        }
+        if (workspace.ownerId === userId) return 'admin'
+        const user = workspace.users.find(user => user.userId === userId)
+        if (user) {
+            return user.role
+        }
+        else {
+            return workspace.loggedInUserRole
+        }
+    }, [workspace, userId])
+
+
     const value = React.useMemo(() => ({
         workspaceId,
         workspace,
@@ -93,8 +108,9 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         createAnalysis: createAnalysisHandler,
         deleteWorkspace: deleteWorkspaceHandler,
         setWorkspaceUsers: setWorkspaceUsersHandler,
-        setWorkspaceProperty: setWorkspacePropertyHandler
-    }), [analyses, workspace, createAnalysisHandler, deleteWorkspaceHandler, setWorkspaceUsersHandler, setWorkspacePropertyHandler, workspaceId])
+        setWorkspaceProperty: setWorkspacePropertyHandler,
+        workspaceRole
+    }), [analyses, workspace, createAnalysisHandler, deleteWorkspaceHandler, setWorkspaceUsersHandler, setWorkspacePropertyHandler, workspaceId, workspaceRole])
 
     return (
         <WorkspacePageContext.Provider value={value}>
@@ -112,6 +128,7 @@ export const useWorkspace = () => {
         createAnalysis: context.createAnalysis,
         deleteWorkspace: context.deleteWorkspace,
         setWorkspaceUsers: context.setWorkspaceUsers,
-        setWorkspaceProperty: context.setWorkspaceProperty
+        setWorkspaceProperty: context.setWorkspaceProperty,
+        workspaceRole: context.workspaceRole
     }
 }

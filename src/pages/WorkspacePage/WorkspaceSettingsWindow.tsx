@@ -1,5 +1,6 @@
 import { FunctionComponent, useCallback } from "react";
 import { confirm } from "../../confirm_prompt_alert";
+import UserIdComponent from "../../UserIdComponent";
 import useRoute from "../../useRoute";
 import { useWorkspace } from "./WorkspacePageContext";
 import WorkspaceUsersComponent from "./WorkspaceUsersComponent";
@@ -9,7 +10,7 @@ type Props = {
 }
 
 const WorkspaceSettingsWindow: FunctionComponent<Props> = () => {
-    const {workspaceId, workspace} = useWorkspace()
+    const {workspaceId, workspace, workspaceRole} = useWorkspace()
 
     return (
         <div>
@@ -22,14 +23,18 @@ const WorkspaceSettingsWindow: FunctionComponent<Props> = () => {
                     </tr>
                     <tr>
                         <td>Owner:</td>
-                        <td>{workspace?.ownerId}</td>
+                        <td><UserIdComponent userId={workspace?.ownerId} /></td>
                     </tr>
                 </tbody>
             </table>
             <hr />
             <WorkspaceUsersComponent />
             <hr />
-            <DeleteWorkspaceButton />
+            {
+                workspaceRole === 'admin' && (
+                    <DeleteWorkspaceButton />
+                )
+            }
         </div>
     )
 }

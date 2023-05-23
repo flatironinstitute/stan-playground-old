@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
+import UserIdComponent from "../../UserIdComponent";
 import BackButton from "./BackButton";
 import { useWorkspace } from "./WorkspacePageContext";
 import WorkspaceSettingsWindow from "./WorkspaceSettingsWindow";
@@ -32,7 +33,7 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
                     </tr>
                     <tr>
                         <td>Owner:</td>
-                        <td>{workspace?.ownerId}</td>
+                        <td><UserIdComponent userId={workspace?.ownerId} /></td>
                     </tr>
                 </tbody>
             </table>

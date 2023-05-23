@@ -21,6 +21,8 @@ const setWorkspaceUsersHandler = async (request: SetWorkspaceUsersRequest, o: {v
 
     workspace.users = request.users
 
+    workspace.timestampModified = Date.now() / 1000
+
     const workspacesCollection = client.db('stan-playground').collection('workspaces')
 
     await workspacesCollection.updateOne({workspaceId}, {$set: workspace})

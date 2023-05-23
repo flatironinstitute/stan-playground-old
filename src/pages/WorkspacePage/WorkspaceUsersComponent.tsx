@@ -2,6 +2,7 @@ import { Delete, Edit } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useState } from "react";
 import Hyperlink from "../../components/Hyperlink";
 import { alert, confirm, prompt } from "../../confirm_prompt_alert";
+import UserIdComponent from "../../UserIdComponent";
 import { useWorkspace } from "./WorkspacePageContext";
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
 type Role = 'admin' | 'editor' | 'viewer'
 
 const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
-    const {workspace, setWorkspaceUsers, setWorkspaceProperty} = useWorkspace()
+    const {workspace, setWorkspaceUsers, setWorkspaceProperty, workspaceRole} = useWorkspace()
     
     const handleDeleteUser = useCallback(async (userId: string) => {
         const user = workspace?.users.find(user => user.userId === userId)
@@ -22,8 +23,9 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
     }, [workspace, setWorkspaceUsers])
 
     const handleAddUser = useCallback(async () => {
-        const userId = await prompt('User ID:', '')
-        if (!userId) return
+        const gitHubUserId = await prompt('GitHub user ID:', '')
+        if (!gitHubUserId) return
+        const userId = `github|${gitHubUserId}`
         const role = 'editor' as Role
         if (workspace?.users.find(user => user.userId === userId)) {
             await alert(`User ${userId} already exists`)
@@ -58,7 +60,13 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
 
     return (
         <div>
-            <Hyperlink onClick={handleAddUser}>Add user</Hyperlink>
+            {
+                workspaceRole === 'admin' ? (
+                    <Hyperlink onClick={handleAddUser}>Add user</Hyperlink>
+                ) : (
+                    <span>Only workspace admins can manage users</span>
+                )
+            }
             <table className="scientific-table" style={{maxWidth: 380}}>
                 <thead>
                     <tr>
@@ -75,7 +83,7 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
                                 <td>
                                 <Delete onClick={() => handleDeleteUser(user.userId)} />
                                 </td>
-                                <td>{user.userId}</td>
+                                <td><UserIdComponent userId={user.userId} /></td>
                                 <td>
                                     {
                                         editingUserId !== user.userId ? (
@@ -89,7 +97,7 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
                                                 }
                                             </span>
                                         ) : (
-                                            <EditRoleComponent role={user.role} onSetRole={(role) => handleSetUserRole(user.userId, role)} />
+                                            <EditRoleComponent editable={workspaceRole === 'admin'} role={user.role} onSetRole={(role) => handleSetUserRole(user.userId, role)} />
                                         )
                                     }
                                 </td>
@@ -103,11 +111,11 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
                 <tbody>
                     <tr>
                         <td>Anonymous users:</td>
-                        <td><AnonymousUsersComponent role={workspace?.anonymousUserRole} setRole={setAnonymousUserRoleHandler} /></td>
+                        <td><AnonymousOrLoggedInUsersComponent role={workspace?.anonymousUserRole} setRole={setAnonymousUserRoleHandler} editable={workspaceRole === 'admin'} anonymous={true} /></td>
                     </tr>
                     <tr>
                         <td>Logged-in users:</td>
-                        <td><LoggedInUsersComponent role={workspace?.loggedInUserRole} setRole={setLoggedInUserRoleHandler} /></td>
+                        <td><AnonymousOrLoggedInUsersComponent role={workspace?.loggedInUserRole} setRole={setLoggedInUserRoleHandler} editable={workspaceRole === 'admin'} anonymous={false} /></td>
                     </tr>
                 </tbody>
             </table>
@@ -115,44 +123,44 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
     )
 }
 
-const EditRoleComponent: FunctionComponent<{role: Role, onSetRole: (role: Role) => void}> = ({role, onSetRole}) => {
-    return (
-        <select value={role} onChange={(e) => onSetRole(e.target.value as Role)}>
-            <option value="admin">admin</option>
-            <option value="editor">editor</option>
-            <option value="viewer">viewer</option>
-        </select>
-    )
+const EditRoleComponent: FunctionComponent<{role: Role, onSetRole: (role: Role) => void, editable: boolean}> = ({role, onSetRole, editable}) => {
+    if (editable) {
+        return (
+            <select value={role} onChange={(e) => onSetRole(e.target.value as Role)}>
+                <option value="admin">admin</option>
+                <option value="editor">editor</option>
+                <option value="viewer">viewer</option>
+            </select>
+        )
+    }
+    else {
+        return <span>{role}</span>
+    }
 }
 
-const AnonymousUsersComponent: FunctionComponent<{role: 'none' | 'viewer' | 'editor' | undefined, setRole: (r: 'none' | 'viewer' | 'editor') => void}> = ({role, setRole}) => {
-    return (
-        <div>
-            <select value={role} onChange={(e) => {
-                const newRole = e.target.value as ('none' | 'viewer' | 'editor')
-                setRole(newRole)
-            }}>
-                <option value="none">Anonymous users cannot view</option>
-                <option value="viewer">Anonymous users can view</option>
-                <option value="editor">Anonymous users can edit</option>
-            </select>
-        </div>
-    )
-}
-
-const LoggedInUsersComponent: FunctionComponent<{role: 'none' | 'viewer' | 'editor' | undefined, setRole: (r: 'none' | 'viewer' | 'editor') => void}> = ({role, setRole}) => {
-    return (
-        <div>
-            <select value={role} onChange={(e) => {
-                const newRole = e.target.value as ('none' | 'viewer' | 'editor')
-                setRole(newRole)
-            }}>
-                <option value="none">Logged-in users cannot view</option>
-                <option value="viewer">Logged-in users can view</option>
-                <option value="editor">Logged-in users can edit</option>
-            </select>
-        </div>
-    )
+const AnonymousOrLoggedInUsersComponent: FunctionComponent<{role: 'none' | 'viewer' | 'editor' | undefined, setRole: (r: 'none' | 'viewer' | 'editor') => void, editable: boolean, anonymous: boolean}> = ({role, setRole, editable, anonymous}) => {
+    const x = anonymous ? 'Anonymous' : 'Logged-in'
+    if (editable) {
+        return (
+            <div>
+                <select value={role} onChange={(e) => {
+                    const newRole = e.target.value as ('none' | 'viewer' | 'editor')
+                    setRole(newRole)
+                }}>
+                    <option value="none">{x} users cannot view</option>
+                    <option value="viewer">{x} users can view</option>
+                    <option value="editor">{x} users can edit</option>
+                </select>
+            </div>
+        )
+    }
+    else {
+        return (
+            role === 'none' ? <span>{x} users cannot view</span> :
+            role === 'viewer' ? <span>{x} users can view</span> :
+            role === 'editor' ? <span>{x} users can edit</span> : <span />
+        )
+    }
 }
 
 export default WorkspaceUsersComponent

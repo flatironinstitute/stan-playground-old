@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback } from "react";
 import Hyperlink from "../../components/Hyperlink";
-import { confirm } from "../../confirm_prompt_alert";
+import { confirm, prompt } from "../../confirm_prompt_alert";
 import useRoute from "../../useRoute";
 import { useWorkspace } from "./WorkspacePageContext";
 
@@ -9,21 +9,27 @@ type Props = {
 }
 
 const AnalysesMenuBar: FunctionComponent<Props> = () => {
-    const {createAnalysis} = useWorkspace()
+    const {createAnalysis, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
 
     const handleCreateAnalysis = useCallback(() => {
         (async () => {
-            const okay = await confirm("Create new analysis?")
-            if (!okay) return
-            const analysisId = await createAnalysis()
+            const analysisName = await prompt('Enter analysis name:', 'Untitled')
+            if (!analysisName) return
+            const analysisId = await createAnalysis(analysisName)
             setRoute({page: 'analysis', analysisId})
         })()
     }, [createAnalysis, setRoute])
     
     return (
         <div>
-            <Hyperlink onClick={handleCreateAnalysis}>Add Analysis</Hyperlink>
+            {
+                workspaceRole === 'admin' || workspaceRole === 'editor' ? (
+                    <Hyperlink onClick={handleCreateAnalysis}>Add Analysis</Hyperlink>
+                ) : (
+                    <span>&nbsp;</span>
+                )
+            }
         </div>
     )
 }

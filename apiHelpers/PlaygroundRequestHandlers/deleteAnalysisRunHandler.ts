@@ -31,6 +31,12 @@ const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {v
     const analysisRunsCollection = client.db('stan-playground').collection('analysisRuns')
     await analysisRunsCollection.deleteOne({analysisRunId: request.analysisRunId})
 
+    const analysesCollection = client.db('stan-playground').collection('analyses')
+    await analysesCollection.updateOne({analysisId: request.analysisId}, {$set: {timestampModified: Date.now() / 1000}})
+
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+    await workspacesCollection.updateOne({workspaceId: request.workspaceId}, {$set: {timestampModified: Date.now() / 1000}})
+
     return {
         type: 'deleteAnalysisRun'
     }

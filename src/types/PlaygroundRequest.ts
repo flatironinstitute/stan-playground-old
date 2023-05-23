@@ -145,13 +145,15 @@ export type CreateAnalysisRequest = {
     type: 'createAnalysis'
     timestamp: number
     workspaceId: string
+    name: string
 }
 
 export const isCreateAnalysisRequest = (x: any): x is CreateAnalysisRequest => {
     return validateObject(x, {
         type: isEqualTo('createAnalysis'),
         timestamp: isNumber,
-        workspaceId: isString
+        workspaceId: isString,
+        name: isString
     })
 }
 

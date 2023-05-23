@@ -9,6 +9,8 @@ export type Route = {
 } | {
     page: 'workspace'
     workspaceId: string
+} | {
+    page: 'github-auth'
 }
 
 const useRoute = () => {
@@ -32,6 +34,11 @@ const useRoute = () => {
                 workspaceId
             }
         }
+        else if (p === '/github/auth') {
+            return {
+                page: 'github-auth'
+            }
+        }
         else {
             return {
                 page: 'home'
@@ -48,6 +55,9 @@ const useRoute = () => {
         }
         else if (r.page === 'workspace') {
             navigate(`/workspace/${r.workspaceId}`)
+        }
+        else if (r.page === 'github-auth') {
+            navigate('/github/auth')
         }
     }, [navigate])
 

@@ -104,9 +104,6 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
             timestamp: Date.now() / 1000,
             name: workspaceName
         }
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to createWorkspace in production mode')
-        }
         const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'createWorkspace') {
             throw Error(`Unexpected response type ${resp.type}. Expected createWorkspace.`)
@@ -157,15 +154,13 @@ const defaultStanProgram = ``
 
 const defaultOptionsYaml = ``
 
-export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<string> => {
+export const createAnalysis = async (workspaceId: string, analysisName: string, auth: Auth): Promise<string> => {
     if (vercelMode) {
         const req: CreateAnalysisRequest = {
             type: 'createAnalysis',
             timestamp: Date.now() / 1000,
-            workspaceId
-        }
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to createAnalysis in production mode')
+            workspaceId,
+            name: analysisName
         }
         const resp = await postPlaygroundRequest(req, {...auth})
         if (resp.type !== 'createAnalysis') {
@@ -180,7 +175,7 @@ export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<s
         db.analyses.push({
             analysisId,
             workspaceId,
-            name: 'Untitled',
+            name: analysisName,
             description: '',
             timestampCreated: Date.now() / 1000,
             timestampModified: Date.now() / 1000
@@ -196,9 +191,6 @@ export const createAnalysis = async (workspaceId: string, auth: Auth): Promise<s
 
 export const setWorkspaceUsers = async (workspaceId: string, users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[], auth: Auth): Promise<void> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to setWorkspaceUsers in production mode')
-        }
         const req: SetWorkspaceUsersRequest = {
             type: 'setWorkspaceUsers',
             timestamp: Date.now() / 1000,
@@ -227,9 +219,6 @@ export const setWorkspaceUsers = async (workspaceId: string, users: {userId: str
 
 export const setWorkspaceProperty = async (workspaceId: string, property: 'anonymousUserRole' | 'loggedInUserRole', value: any, auth: Auth): Promise<void> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to setWorkspaceProperty in production mode')
-        }
         const req: SetWorkspacePropertyRequest = {
             type: 'setWorkspaceProperty',
             timestamp: Date.now() / 1000,
@@ -268,9 +257,6 @@ export const setWorkspaceProperty = async (workspaceId: string, property: 'anony
 
 export const deleteWorkspace = async (workspaceId: string, auth: Auth): Promise<void> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to deleteWorkspace in production mode')
-        }
         const req: DeleteWorkspaceRequest = {
             type: 'deleteWorkspace',
             timestamp: Date.now() / 1000,
@@ -384,9 +370,6 @@ export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha
 
 export const setAnalysisFileContent = async (workspaceId: string, analysisId: string, fileName: string, fileContent: string, auth: Auth): Promise<void> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to setAnalysisFileContent in production mode')
-        }
         const req: SetAnalysisFileRequest = {
             type: 'setAnalysisFile',
             timestamp: Date.now() / 1000,
@@ -462,9 +445,6 @@ export const fetchAnalysisRuns = async (analysisId: string, auth: Auth): Promise
 
 export const createAnalysisRun = async (workspaceId: string, analysisId: string, o: {stanFileName: string, datasetFileName: string, optionsFileName: string}, auth: Auth): Promise<string> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to createAnalysisRun in production mode')
-        }
         const req: CreateAnalysisRunRequest = {
             type: 'createAnalysisRun',
             timestamp: Date.now() / 1000,
@@ -533,9 +513,6 @@ export const createAnalysisRun = async (workspaceId: string, analysisId: string,
 
 export const deleteAnalysisRun = async (workspaceId: string, analysisId: string, analysisRunId: string, auth: Auth): Promise<void> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to deleteAnalysisRun in production mode')
-        }
         const req: DeleteAnalysisRunRequest = {
             type: 'deleteAnalysisRun',
             timestamp: Date.now() / 1000,
@@ -560,9 +537,6 @@ export const deleteAnalysisRun = async (workspaceId: string, analysisId: string,
 
 export const deleteAnalysis = async (workspaceId: string, analysisId: string, auth: Auth): Promise<void> => {
     if (vercelMode) {
-        if (!auth.githubAccessToken) {
-            throw Error('Must provide githubAccessToken to deleteAnalysis in production mode')
-        }
         const req: DeleteAnalysisRequest = {
             type: 'deleteAnalysis',
             timestamp: Date.now() / 1000,

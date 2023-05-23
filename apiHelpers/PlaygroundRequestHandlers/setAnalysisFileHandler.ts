@@ -77,6 +77,12 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
         })
     }
 
+    const analysesCollection = client.db('stan-playground').collection('analyses')
+    await analysesCollection.updateOne({analysisId}, {$set: {timestampModified: Date.now() / 1000}})
+
+    const workspacesCollection = client.db('stan-playground').collection('workspaces')
+    await workspacesCollection.updateOne({workspaceId}, {$set: {timestampModified: Date.now() / 1000}})
+
     return {
         type: 'setAnalysisFile'
     }
