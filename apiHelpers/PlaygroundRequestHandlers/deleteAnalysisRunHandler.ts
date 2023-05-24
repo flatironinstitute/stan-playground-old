@@ -7,10 +7,6 @@ import { userCanDeleteAnalysisRun } from "../permissions";
 const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteAnalysisRunResponse> => {
     const {verifiedUserId} = o
 
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to delete an analysis run')
-    }
-
     const client = await getMongoClient()
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: false})

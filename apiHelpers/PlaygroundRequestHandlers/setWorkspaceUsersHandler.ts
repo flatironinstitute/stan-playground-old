@@ -6,10 +6,6 @@ import { userCanSetWorkspaceUsers } from "../permissions";
 const setWorkspaceUsersHandler = async (request: SetWorkspaceUsersRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetWorkspaceUsersResponse> => {
     const {verifiedUserId} = o
 
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to set workspace users')
-    }
-
     const workspaceId = request.workspaceId
 
     const client = await getMongoClient()

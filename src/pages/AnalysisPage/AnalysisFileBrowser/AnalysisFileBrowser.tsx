@@ -1,19 +1,18 @@
 import { ChonkyActions, ChonkyFileActionData, FileArray, FileBrowser as ChonkyFileBrowser, FileList } from 'chonky';
-import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
-import { fetchAnalysisFiles } from '../../../dbInterface/dbInterface';
-import { useGithubAuth } from '../../../GithubAuth/useGithubAuth';
-import { useAnalysis } from '../AnalysisPageContext';
+import { FunctionComponent, useCallback, useMemo } from "react";
+import { SPAnalysisFile } from '../../../types/stan-playground-types';
 
 type Props = {
+    analysisFiles: SPAnalysisFile[] | undefined
     onOpenFile: (path: string) => void
     // currentFolderPath: string
     // setCurrentFolderPath: (path: string) => void
 }
 
-const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile}) => {
-    const {analysisId} = useAnalysis()
+const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile, analysisFiles}) => {
+    // const {analysisId} = useAnalysis()
 
-    const [files, setFiles] = useState<FileArray>([])
+    // const [files, setFiles] = useState<FileArray>([])
 
     const folderChain: FileArray = useMemo(() => {
         const ret: FileArray = []
@@ -21,28 +20,40 @@ const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile}) => {
         return ret
     }, [])
 
-    const {accessToken, userId} = useGithubAuth()
-    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
+    // const {accessToken, userId} = useGithubAuth()
+    // const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
-    useEffect(() => {
-        setFiles([])
-        let canceled = false
-        ;(async () => {
-            if (!analysisId) return
-            const analysisFiles = await fetchAnalysisFiles(analysisId, auth)
-            if (canceled) return
-            const ff: FileArray = []
-            for (const x of analysisFiles) {
-                ff.push({
-                    id: x.fileName,
-                    name: x.fileName,
-                    isDir: false
-                })
-            }
-            setFiles(ff)
-        })()
-        return () => {canceled = true}
-    }, [analysisId, auth])
+    // useEffect(() => {
+    //     setFiles([])
+    //     let canceled = false
+    //     ;(async () => {
+    //         if (!analysisId) return
+    //         const analysisFiles = await fetchAnalysisFiles(analysisId, auth)
+    //         if (canceled) return
+    //         const ff: FileArray = []
+    //         for (const x of analysisFiles) {
+    //             ff.push({
+    //                 id: x.fileName,
+    //                 name: x.fileName,
+    //                 isDir: false
+    //             })
+    //         }
+    //         setFiles(ff)
+    //     })()
+    //     return () => {canceled = true}
+    // }, [analysisId, auth])
+
+    const files = useMemo(() => {
+        const ret: FileArray = []
+        for (const x of analysisFiles || []) {
+            ret.push({
+                id: x.fileName,
+                name: x.fileName,
+                isDir: false
+            })
+        }
+        return ret
+    }, [analysisFiles])
 
     const handleFileAction = useCallback((data: ChonkyFileActionData) => {
         if (data.id === ChonkyActions.OpenFiles.id) {

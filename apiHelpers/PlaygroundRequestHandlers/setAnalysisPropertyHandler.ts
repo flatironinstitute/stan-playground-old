@@ -7,10 +7,6 @@ import { userCanSetAnalysisProperty } from "../permissions";
 const setAnalysisPropertyHandler = async (request: SetAnalysisPropertyRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetAnalysisPropertyResponse> => {
     const {verifiedUserId} = o
 
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to create an analysis file')
-    }
-
     const analysisId = request.analysisId
 
     const client = await getMongoClient()

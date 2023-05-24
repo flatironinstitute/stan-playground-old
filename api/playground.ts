@@ -6,6 +6,7 @@ import createAnalysisRunHandler from '../apiHelpers/PlaygroundRequestHandlers/cr
 import createScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/createScriptJobHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
 import deleteAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteAnalysisHandler'
+import deleteCompletedScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteCompletedScriptJobsHandler'
 import deleteComputeResourceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteComputeResourceHandler'
 import deleteScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteScriptJobHandler'
 import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
@@ -28,7 +29,7 @@ import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetAnalysisFileRequest, isSetAnalysisPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteAnalysisRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetAnalysisFileRequest, isSetAnalysisPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -155,6 +156,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isDeleteScriptJobRequest(payload)) {
             return await deleteScriptJobHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isDeleteCompletedScriptJobsRequest(payload)) {
+            return await deleteCompletedScriptJobsHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isGetScriptJobRequest(payload)) {
             return await getScriptJobHandler(payload, {verifiedClientId, verifiedUserId})

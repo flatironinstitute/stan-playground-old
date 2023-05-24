@@ -7,10 +7,6 @@ import getWorkspaceRole from "../getWorkspaceRole";
 const deleteScriptJobHandler = async (request: DeleteScriptJobRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteScriptJobResponse> => {
     const {verifiedUserId} = o
 
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to delete an analysis run')
-    }
-
     const client = await getMongoClient()
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: false})

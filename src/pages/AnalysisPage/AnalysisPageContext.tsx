@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createAnalysisRun, createScriptJob, deleteAnalysis, deleteAnalysisRun, deleteScriptJob, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns, fetchScriptJobs, setAnalysisProperty } from '../../dbInterface/dbInterface';
+import { createAnalysisRun, createScriptJob, deleteAnalysis, deleteAnalysisRun, deleteCompletedScriptJobs, deleteScriptJob, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns, fetchScriptJobs, setAnalysisProperty } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPScriptJob } from '../../types/stan-playground-types';
 
@@ -87,6 +87,7 @@ type AnalysisPageContextType = {
     createScriptJob: (o: {scriptFileName: string}) => void
     deleteScriptJob: (scriptJobId: string) => void
     refreshScriptJobs: () => void
+    deleteCompletedScriptJobs: (o: {scriptFileName: string}) => void
 }
 
 const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
@@ -106,7 +107,8 @@ const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
     setAnalysisProperty: () => {},
     createScriptJob: () => {},
     deleteScriptJob: () => {},
-    refreshScriptJobs: () => {}
+    refreshScriptJobs: () => {},
+    deleteCompletedScriptJobs: () => {}
 })
 
 export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({children, analysisId}) => {
@@ -191,6 +193,12 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         refreshScriptJobs()
     }, [analysis, analysisId, refreshScriptJobs, auth])
 
+    const deleteCompletedScriptJobsHandler = useCallback(async (o: {scriptFileName: string}) => {
+        if (!analysis) return
+        await deleteCompletedScriptJobs(analysis.workspaceId, analysisId, o.scriptFileName, auth)
+        refreshScriptJobs()
+    }, [analysis, analysisId, refreshScriptJobs, auth])
+
     const deleteAnalysisHandler = useMemo(() => (async () => {
         if (!analysis) return
         await deleteAnalysis(analysis.workspaceId, analysisId, auth)
@@ -222,8 +230,9 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         setAnalysisProperty: setAnalysisPropertyHandler,
         refreshScriptJobs,
         createScriptJob: createScriptJobHandler,
-        deleteScriptJob: deleteScriptJobHandler
-    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler, setAnalysisPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler])
+        deleteScriptJob: deleteScriptJobHandler,
+        deleteCompletedScriptJobs: deleteCompletedScriptJobsHandler
+    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler, setAnalysisPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler])
 
     return (
         <AnalysisPageContext.Provider value={value}>

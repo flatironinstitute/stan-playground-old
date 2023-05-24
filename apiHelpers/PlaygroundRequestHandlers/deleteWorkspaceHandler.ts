@@ -6,10 +6,6 @@ import { userCanDeleteWorkspace } from "../permissions";
 const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteWorkspaceResponse> => {
     const {verifiedUserId} = o
 
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to delete a workspace')
-    }
-
     const client = await getMongoClient()
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: false})

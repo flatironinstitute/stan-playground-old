@@ -88,10 +88,12 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                 </table>
                 <div>
                     <button onClick={handleCreateFile}>Create file</button>
+                    <button onClick={refreshFiles}>Refresh</button>
                 </div>
             </div>
             <div style={{position: 'absolute', width: W, top: topHeight, height: H - topHeight - bottomHeight}}>
                 <AnalysisFileBrowser
+                    analysisFiles={analysisFiles}
                     onOpenFile={handleOpenFile}
                 />
             </div>

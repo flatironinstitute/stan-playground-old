@@ -5,9 +5,7 @@ import removeIdField from "../removeIdField";
 
 const getComputeResourcesHandler = async (request: GetComputeResourcesRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<GetComputeResourcesResponse> => {
     const userId = o.verifiedUserId
-    if (!userId) {
-        throw new Error('You must be logged in to get compute resources')
-    }
+
     const client = await getMongoClient()
     const computeResourcesCollection = client.db('stan-playground').collection('computeResources')
     
