@@ -705,6 +705,36 @@ export const isDeleteScriptJobResponse = (x: any): x is DeleteScriptJobResponse 
     })
 }
 
+// deleteCompletedScriptJobs
+
+export type DeleteCompletedScriptJobsRequest = {
+    type: 'deleteCompletedScriptJobs'
+    timestamp: number
+    workspaceId: string
+    analysisId: string
+    scriptFileName: string
+}
+
+export const isDeleteCompletedScriptJobsRequest = (x: any): x is DeleteCompletedScriptJobsRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteCompletedScriptJobs'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        analysisId: isString,
+        scriptFileName: isString
+    })
+}
+
+export type DeleteCompletedScriptJobsResponse = {
+    type: 'deleteCompletedScriptJobs'
+}
+
+export const isDeleteCompletedScriptJobsResponse = (x: any): x is DeleteCompletedScriptJobsResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteCompletedScriptJobs')
+    })
+}
+
 // getScriptJob
 
 export type GetScriptJobRequest = {
@@ -826,6 +856,7 @@ export type PlaygroundRequestPayload =
     CreateScriptJobRequest |
     GetScriptJobsRequest |
     DeleteScriptJobRequest |
+    DeleteCompletedScriptJobsRequest |
     GetScriptJobRequest |
     GetPendingScriptJobRequest |
     SetScriptJobPropertyRequest
@@ -856,6 +887,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isCreateScriptJobRequest,
         isGetScriptJobsRequest,
         isDeleteScriptJobRequest,
+        isDeleteCompletedScriptJobsRequest,
         isGetScriptJobRequest,
         isGetPendingScriptJobRequest,
         isSetScriptJobPropertyRequest
@@ -909,6 +941,7 @@ export type PlaygroundResponse =
     CreateScriptJobResponse |
     GetScriptJobsResponse |
     DeleteScriptJobResponse |
+    DeleteCompletedScriptJobsResponse |
     GetScriptJobResponse |
     GetPendingScriptJobResponse |
     SetScriptJobPropertyResponse
@@ -939,6 +972,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isCreateScriptJobResponse,
         isGetScriptJobsResponse,
         isDeleteScriptJobResponse,
+        isDeleteCompletedScriptJobsResponse,
         isGetScriptJobResponse,
         isGetPendingScriptJobResponse,
         isSetScriptJobPropertyResponse
