@@ -59,7 +59,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])
 
-    const setWorkspacePropertyHandler = useMemo(() => (async (property: 'anonymousUserRole' | 'loggedInUserRole', value: any) => {
+    const setWorkspacePropertyHandler = useMemo(() => (async (property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any) => {
         if (!auth) {
             throw Error('Not logged in')
         }

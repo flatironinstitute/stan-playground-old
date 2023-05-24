@@ -1,10 +1,10 @@
-import { DeleteAnalysisRunRequest, DeleteAnalysisRunResponse } from "../../src/types/PlaygroundRequest";
+import { DeleteScriptJobRequest, DeleteScriptJobResponse } from "../../src/types/PlaygroundRequest";
 import getAnalysis from "../getAnalysis";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
-import { userCanDeleteAnalysisRun } from "../permissions";
+import getWorkspaceRole from "../getWorkspaceRole";
 
-const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteAnalysisRunResponse> => {
+const deleteScriptJobHandler = async (request: DeleteScriptJobRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteScriptJobResponse> => {
     const {verifiedUserId} = o
 
     if (!verifiedUserId) {
@@ -14,8 +14,10 @@ const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {v
     const client = await getMongoClient()
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: false})
-    if (!userCanDeleteAnalysisRun(workspace, verifiedUserId)) {
-        throw new Error('User does not have permission to delete an analysis run in this workspace')
+    const workspaceRole = getWorkspaceRole(workspace, verifiedUserId)
+    const okay = workspaceRole === 'admin' || workspaceRole === 'editor'
+    if (!okay) {
+        throw new Error('User does not have permission to delete a script job in this workspace')
     }
 
     const analysis = await getAnalysis(request.analysisId, {useCache: false})
@@ -24,8 +26,8 @@ const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {v
         throw new Error('Incorrect workspace ID')
     }
 
-    const analysisRunsCollection = client.db('stan-playground').collection('analysisRuns')
-    await analysisRunsCollection.deleteOne({analysisRunId: request.analysisRunId})
+    const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
+    await scriptJobsCollection.deleteOne({scriptJobId: request.scriptJobId})
 
     const analysesCollection = client.db('stan-playground').collection('analyses')
     await analysesCollection.updateOne({analysisId: request.analysisId}, {$set: {timestampModified: Date.now() / 1000}})
@@ -34,8 +36,8 @@ const deleteAnalysisRunHandler = async (request: DeleteAnalysisRunRequest, o: {v
     await workspacesCollection.updateOne({workspaceId: request.workspaceId}, {$set: {timestampModified: Date.now() / 1000}})
 
     return {
-        type: 'deleteAnalysisRun'
+        type: 'deleteScriptJob'
     }
 }
 
-export default deleteAnalysisRunHandler
+export default deleteScriptJobHandler

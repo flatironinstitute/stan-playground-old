@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 import { useWorkspace } from "../../WorkspacePage/WorkspacePageContext";
-import CreateRunComponent from "./CreateRunComponent";
-import StanFileRunsTable from "./StanFileRunsTable";
+import CreateScriptJobComponent from "./CreateScriptJobComponent";
+import ScriptJobsTable from "./ScriptJobsTable";
 
 type Props = {
     width: number,
@@ -9,28 +9,28 @@ type Props = {
     fileName: string
 }
 
-const StanFileRunsWindow: FunctionComponent<Props> = ({ width, height, fileName }) => {
+const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName }) => {
     const {workspaceRole, workspace} = useWorkspace()
     return (
         <>
             {
                 (workspaceRole === 'admin' || workspaceRole === 'editor') ? (
                     workspace?.computeResourceId ? (
-                        <CreateRunComponent
-                            stanFileName={fileName}
+                        <CreateScriptJobComponent
+                            scriptFileName={fileName}
                         />
                     ) : (
-                        <p>You must set a compute resource for this workspace before you can create analysis runs.</p>
+                        <p>You must set a compute resource for this workspace before you can run scripts.</p>
                     )
                 ) : (
-                    <p>You do not have permission to create analysis runs for this analysis.</p>
+                    <p>You do not have permission to run scripts for this analysis.</p>
                 )
             }
-            <StanFileRunsTable
+            <ScriptJobsTable
                 fileName={fileName}
             />
         </>
     )
 }
 
-export default StanFileRunsWindow
+export default ScriptJobsWindow

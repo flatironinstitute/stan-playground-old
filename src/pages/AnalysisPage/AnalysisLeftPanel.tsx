@@ -1,10 +1,12 @@
 import { Edit } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
 import { prompt } from "../../confirm_prompt_alert";
+import { setAnalysisFileContent } from "../../dbInterface/dbInterface";
+import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import useRoute from "../../useRoute";
 import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
 import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
@@ -18,7 +20,7 @@ type Props = {
 }
 
 const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
-    const {analysisId, analysis, workspaceId, openTab, analysisFiles, setAnalysisProperty} = useAnalysis()
+    const {analysisId, analysis, workspaceId, openTab, analysisFiles, setAnalysisProperty, refreshFiles} = useAnalysis()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
     const {workspace, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
@@ -45,7 +47,17 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         setAnalysisProperty('name', newName)
     }, [analysis, setAnalysisProperty])
 
-    const topHeight = 100
+    const {accessToken, userId} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
+
+    const handleCreateFile = useCallback(async () => {
+        const fileName = await prompt('Enter file name:', '')
+        if (!fileName) return
+        await setAnalysisFileContent(workspaceId, analysisId, fileName, '', auth)
+        refreshFiles()
+    }, [workspaceId, analysisId, auth, refreshFiles])
+
+    const topHeight = 125
     const bottomHeight = 20
     const padding = 10
     const W = width - 2 * padding
@@ -74,6 +86,9 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                         </tr>
                     </tbody>
                 </table>
+                <div>
+                    <button onClick={handleCreateFile}>Create file</button>
+                </div>
             </div>
             <div style={{position: 'absolute', width: W, top: topHeight, height: H - topHeight - bottomHeight}}>
                 <AnalysisFileBrowser

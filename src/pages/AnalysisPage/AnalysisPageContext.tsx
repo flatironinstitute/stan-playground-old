@@ -1,7 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createAnalysisRun, deleteAnalysis, deleteAnalysisRun, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns, setAnalysisProperty } from '../../dbInterface/dbInterface';
+import { createAnalysisRun, createScriptJob, deleteAnalysis, deleteAnalysisRun, deleteScriptJob, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns, fetchScriptJobs, setAnalysisProperty } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
-import { SPAnalysis, SPAnalysisFile, SPAnalysisRun } from '../../types/stan-playground-types';
+import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPScriptJob } from '../../types/stan-playground-types';
 
 type Props = {
     analysisId: string
@@ -73,6 +73,7 @@ type AnalysisPageContextType = {
     openTabNames: string[]
     currentTabName?: string
     analysisRuns?: SPAnalysisRun[]
+    scriptJobs?: SPScriptJob[]
     openTab: (tabName: string) => void
     closeTab: (tabName: string) => void
     closeAllTabs: () => void
@@ -83,6 +84,9 @@ type AnalysisPageContextType = {
     deleteAnalysisRun: (analysisRunId: string) => void
     deleteAnalysis: () => Promise<void>
     setAnalysisProperty: (property: 'name', value: any) => void
+    createScriptJob: (o: {scriptFileName: string}) => void
+    deleteScriptJob: (scriptJobId: string) => void
+    refreshScriptJobs: () => void
 }
 
 const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
@@ -99,7 +103,10 @@ const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
     createAnalysisRun: () => {},
     deleteAnalysisRun: () => {},
     deleteAnalysis: async () => {},
-    setAnalysisProperty: () => {}
+    setAnalysisProperty: () => {},
+    createScriptJob: () => {},
+    deleteScriptJob: () => {},
+    refreshScriptJobs: () => {}
 })
 
 export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({children, analysisId}) => {
@@ -111,6 +118,10 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
     const [analysisRuns, setAnalysisRuns] = React.useState<SPAnalysisRun[] | undefined>(undefined)
     const [refreshRunsCode, setRefreshRunsCode] = React.useState(0)
     const refreshRuns = useCallback(() => setRefreshRunsCode(rfc => rfc + 1), [])
+
+    const [scriptJobs, setScriptJobs] = React.useState<SPScriptJob[] | undefined>(undefined)
+    const [refreshScriptJobsCode, setRefreshScriptJobsCode] = React.useState(0)
+    const refreshScriptJobs = useCallback(() => setRefreshScriptJobsCode(c => c + 1), [])
 
     const [refreshAnalysisCode, setRefreshAnalysisCode] = React.useState(0)
     const refreshAnalysis = useCallback(() => setRefreshAnalysisCode(rac => rac + 1), [])
@@ -147,6 +158,15 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         })()
     }, [refreshRunsCode, analysisId, auth])
 
+    useEffect(() => {
+        (async () => {
+            setScriptJobs(undefined)
+            if (!analysisId) return
+            const x = await fetchScriptJobs(analysisId, auth)
+            setScriptJobs(x)
+        })()
+    }, [refreshScriptJobsCode, analysisId, auth])
+
     const createAnalysisRunHandler = useCallback(async (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => {
         if (!analysis) return
         await createAnalysisRun(analysis.workspaceId, analysisId, o, auth)
@@ -158,6 +178,18 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         await deleteAnalysisRun(analysis.workspaceId, analysisId, analysisRunId, auth)
         refreshRuns()
     }, [analysis, analysisId, refreshRuns, auth])
+
+    const createScriptJobHandler = useCallback(async (o: {scriptFileName: string}) => {
+        if (!analysis) return
+        await createScriptJob(analysis.workspaceId, analysisId, o, auth)
+        refreshScriptJobs()
+    }, [analysis, analysisId, refreshScriptJobs, auth])
+
+    const deleteScriptJobHandler = useCallback(async (scriptJobId: string) => {
+        if (!analysis) return
+        await deleteScriptJob(analysis.workspaceId, analysisId, scriptJobId, auth)
+        refreshScriptJobs()
+    }, [analysis, analysisId, refreshScriptJobs, auth])
 
     const deleteAnalysisHandler = useMemo(() => (async () => {
         if (!analysis) return
@@ -177,6 +209,7 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         analysisRuns,
         openTabNames: selectedTabs.openTabNames,
         currentTabName: selectedTabs.currentTabName,
+        scriptJobs,
         openTab: (tabName: string) => selectedTabsDispatch({type: 'openTab', tabName}),
         closeTab: (tabName: string) => selectedTabsDispatch({type: 'closeTab', tabName}),
         closeAllTabs: () => selectedTabsDispatch({type: 'closeAllTabs'}),
@@ -186,8 +219,11 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         createAnalysisRun: createAnalysisRunHandler,
         deleteAnalysisRun: deleteAnalysisRunHandler,
         deleteAnalysis: deleteAnalysisHandler,
-        setAnalysisProperty: setAnalysisPropertyHandler
-    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler, setAnalysisPropertyHandler])
+        setAnalysisProperty: setAnalysisPropertyHandler,
+        refreshScriptJobs,
+        createScriptJob: createScriptJobHandler,
+        deleteScriptJob: deleteScriptJobHandler
+    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler, setAnalysisPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler])
 
     return (
         <AnalysisPageContext.Provider value={value}>

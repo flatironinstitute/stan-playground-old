@@ -7,11 +7,7 @@ import getWorkspace from '../getWorkspace';
 import { userCanSetAnalysisFile } from '../permissions';
 
 const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetAnalysisFileResponse> => {
-    const {verifiedUserId} = o
-
-    if (!verifiedUserId) {
-        throw new Error('Must be logged in to create an analysis file')
-    }
+    const {verifiedUserId, verifiedClientId} = o
 
     const analysisId = request.analysisId
 
@@ -25,7 +21,7 @@ const setAnalysisFileHandler = async (request: SetAnalysisFileRequest, o: {verif
     const workspaceId = analysis.workspaceId
 
     const workspace = await getWorkspace(analysis.workspaceId, {useCache: true})
-    if (!userCanSetAnalysisFile(workspace, verifiedUserId)) {
+    if (!userCanSetAnalysisFile(workspace, verifiedUserId, verifiedClientId)) {
         throw new Error('User does not have permission to set an analysis file in this workspace')
     }
 

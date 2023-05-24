@@ -1,5 +1,5 @@
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteComputeResourceRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
-import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPWorkspace } from "../types/stan-playground-types";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 export const fetchWorkspaces = async (auth: Auth): Promise<SPWorkspace[]> => {
@@ -83,7 +83,7 @@ export const setWorkspaceUsers = async (workspaceId: string, users: {userId: str
     }
 }
 
-export const setWorkspaceProperty = async (workspaceId: string, property: 'anonymousUserRole' | 'loggedInUserRole', value: any, auth: Auth): Promise<void> => {
+export const setWorkspaceProperty = async (workspaceId: string, property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any, auth: Auth): Promise<void> => {
     const req: SetWorkspacePropertyRequest = {
         type: 'setWorkspaceProperty',
         timestamp: Date.now() / 1000,
@@ -287,4 +287,61 @@ export const deleteComputeResource = async (computeResourceId: string, auth: Aut
     if (resp.type !== 'deleteComputeResource') {
         throw Error(`Unexpected response type ${resp.type}. Expected deleteComputeResource.`)
     }
+}
+
+export const createScriptJob = async (workspaceId: string, analysisId: string, o: {scriptFileName: string}, auth: Auth): Promise<string> => {
+    const req: CreateScriptJobRequest = {
+        type: 'createScriptJob',
+        timestamp: Date.now() / 1000,
+        workspaceId,
+        analysisId,
+        scriptFileName: o.scriptFileName
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'createScriptJob') {
+        throw Error(`Unexpected response type ${resp.type}. Expected createScriptJob.`)
+    }
+    return resp.scriptJobId
+}
+
+export const deleteScriptJob = async (workspaceId: string, analysisId: string, scriptJobId: string, auth: Auth): Promise<void> => {
+    const req: DeleteScriptJobRequest = {
+        type: 'deleteScriptJob',
+        timestamp: Date.now() / 1000,
+        workspaceId,
+        analysisId,
+        scriptJobId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'deleteScriptJob') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteScriptJob.`)
+    }
+}
+
+export const fetchScriptJobs = async (analysisId: string, auth: Auth): Promise<SPScriptJob[]> => {
+    const req: GetScriptJobsRequest = {
+        type: 'getScriptJobs',
+        timestamp: Date.now() / 1000,
+        analysisId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'getScriptJobs') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getScriptJobs.`)
+    }
+    return resp.scriptJobs
+}
+
+export const fetchScriptJob = async (workspaceId: string, analysisId: string, scriptJobId: string, auth: Auth): Promise<SPScriptJob | undefined> => {
+    const req: GetScriptJobRequest = {
+        type: 'getScriptJob',
+        timestamp: Date.now() / 1000,
+        workspaceId,
+        analysisId,
+        scriptJobId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'getScriptJob') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getScriptJob.`)
+    }
+    return resp.scriptJob
 }

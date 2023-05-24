@@ -49,7 +49,12 @@ export const userCanReadWorkspace = (workspace: SPWorkspace, userId: string | un
     return ((workspaceRole === 'admin' || workspaceRole === 'editor' || workspaceRole === 'viewer'))
 }
 
-export const userCanSetAnalysisFile = (workspace: SPWorkspace, userId: string | undefined): boolean => {
+export const userCanSetAnalysisFile = (workspace: SPWorkspace, userId: string | undefined, clientId: string | undefined): boolean => {
+    if (clientId) {
+        if ((workspace.computeResourceId) && (workspace.computeResourceId === clientId)) {
+            return true
+        }
+    }
     const workspaceRole = getWorkspaceRole(workspace, userId)
     return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
 }

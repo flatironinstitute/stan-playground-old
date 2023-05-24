@@ -21,10 +21,6 @@ const createAnalysisHandler = async (request: CreateAnalysisRequest, o: {verifie
         throw new Error('User does not have permission to create an analysis in this workspace')
     }
 
-    if (workspace.ownerId !== verifiedUserId) {
-        throw new Error('Only the owner of a workspace can create an analysis in the workspace')
-    }
-
     const analysis: SPAnalysis = {
         analysisId,
         workspaceId,

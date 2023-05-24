@@ -3,6 +3,7 @@ import TabWidget from "../../TabWidget/TabWidget";
 import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
 import AnalysisFileEditor from "./AnalysisFileEditor/AnalysisFileEditor";
 import { useAnalysis } from "./AnalysisPageContext";
+import ScriptJobView from "./ScriptJobView/ScriptJobView";
 
 const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
     const {openTabNames, currentTabName, setCurrentTab, closeTab} = useAnalysis()
@@ -32,7 +33,16 @@ const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({
                         width={0}
                         height={0}
                     />
-                ) : (
+                ) :
+                tabName.startsWith('scriptJob:') ? (
+                    <ScriptJobView
+                        key={tabName}
+                        scriptJobId={tabName.slice('scriptJob:'.length)}
+                        width={0}
+                        height={0}
+                    />
+                ) :
+                (
                     <div key={tabName}>Not implemented</div>
                 )
             ))}
@@ -43,6 +53,9 @@ const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({
 const labelFromTabName = (tabName: string) => {
     if (tabName.startsWith('file:')) {
         return tabName.slice('file:'.length)
+    }
+    else if (tabName.startsWith('scriptJob:')) {
+        return 'job:' + tabName.slice('scriptJob:'.length)
     }
     return tabName
 }

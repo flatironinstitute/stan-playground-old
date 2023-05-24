@@ -1,6 +1,6 @@
 import { Delete } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 import ComputeResourceIdComponent from "../../ComputeResourceIdComponent";
 import { useComputeResources } from "../ComputeResourcesPage/ComputeResourcesContext";
 import { useWorkspace } from "./WorkspacePageContext";
