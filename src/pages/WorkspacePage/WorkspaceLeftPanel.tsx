@@ -22,6 +22,7 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
         <div style={{position: 'absolute', left: padding, top: padding, width: W, height: H}}>
             <div>
                 <BackButton />
+                <hr />
                 <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
                     Workspace: {workspace?.name}
                 </div>

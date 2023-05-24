@@ -319,6 +319,36 @@ export const isSetAnalysisFileResponse = (x: any): x is SetAnalysisFileResponse 
     })
 }
 
+// deleteAnalysisFile
+
+export type DeleteAnalysisFileRequest = {
+    type: 'deleteAnalysisFile'
+    timestamp: number
+    workspaceId: string
+    analysisId: string
+    fileName: string
+}
+
+export const isDeleteAnalysisFileRequest = (x: any): x is DeleteAnalysisFileRequest => {
+    return validateObject(x, {
+        type: isEqualTo('deleteAnalysisFile'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        analysisId: isString,
+        fileName: isString
+    })
+}
+
+export type DeleteAnalysisFileResponse = {
+    type: 'deleteAnalysisFile'
+}
+
+export const isDeleteAnalysisFileResponse = (x: any): x is DeleteAnalysisFileResponse => {
+    return validateObject(x, {
+        type: isEqualTo('deleteAnalysisFile')
+    })
+}
+
 // getAnalysisFile
 
 export type GetAnalysisFileRequest = {
@@ -843,6 +873,7 @@ export type PlaygroundRequestPayload =
     DeleteWorkspaceRequest |
     GetAnalysisFilesRequest |
     SetAnalysisFileRequest |
+    DeleteAnalysisFileRequest |
     GetAnalysisFileRequest |
     GetAnalysisRunsRequest |
     GetDataBlobRequest |
@@ -874,6 +905,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isDeleteWorkspaceRequest,
         isGetAnalysisFilesRequest,
         isSetAnalysisFileRequest,
+        isDeleteAnalysisFileRequest,
         isGetAnalysisFileRequest,
         isGetAnalysisRunsRequest,
         isGetDataBlobRequest,
@@ -928,6 +960,7 @@ export type PlaygroundResponse =
     DeleteWorkspaceResponse |
     GetAnalysisFilesResponse |
     SetAnalysisFileResponse |
+    DeleteAnalysisFileResponse |
     GetAnalysisFileResponse |
     GetAnalysisRunsResponse |
     GetDataBlobResponse |
@@ -959,6 +992,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isDeleteWorkspaceResponse,
         isGetAnalysisFilesResponse,
         isSetAnalysisFileResponse,
+        isDeleteAnalysisFileResponse,
         isGetAnalysisFileResponse,
         isGetAnalysisRunsResponse,
         isGetDataBlobResponse,

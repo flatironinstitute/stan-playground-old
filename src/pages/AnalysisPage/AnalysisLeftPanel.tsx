@@ -1,15 +1,16 @@
-import { Edit } from "@mui/icons-material";
+import { Add, Edit, Refresh } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
-import { prompt } from "../../confirm_prompt_alert";
+import SmallIconButton from "../../components/SmallIconButton";
+import { confirm, prompt } from "../../confirm_prompt_alert";
 import { setAnalysisFileContent } from "../../dbInterface/dbInterface";
 import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import useRoute from "../../useRoute";
 import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
-import AnalysisFileBrowser from "./AnalysisFileBrowser/AnalysisFileBrowser";
+import AnalysisFileBrowser2 from "./AnalysisFileBrowser/AnalysisFileBrowser2";
 import { useAnalysis } from "./AnalysisPageContext";
 import AnalysisSettingsWindow from "./AnalysisSettingsWindow";
 import BackButton from "./BackButton";
@@ -20,13 +21,20 @@ type Props = {
 }
 
 const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
-    const {analysisId, analysis, workspaceId, openTab, analysisFiles, setAnalysisProperty, refreshFiles} = useAnalysis()
+    const {analysisId, analysis, workspaceId, openTab, closeTab, analysisFiles, setAnalysisProperty, refreshFiles, deleteFile} = useAnalysis()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
     const {workspace, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
     const handleOpenFile = useCallback((fileName: string) => {
         openTab(`file:${fileName}`)
     }, [openTab])
+
+    const handleDeleteFile = useCallback(async (fileName: string) => {
+        const okay = await confirm(`Delete ${fileName}?`)
+        if (!okay) return
+        deleteFile(fileName)
+        closeTab(`file:${fileName}`)
+    }, [deleteFile, closeTab])
 
     const [initialized, setInitialized] = useState(false)
 
@@ -57,7 +65,7 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         refreshFiles()
     }, [workspaceId, analysisId, auth, refreshFiles])
 
-    const topHeight = 125
+    const topHeight = 140
     const bottomHeight = 20
     const padding = 10
     const W = width - 2 * padding
@@ -66,11 +74,12 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         <div style={{position: 'absolute', left: padding, top: padding, width: W, height: H}}>
             <div style={{position: 'absolute', width: W, height: topHeight}}>
                 <BackButton />
+                <hr />
                 <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
                     Analysis: {analysis?.name}&nbsp;
                     {
                         (workspaceRole === 'admin' || workspaceRole === 'editor') && (
-                            <IconButton onClick={handleEditAnalysisName}><Edit fontSize="small" /></IconButton>
+                            <SmallIconButton onClick={handleEditAnalysisName} title="Edit analysis name" icon={<Edit />} />
                         )
                     }
                 </div>
@@ -86,15 +95,17 @@ const AnalysisLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                         </tr>
                     </tbody>
                 </table>
+                <hr />
                 <div>
-                    <button onClick={handleCreateFile}>Create file</button>
-                    <button onClick={refreshFiles}>Refresh</button>
+                    <SmallIconButton onClick={handleCreateFile} title="Create a new file" icon={<Add />} />
+                    <SmallIconButton onClick={refreshFiles} title="Refresh files" icon={<Refresh />} />
                 </div>
             </div>
             <div style={{position: 'absolute', width: W, top: topHeight, height: H - topHeight - bottomHeight}}>
-                <AnalysisFileBrowser
+                <AnalysisFileBrowser2
                     analysisFiles={analysisFiles}
                     onOpenFile={handleOpenFile}
+                    onDeleteFile={handleDeleteFile}
                 />
             </div>
             <div style={{position: 'absolute', width: W, top: H - bottomHeight + 5, height: bottomHeight}}>

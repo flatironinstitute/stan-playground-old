@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { fetchAnalysisFile, fetchDataBlob, setAnalysisFileContent } from "../../../dbInterface/dbInterface"
+import { deleteAnalysisFile, fetchAnalysisFile, fetchDataBlob, setAnalysisFileContent } from "../../../dbInterface/dbInterface"
 import { useGithubAuth } from "../../../GithubAuth/useGithubAuth"
 
 const useAnalysisFile = (workspaceId: string, analysisId: string, fileName: string) => {
@@ -30,17 +30,22 @@ const useAnalysisFile = (workspaceId: string, analysisId: string, fileName: stri
             console.warn('No workspace ID')
             return
         }
-        if (!auth) {
-            console.warn('No auth')
-            return
-        }
         await setAnalysisFileContent(workspaceId, analysisId, fileName, fileContent, auth)
         setRefreshCode(rc => rc + 1)
     }, [workspaceId, analysisId, fileName, auth])
 
+    const deleteFileHandler = useMemo(() => (async () => {
+        if (!workspaceId) {
+            console.warn('No workspace ID')
+            return
+        }
+        await deleteAnalysisFile(workspaceId, analysisId, fileName, auth)
+    }), [workspaceId, analysisId, fileName, auth])
+
     return {
         fileContent,
-        setFileContent: setFileContentHandler
+        setFileContent: setFileContentHandler,
+        deleteFile: deleteFileHandler
     }
 }
 

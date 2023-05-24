@@ -1,6 +1,7 @@
 import { ChonkyActions, ChonkyFileActionData, FileArray, FileBrowser as ChonkyFileBrowser, FileList } from 'chonky';
 import { FunctionComponent, useCallback, useMemo } from "react";
 import { SPAnalysisFile } from '../../../types/stan-playground-types';
+import { useAnalysis } from '../AnalysisPageContext';
 
 type Props = {
     analysisFiles: SPAnalysisFile[] | undefined
@@ -11,6 +12,8 @@ type Props = {
 
 const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile, analysisFiles}) => {
     // const {analysisId} = useAnalysis()
+
+    const {currentTabName} = useAnalysis()
 
     // const [files, setFiles] = useState<FileArray>([])
 
@@ -49,11 +52,14 @@ const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile, analysisFile
             ret.push({
                 id: x.fileName,
                 name: x.fileName,
-                isDir: false
+                color: 'file:' + x.fileName === currentTabName ? 'red' : undefined,
+                isDir: false,
+                size: x.contentSize,
+                modDate: new Date(x.timestampModified * 1000)
             })
         }
         return ret
-    }, [analysisFiles])
+    }, [analysisFiles, currentTabName])
 
     const handleFileAction = useCallback((data: ChonkyFileActionData) => {
         if (data.id === ChonkyActions.OpenFiles.id) {
@@ -89,6 +95,7 @@ const AnalysisFileBrowser: FunctionComponent<Props> = ({onOpenFile, analysisFile
             folderChain={folderChain}
             defaultFileViewActionId={ChonkyActions.EnableListView.id}
             onFileAction={handleFileAction}
+            disableSelection={true}
         >
             {/* <FileNavbar /> */}
             {/* <FileToolbar /> */}

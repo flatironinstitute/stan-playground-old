@@ -8,7 +8,7 @@ const postPlaygroundRequestFromComputeResource = async (req: PlaygroundRequestPa
         signature: await signMessage(req, o.computeResourceId, o.privateKey)
     }
 
-    const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'https://stan-plaground.vercel.app'
+    const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'https://stan-playground.vercel.app'
     // const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'http://localhost:3000'
 
     try {

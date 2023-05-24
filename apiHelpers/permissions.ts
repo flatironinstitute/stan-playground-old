@@ -59,6 +59,15 @@ export const userCanSetAnalysisFile = (workspace: SPWorkspace, userId: string | 
     return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
 }
 
+export const userCanDeleteAnalysisFile = (workspace: SPWorkspace, userId: string | undefined, clientId: string | undefined): boolean => {
+    if (!userId) {
+        // anonymous cannot delete
+        return false
+    }
+    const workspaceRole = getWorkspaceRole(workspace, userId)
+    return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
+}
+
 export const userCanSetWorkspaceProperty = (workspace: SPWorkspace, userId: string | undefined): boolean => {
     const workspaceRole = getWorkspaceRole(workspace, userId)
     return (workspaceRole === 'admin')

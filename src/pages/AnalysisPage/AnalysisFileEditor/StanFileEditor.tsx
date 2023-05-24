@@ -1,3 +1,4 @@
+import { AutoFixHigh } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import Splitter from "../../../components/Splitter";
 import StanFileRunsWindow from "../StanFileRunsWindow/StanFileRunsWindow";
@@ -9,12 +10,13 @@ type Props = {
     fileName: string
     fileContent: string
     setFileContent: (text: string) => void
+    onDeleteFile?: () => void
     readOnly: boolean
     width: number
     height: number
 }
 
-const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, width, height}) => {
+const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, onDeleteFile, readOnly, width, height}) => {
     const [editedText, setEditedText] = useState<string>(fileContent)
     const [editedStanTextOverrider, setEditedStanTextOverrider] = useState<(text: string) => void>()
     const handleEditedTextOverrider = useCallback((overrider: (text: string) => void) => {
@@ -39,7 +41,8 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
         if (!readOnly) {
             if (editedText !== undefined) {
                 ret.push({
-                    label: "auto format",
+                    icon: <AutoFixHigh />,
+                    label: 'Auto Format',
                     onClick: handleAutoFormat,
                     color: 'darkblue'
                 })
@@ -73,6 +76,7 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                     // onReload={refreshMainStanText}
                     onEditedTextChanged={setEditedText}
                     onEditedTextOverrider={handleEditedTextOverrider}
+                    onDeleteFile={onDeleteFile}
                     readOnly={readOnly}
                     toolbarItems={toolbarItems}
                 />

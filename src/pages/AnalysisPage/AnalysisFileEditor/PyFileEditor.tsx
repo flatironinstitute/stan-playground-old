@@ -8,11 +8,12 @@ type Props = {
     fileContent: string
     setFileContent: (text: string) => void
     readOnly: boolean
+    onDeleteFile?: () => void
     width: number
     height: number
 }
 
-const PyFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, width, height}) => {
+const PyFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
     return (
         <Splitter
             width={width}
@@ -29,6 +30,7 @@ const PyFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileC
                 text={fileContent}
                 onSetText={setFileContent}
                 readOnly={readOnly}
+                onDeleteFile={onDeleteFile}
             />
             <ScriptJobsWindow
                 width={0}

@@ -25,10 +25,10 @@ const ApplicationBar: FunctionComponent<Props> = () => {
 
     return (
         <span>
-            <AppBar position="static" style={{height: applicationBarHeight - 10, color: 'white', background: '#e09050'}}>
+            <AppBar position="static" style={{height: applicationBarHeight - 10, color: 'black', background: '#e09050'}}>
                 <Toolbar style={{minHeight: applicationBarHeight - 10}}>
                     <img src="/stan-playground-logo.png" alt="logo" height={30} style={{paddingBottom: 5, cursor: 'pointer'}} onClick={onHome} />
-                    <div>&nbsp;&nbsp;&nbsp;Stan Playground</div>
+                    <div onClick={onHome} style={{cursor: 'pointer'}}>&nbsp;&nbsp;&nbsp;Stan Playground</div>
                     <span style={{marginLeft: 'auto'}} />
                     {
                         signedIn && (

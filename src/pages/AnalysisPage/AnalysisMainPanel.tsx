@@ -6,7 +6,7 @@ import { useAnalysis } from "./AnalysisPageContext";
 import ScriptJobView from "./ScriptJobView/ScriptJobView";
 
 const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
-    const {openTabNames, currentTabName, setCurrentTab, closeTab} = useAnalysis()
+    const {openTabNames, currentTabName, setCurrentTab, closeTab, refreshFiles} = useAnalysis()
     const {workspaceRole} = useWorkspace()
     const canEdit = workspaceRole === 'admin' || workspaceRole === 'editor'
     return (
@@ -30,6 +30,7 @@ const AnalysisMainPanel: FunctionComponent<{width: number, height: number}> = ({
                         key={tabName}
                         fileName={tabName.slice('file:'.length)}
                         readOnly={!canEdit}
+                        onFileDeleted={() => {closeTab(tabName); refreshFiles()}}
                         width={0}
                         height={0}
                     />

@@ -1,9 +1,10 @@
 import { Editor } from "@monaco-editor/react";
-import { Refresh } from "@mui/icons-material";
+import { Delete, Refresh, Save } from "@mui/icons-material";
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { FunctionComponent, PropsWithChildren, useCallback, useEffect, useState } from "react";
 import Hyperlink from "../../../components/Hyperlink";
+import SmallIconButton from "../../../components/SmallIconButton";
 import { highlightJsData } from "./stanLang";
 
 type Monaco = typeof monaco
@@ -19,18 +20,20 @@ type Props = {
     onEditedTextChanged?: (text: string) => void
     onEditedTextOverrider?: (cb: (text: string) => void) => void
     toolbarItems?: ToolbarItem[]
+    onDeleteFile?: () => void
     label: string
     width: number
     height: number
 }
 
 export type ToolbarItem = {
-    label: string
+    label?: string
+    icon?: any
     onClick?: () => void
     color?: string
 }
 
-const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, readOnly, wordWrap, onReload, onEditedTextChanged, onEditedTextOverrider, toolbarItems, language, label, width, height}) => {
+const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, readOnly, wordWrap, onReload, onEditedTextChanged, onEditedTextOverrider, toolbarItems, onDeleteFile, language, label, width, height}) => {
     const [internalText, setInternalText] = useState('')
     useEffect(() => {
         if (text !== undefined) {
@@ -154,10 +157,12 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
     return (
         <div style={{position: 'absolute', width, height, overflow: 'hidden'}} onKeyDown={handleKeyDown}>
             <NotSelectable>
-                <div style={{position: 'absolute', paddingLeft: 20, paddingTop: 5, width, height: toolbarHeight, backgroundColor: 'lightgray'}}>
+                <div style={{position: 'absolute', paddingLeft: 20, paddingTop: 3, width: width - 50, height: toolbarHeight, backgroundColor: 'lightgray', overflow: 'hidden'}}>
                     {label}
                     &nbsp;&nbsp;&nbsp;
-                    {!readOnly && <Hyperlink disabled={text === internalText} onClick={handleSave} color="black">save</Hyperlink>}
+                    {!readOnly && (
+                        <SmallIconButton onClick={handleSave} icon={<Save />} title="Save file" disabled={text === internalText} />
+                    )}
                     &nbsp;&nbsp;&nbsp;
                     {readOnly && <span style={{color: 'gray'}}>read only</span>}
                     &nbsp;&nbsp;&nbsp;
@@ -166,6 +171,17 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
                     {toolbarItems && toolbarItems.map((item, i) => (
                         <ToolbarItemComponent key={i} item={item} />
                     ))}
+                </div>
+                <div style={{position: 'absolute', paddingLeft: 20, paddingTop: 3, left: width - 50, width: 50, height: toolbarHeight, backgroundColor: 'lightgray'}}>
+                    {
+                        onDeleteFile && (
+                            <SmallIconButton
+                                onClick={onDeleteFile}
+                                icon={<Delete />}
+                                title="Delete this file"
+                            />
+                        )
+                    }
                 </div>
             </NotSelectable>
             <div style={{position: 'absolute', top: toolbarHeight, width, height: height - toolbarHeight}}>
@@ -188,18 +204,29 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
 }
 
 const ToolbarItemComponent: FunctionComponent<{item: ToolbarItem}> = ({item}) => {
-    const {onClick, color, label} = item
-    if (!onClick) {
-        return <span style={{color: color || 'gray'}}>{label}&nbsp;&nbsp;&nbsp;</span>
+    const {onClick, color, label, icon} = item
+    if (icon) {
+        return (
+            <SmallIconButton
+                onClick={onClick}
+                icon={icon}
+                title={label}
+            />
+        )
     }
-    return (
-        <span>
-            <Hyperlink onClick={onClick} color={color || 'gray'}>
-                {label}
-            </Hyperlink>
-            &nbsp;&nbsp;&nbsp;
-        </span>
-    )
+    else {
+        if (!onClick) {
+            return <span style={{color: color || 'gray'}}>{label}&nbsp;&nbsp;&nbsp;</span>
+        }
+        return (
+            <span>
+                <Hyperlink onClick={onClick} color={color || 'gray'}>
+                    {label}
+                </Hyperlink>
+                &nbsp;&nbsp;&nbsp;
+            </span>
+        )
+    }
 }
 
 const LowerABit: FunctionComponent<PropsWithChildren<{numPixels: number}>> = ({children, numPixels}) => {

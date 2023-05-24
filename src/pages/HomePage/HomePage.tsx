@@ -3,12 +3,15 @@ import { SetupHomePage } from "./HomePageContext";
 import WorkspacesMenuBar from "./WorkspacesMenuBar";
 import WorkspacesTable from "./WorkspacesTable";
 import "./HomePage.css";
+import Hyperlink from "../../components/Hyperlink";
+import useRoute from "../../useRoute";
 
 type Props = {
     // none
 }
 
 const HomePage: FunctionComponent<Props> = () => {
+    const { setRoute } = useRoute()
     return (
         <SetupHomePage>
             <div className="homepage">
@@ -23,6 +26,8 @@ const HomePage: FunctionComponent<Props> = () => {
                 <h2>Workspaces</h2>
                 <WorkspacesMenuBar />
                 <WorkspacesTable />
+                <hr />
+                <p><Hyperlink onClick={() => setRoute({page: 'compute-resources'})}>Manage your compute resources</Hyperlink></p>
             </div>
         </SetupHomePage>
     )

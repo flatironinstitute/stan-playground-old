@@ -1,4 +1,4 @@
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteAnalysisFileRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
@@ -177,6 +177,20 @@ export const setAnalysisFileContent = async (workspaceId: string, analysisId: st
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'setAnalysisFile') {
         throw Error(`Unexpected response type ${resp.type}. Expected setAnalysisFile.`)
+    }
+}
+
+export const deleteAnalysisFile = async (workspaceId: string, analysisId: string, fileName: string, auth: Auth): Promise<void> => {
+    const req: DeleteAnalysisFileRequest = {
+        type: 'deleteAnalysisFile',
+        timestamp: Date.now() / 1000,
+        analysisId,
+        workspaceId,
+        fileName
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'deleteAnalysisFile') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteAnalysisFile.`)
     }
 }
 

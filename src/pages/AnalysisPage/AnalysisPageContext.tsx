@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createAnalysisRun, createScriptJob, deleteAnalysis, deleteAnalysisRun, deleteCompletedScriptJobs, deleteScriptJob, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns, fetchScriptJobs, setAnalysisProperty } from '../../dbInterface/dbInterface';
+import { createAnalysisRun, createScriptJob, deleteAnalysis, deleteAnalysisFile, deleteAnalysisRun, deleteCompletedScriptJobs, deleteScriptJob, fetchAnalysis, fetchAnalysisFiles, fetchAnalysisRuns, fetchScriptJobs, setAnalysisProperty } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPScriptJob } from '../../types/stan-playground-types';
 
@@ -88,6 +88,7 @@ type AnalysisPageContextType = {
     deleteScriptJob: (scriptJobId: string) => void
     refreshScriptJobs: () => void
     deleteCompletedScriptJobs: (o: {scriptFileName: string}) => void
+    deleteFile: (fileName: string) => void
 }
 
 const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
@@ -108,7 +109,8 @@ const AnalysisPageContext = React.createContext<AnalysisPageContextType>({
     createScriptJob: () => {},
     deleteScriptJob: () => {},
     refreshScriptJobs: () => {},
-    deleteCompletedScriptJobs: () => {}
+    deleteCompletedScriptJobs: () => {},
+    deleteFile: () => {}
 })
 
 export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({children, analysisId}) => {
@@ -161,13 +163,33 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
     }, [refreshRunsCode, analysisId, auth])
 
     useEffect(() => {
-        (async () => {
+        let canceled = false
+        ;(async () => {
             setScriptJobs(undefined)
             if (!analysisId) return
             const x = await fetchScriptJobs(analysisId, auth)
+            if (canceled) return
             setScriptJobs(x)
         })()
+        return () => {canceled = true}
     }, [refreshScriptJobsCode, analysisId, auth])
+
+    // if any script jobs are newly completed, refresh the files
+    const [previousScriptJobs, setPreviousScriptJobs] = React.useState<SPScriptJob[] | undefined>(undefined)
+    useEffect(() => {
+        if (!scriptJobs) return
+        if (previousScriptJobs) {
+            const newlyCompletedJobs = scriptJobs.filter(j => (
+                j.status === 'completed' && (
+                    !previousScriptJobs.find(pj => (pj.scriptJobId === j.scriptJobId) && pj.status === 'completed')
+                )
+            ))
+            if (newlyCompletedJobs.length > 0) {
+                refreshFiles()
+            }
+        }
+        setPreviousScriptJobs(scriptJobs)
+    }, [scriptJobs, previousScriptJobs, refreshFiles])
 
     const createAnalysisRunHandler = useCallback(async (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => {
         if (!analysis) return
@@ -209,6 +231,12 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         refreshAnalysis()
     }, [analysisId, refreshAnalysis, auth])
 
+    const deleteFile = useCallback(async (fileName: string) => {
+        if (!analysis) return
+        await deleteAnalysisFile(analysis.workspaceId, analysisId, fileName, auth)
+        refreshFiles()
+    }, [analysis, analysisId, refreshFiles, auth])
+
     const value = React.useMemo(() => ({
         analysisId,
         workspaceId: analysis?.workspaceId ?? '',
@@ -231,8 +259,9 @@ export const SetupAnalysisPage: FunctionComponent<PropsWithChildren<Props>> = ({
         refreshScriptJobs,
         createScriptJob: createScriptJobHandler,
         deleteScriptJob: deleteScriptJobHandler,
-        deleteCompletedScriptJobs: deleteCompletedScriptJobsHandler
-    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler, setAnalysisPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler])
+        deleteCompletedScriptJobs: deleteCompletedScriptJobsHandler,
+        deleteFile
+    }), [analysis, analysisFiles, analysisRuns, analysisId, refreshFiles, selectedTabs, refreshRuns, createAnalysisRunHandler, deleteAnalysisRunHandler, deleteAnalysisHandler, setAnalysisPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile])
 
     return (
         <AnalysisPageContext.Provider value={value}>

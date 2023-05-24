@@ -1,6 +1,7 @@
 import { Delete } from "@mui/icons-material";
 import { FunctionComponent, useCallback } from "react";
 import Hyperlink from "../../../components/Hyperlink";
+import SmallIconButton from "../../../components/SmallIconButton";
 import { confirm } from "../../../confirm_prompt_alert";
 import { timeAgoString } from "../../../timeStrings";
 import { SPScriptJob } from "../../../types/stan-playground-types";
@@ -59,7 +60,12 @@ const JobRowActions: FunctionComponent<{job: SPScriptJob}> = ({job}) => {
     }, [job, deleteScriptJob])
     return (
         <span>
-            <Delete onClick={handleDelete} />
+            <SmallIconButton
+                onClick={handleDelete}
+                icon={<Delete />}
+                title="Delete this job"
+                fontSize={20}
+            />
         </span>
     )
 }

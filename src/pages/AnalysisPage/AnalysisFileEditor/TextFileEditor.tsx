@@ -6,11 +6,12 @@ type Props = {
     fileContent: string
     setFileContent: (text: string) => void
     readOnly: boolean
+    onDeleteFile?: () => void
     width: number
     height: number
 }
 
-const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, width, height}) => {
+const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
     const language = fileName.endsWith('.json') ? (
         'json'
     ) : fileName.endsWith('.yaml') ? (
@@ -23,6 +24,8 @@ const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
         'javascript'
     ) : 'text'
 
+    const wordWrap = language === 'json'
+
     return (
         <TextEditor
             width={width}
@@ -31,8 +34,10 @@ const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
             label={fileName}
             text={fileContent}
             onSetText={setFileContent}
+            wordWrap={wordWrap}
             // onReload=
             readOnly={readOnly}
+            onDeleteFile={onDeleteFile}
         />
     )
 }
