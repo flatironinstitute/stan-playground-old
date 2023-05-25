@@ -1,6 +1,7 @@
 scriptJobs
 example-data
 tmp
+.stan-playground-compute-resource.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
