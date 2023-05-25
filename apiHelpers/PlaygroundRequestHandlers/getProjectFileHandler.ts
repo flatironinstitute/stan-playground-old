@@ -22,7 +22,7 @@ const getProjectFileHandler = async (request: GetProjectFileRequest, o: {verifie
     }
 
     const workspace = await getWorkspace(projectFile.workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
+    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
         throw new Error('User does not have permission to read this workspace')
     }
 

@@ -10,7 +10,7 @@ const getDataBlobHandler = async (request: GetDataBlobRequest, o: {verifiedClien
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
+    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
         throw new Error('User does not have permission to read this workspace')
     }
     

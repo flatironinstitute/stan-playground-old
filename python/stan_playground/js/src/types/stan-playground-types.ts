@@ -139,8 +139,6 @@ export type SPScriptJob = {
     workspaceId: string
     projectId: string
     scriptFileName: string
-    scriptContentSha1: string
-    scriptContentSize: number
     status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
     error?: string
     consoleOutput?: string
@@ -155,8 +153,6 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
         workspaceId: isString,
         projectId: isString,
         scriptFileName: isString,
-        scriptContentSha1: isString,
-        scriptContentSize: isNumber,
         status: isOneOf([isEqualTo('pending'), isEqualTo('queued'), isEqualTo('running'), isEqualTo('completed'), isEqualTo('failed')]),
         error: optional(isString),
         consoleOutput: optional(isString),

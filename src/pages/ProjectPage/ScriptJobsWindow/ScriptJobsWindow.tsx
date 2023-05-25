@@ -13,7 +13,7 @@ type Props = {
 
 const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName }) => {
     const {workspaceRole, workspace} = useWorkspace()
-    const {refreshScriptJobs, createScriptJob, deleteCompletedScriptJobs} = useProject()
+    const {refreshScriptJobs, createScriptJob, deleteCompletedScriptJobs, scriptJobs} = useProject()
 
     const handleCreateJob = useCallback(async () => {
         createScriptJob({scriptFileName: fileName})
@@ -22,9 +22,17 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
     const [createJobTitle, setCreateJobTitle] = useState('Run script')
 
     const canCreateJob = useMemo(() => {
+        if (!scriptJobs) return false // not loaded yet
+        const pendingJob = scriptJobs.find(jj => (jj.scriptFileName === fileName && jj.status === 'pending'))
+        const runningJob = scriptJobs.find(jj => (jj.scriptFileName === fileName && jj.status === 'running'))
+        if ((pendingJob) || (runningJob)) {
+            setCreateJobTitle('A job is already pending or running for this script.')
+            return false
+        }
+        let okay = false
         if (workspaceRole === 'admin' || workspaceRole === 'editor') {
             if (workspace?.computeResourceId) {
-                return true
+                okay = true
             }
             else {
                 setCreateJobTitle('You must set a compute resource for this workspace before you can run scripts.')
@@ -33,8 +41,8 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
         else {
             setCreateJobTitle('You do not have permission to run scripts for this project.')
         }
-        return false
-    }, [workspaceRole, workspace])
+        return okay
+    }, [workspaceRole, workspace, scriptJobs, fileName])
 
     const handleDeleteCompletedJobs = useCallback(async () => {
         const okay = await confirm('Delete all completed or failed jobs?')

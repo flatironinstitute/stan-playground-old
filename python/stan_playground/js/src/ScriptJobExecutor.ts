@@ -1,4 +1,4 @@
-import { GetDataBlobRequest, GetPendingScriptJobRequest, PlaygroundRequestPayload, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest"
+import { GetDataBlobRequest, GetPendingScriptJobRequest, GetProjectFileRequest, PlaygroundRequestPayload, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest"
 import fs from 'fs'
 import path from 'path'
 import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource"
@@ -28,6 +28,7 @@ class ScriptJobExecutor {
                 computeResourceId: this.#computeResourceId
             }
             const resp = await this.postPlaygroundRequest(req)
+            let handledAJob = false
             if (resp) {
                 if (resp.type !== 'getPendingScriptJob') {
                     console.warn(resp)
@@ -37,6 +38,7 @@ class ScriptJobExecutor {
                 if (scriptJob) {
                     try {
                         await this.handleScriptJob(scriptJob)
+                        handledAJob = true
                     }
                     catch (err) {
                         console.warn(err)
@@ -45,7 +47,12 @@ class ScriptJobExecutor {
                 }
             }
 
-            await sleepSec(30)
+            if (!handledAJob) {
+                await sleepSec(30)
+            }
+            else {
+                await sleepSec(1)
+            }
         }
     }
     async postPlaygroundRequest(req: PlaygroundRequestPayload): Promise<PlaygroundResponse | undefined> {
@@ -58,7 +65,7 @@ class ScriptJobExecutor {
         console.info(`Handling script job: ${scriptJob.scriptJobId} - ${scriptJob.scriptFileName}`)
         await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'status', 'running')
         const scriptFileName = scriptJob.scriptFileName
-        const scriptFileContent = await this.loadDataBlob(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptContentSha1)
+        const scriptFileContent = await this.loadFileContent(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptFileName)
         const scriptJobDir = path.join(this.a.dir, 'scriptJobs', scriptJob.scriptJobId)
         fs.mkdirSync(scriptJobDir, {recursive: true})
         fs.writeFileSync(path.join(scriptJobDir, scriptFileName), scriptFileContent)
@@ -166,6 +173,23 @@ class ScriptJobExecutor {
         }
 
         await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'status', 'completed')
+    }
+    async loadFileContent(workspaceId: string, projectId: string, fileName: string): Promise<string> {
+        const req: GetProjectFileRequest = {
+            type: 'getProjectFile',
+            timestamp: Date.now() / 1000,
+            projectId,
+            fileName
+        }
+        const resp = await this.postPlaygroundRequest(req)
+        if (!resp) {
+            throw Error('Unable to get project file')
+        }
+        if (resp.type !== 'getProjectFile') {
+            console.warn(resp)
+            throw Error('Unexpected response type. Expected getProjectFile')
+        }
+        return await this.loadDataBlob(workspaceId, projectId, resp.projectFile.contentSha1)
     }
     async loadDataBlob(workspaceId: string, projectId: string, sha1: string): Promise<string> {
         const req: GetDataBlobRequest = {

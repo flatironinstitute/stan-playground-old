@@ -30,7 +30,12 @@ export const userCanDeleteWorkspace = (workspace: SPWorkspace, userId: string | 
     return workspaceRole === 'admin'
 }
 
-export const userCanReadWorkspace = (workspace: SPWorkspace, userId: string | undefined): boolean => {
+export const userCanReadWorkspace = (workspace: SPWorkspace, userId: string | undefined, clientId: string | undefined): boolean => {
+    if (clientId) {
+        if ((workspace.computeResourceId) && (workspace.computeResourceId === clientId)) {
+            return true
+        }
+    }
     const workspaceRole = getWorkspaceRole(workspace, userId)
     return ((workspaceRole === 'admin' || workspaceRole === 'editor' || workspaceRole === 'viewer'))
 }

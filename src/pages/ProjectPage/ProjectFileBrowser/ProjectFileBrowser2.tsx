@@ -38,6 +38,7 @@ const ProjectFileBrowser2: FunctionComponent<Props> = ({onOpenFile, onDeleteFile
                 timestampModified: x.timestampModified
             })
         }
+        ret.sort((a, b) => (a.name.localeCompare(b.name)))
         return ret
     }, [projectFiles, currentTabName])
 
@@ -98,9 +99,13 @@ const FileIcon: FunctionComponent<{fileName: string}> = ({fileName}) => {
         return <FontAwesomeIcon icon={faPython} style={{color: 'darkblue'}} />
     }
     else if (ext === 'json') {
-        return <FontAwesomeIcon icon={faFile as any} style={{color: 'brown'}} />
+        return <FontAwesomeIcon icon={faFile as any} style={{color: 'black'}} />
     }
     else if (ext === 'stan') {
+        // return <FontAwesomeIcon icon={faFile as any} style={{color: 'darkorange'}} />
+        return <img src="/stan-logo.png" alt="logo" height={14} style={{paddingBottom: 0, cursor: 'pointer'}} />
+    }
+    else if (ext === 'spa') {
         return <FontAwesomeIcon icon={faFile as any} style={{color: 'darkorange'}} />
     }
     else {

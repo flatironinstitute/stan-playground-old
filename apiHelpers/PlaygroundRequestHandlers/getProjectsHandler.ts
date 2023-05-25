@@ -10,7 +10,7 @@ const getProjectsHandler = async (request: GetProjectsRequest, o: {verifiedClien
     const projectsCollection = client.db('stan-playground').collection('projects')
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
+    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
         throw new Error('User does not have permission to read this workspace')
     }
     

@@ -19,7 +19,7 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedC
 
             throw new Error('Invalid workspace in database (1)')
         }
-        if (userCanReadWorkspace(workspace, o.verifiedUserId)) {
+        if (userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
             workspaces2.push(workspace)
         }
     }

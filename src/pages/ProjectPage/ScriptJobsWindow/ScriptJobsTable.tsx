@@ -1,5 +1,5 @@
 import { Delete } from "@mui/icons-material";
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent, useCallback, useMemo } from "react";
 import Hyperlink from "../../../components/Hyperlink";
 import SmallIconButton from "../../../components/SmallIconButton";
 import { confirm } from "../../../confirm_prompt_alert";
@@ -15,6 +15,12 @@ type Props = {
 const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
     const {scriptJobs, openTab} = useProject()
     const {workspaceRole} = useWorkspace()
+
+    const sortedScriptJobs = useMemo(() => {
+        if (!scriptJobs) return []
+        return [...scriptJobs].sort((a, b) => (b.timestampCreated - a.timestampCreated))
+    }, [scriptJobs])
+
     return (
         <table className="scientific-table" style={{fontSize: 12}}>
             <thead>
@@ -28,7 +34,7 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
             </thead>
             <tbody>
                 {
-                    scriptJobs?.filter(jj => (jj.scriptFileName === fileName)).map((jj) => (
+                    sortedScriptJobs.filter(jj => (jj.scriptFileName === fileName)).map((jj) => (
                         <tr key={jj.scriptJobId}>
                             <td>{
                                 (workspaceRole === 'admin' || workspaceRole === 'editor') && (
@@ -41,7 +47,13 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
                                 </Hyperlink>
                             </td>
                             <td>{jj.scriptFileName}</td>
-                            <td>{jj.status}</td>
+                            <td>{
+                                jj.status !== 'failed' ? (
+                                    <span>{jj.status}</span>
+                                ) : (
+                                    <span style={{color: 'red'}}>{jj.status}: {jj.error}</span>
+                                )
+                            }</td>
                             <td>{timeAgoString(jj.timestampCreated)}</td>
                         </tr>
                     ))

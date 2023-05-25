@@ -14,7 +14,7 @@ const getScriptJob = async (request: GetScriptJobRequest, o: {verifiedClientId?:
     
     const workspaceId = project.workspaceId
     const workspace = await getWorkspace(workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
+    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
         throw new Error('User does not have permission to read this workspace')
     }
     if (request.workspaceId !== workspaceId) {

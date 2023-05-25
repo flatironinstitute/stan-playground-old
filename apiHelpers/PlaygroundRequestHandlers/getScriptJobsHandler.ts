@@ -14,7 +14,7 @@ const getScriptJobs = async (request: GetScriptJobsRequest, o: {verifiedClientId
     
     const workspaceId = project.workspaceId
     const workspace = await getWorkspace(workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
+    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
         throw new Error('User does not have permission to read this workspace')
     }
     
@@ -24,7 +24,14 @@ const getScriptJobs = async (request: GetScriptJobsRequest, o: {verifiedClientId
     for (const job of scriptJobs) {
         if (!isSPScriptJob(job)) {
             console.warn(job)
-            throw new Error('Invalid script job in database')
+
+            // during development, delete the record
+            await scriptJobsCollection.deleteOne({
+                projectId: request.projectId,
+                scriptJobId: job.scriptJobId
+            })
+
+            throw new Error('Invalid script job in database (3)')
         }
     }
     return {
