@@ -1,6 +1,7 @@
 import { FunctionComponent, useCallback } from "react";
 import { useProject } from "../ProjectPageContext";
 import ScriptFileEditor from "./ScriptFileEditor";
+import SpaOutputFileEditor from "./SpaOutputFileEditor/SpaOutputFileEditor";
 import StanFileEditor from "./StanFileEditor";
 import TextFileEditor from "./TextFileEditor";
 import useProjectFile from "./useProjectFile";
@@ -46,6 +47,16 @@ const ProjectFileEditor: FunctionComponent<Props> = ({fileName, readOnly, onFile
                 setFileContent={setFileContent}
                 readOnly={readOnly}
                 onDeleteFile={handleDeleteFile}
+                width={width}
+                height={height}
+            />
+        )
+    }
+    else if (fileName.endsWith('.spa.out')) {
+        return (
+            <SpaOutputFileEditor
+                fileName={fileName}
+                fileContent={fileContent || ''}
                 width={width}
                 height={height}
             />

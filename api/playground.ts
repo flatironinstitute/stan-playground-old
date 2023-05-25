@@ -38,7 +38,7 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
     if ([
         'http://localhost:3000',
         'http://localhost:5173',
-        'https://flatironinstitute.github.io',
+        'https://flatironinstitute.github.io', // this is important for mcmc monitor
         'https://scratchrealm.github.io'
     ].includes(req.headers.origin || '')) {
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '')

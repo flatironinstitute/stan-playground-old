@@ -1,8 +1,6 @@
 import { GetProjectFileRequest, GetProjectFileResponse } from "../../src/types/PlaygroundRequest";
 import { isSPProjectFile } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
-import getWorkspace from "../getWorkspace";
-import { userCanReadWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const getProjectFileHandler = async (request: GetProjectFileRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<GetProjectFileResponse> => {
