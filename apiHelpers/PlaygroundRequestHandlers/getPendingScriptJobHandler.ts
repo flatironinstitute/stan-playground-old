@@ -19,7 +19,7 @@ const getPendingScriptJobHandler = async (request: GetPendingScriptJobRequest, o
     if (scriptJob) {
         if (!isSPScriptJob(scriptJob)) {
             console.warn(scriptJob)
-            throw new Error('Invalid script job in database')
+            throw new Error('Invalid script job in database (1)')
         }
     }
     return {

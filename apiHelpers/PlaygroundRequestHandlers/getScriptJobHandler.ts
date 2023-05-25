@@ -31,7 +31,7 @@ const getScriptJob = async (request: GetScriptJobRequest, o: {verifiedClientId?:
     }
     if (!isSPScriptJob(scriptJob)) {
         console.warn(scriptJob)
-        throw new Error('Invalid script job in database')
+        throw new Error('Invalid script job in database (2)')
     }
     return {
         type: 'getScriptJob',

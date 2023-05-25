@@ -19,8 +19,8 @@ const deleteProjectHandler = async (request: DeleteProjectRequest, o: {verifiedC
         throw new Error('Incorrect workspace ID')
     }
 
-    const projectsFilesCollection = client.db('stan-playground').collection('projectsFiles')
-    projectsFilesCollection.deleteMany({projectId: request.projectId})
+    const projectFilesCollection = client.db('stan-playground').collection('projectFiles')
+    projectFilesCollection.deleteMany({projectId: request.projectId})
 
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     dataBlobsCollection.deleteMany({projectId: request.projectId})

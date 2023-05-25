@@ -76,11 +76,30 @@ class ScriptJobExecutor {
                 // const args = [scriptFileName]
 
                 const cmd = 'singularity'
-                const args = ['exec', '-C', '--pwd', '/working', '--bind', `.:/working`, 'docker://jjuanda/numpy-pandas', 'python', scriptFileName]
+                const args = [
+                    'exec',
+                    '-C', // do not mount home directory, tmp directory, etc
+                    '--pwd', '/working',
+                    '--bind', `.:/working`,
+                    // '--cpus', '1', // limit to 1 CPU - having trouble with this - cgroups issue
+                    '--memory', '1G', // limit to 1 GB memory
+                    'docker://jjuanda/numpy-pandas',
+                    'python3', scriptFileName
+                ]
+                const timeoutSec = 10
 
                 const child = spawn(cmd, args, {
                     cwd: scriptJobDir
                 })
+
+                const timeoutId = setTimeout(() => {
+                    if (returned) return
+                    console.info(`Killing script job: ${scriptJob.scriptJobId} - ${scriptJob.scriptFileName} due to timeout`)
+                    returned = true
+                    child.kill()
+                    reject(Error('Timeout'))
+                }, timeoutSec * 1000)
+
                 child.stdout.on('data', (data: any) => {
                     console.log(`stdout: ${data}`)
                     consoleOutput += data
@@ -98,11 +117,13 @@ class ScriptJobExecutor {
                 child.on('error', (error: any) => {
                     if (returned) return
                     returned = true
+                    clearTimeout(timeoutId)
                     reject(error)
                 })
                 child.on('close', (code: any) => {
                     if (returned) return
                     returned = true
+                    clearTimeout(timeoutId)
                     if (code !== 0) {
                         reject(Error(`Process exited with code ${code}`))
                     }

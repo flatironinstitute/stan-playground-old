@@ -21,17 +21,17 @@ const deleteProjectFileHandler = async (request: DeleteProjectFileRequest, o: {v
         throw new Error('User does not have permission to delete an projects file in this workspace')
     }
 
-    const projectsFilesCollection = client.db('stan-playground').collection('projectsFiles')
+    const projectFilesCollection = client.db('stan-playground').collection('projectFiles')
 
-    const projectsFile = await projectsFilesCollection.findOne({
+    const projectFile = await projectFilesCollection.findOne({
         projectId,
         fileName: request.fileName
     })
-    if (!projectsFile) {
+    if (!projectFile) {
         throw new Error('Project file does not exist')
     }
 
-    await projectsFilesCollection.deleteOne({
+    await projectFilesCollection.deleteOne({
         projectId,
         fileName: request.fileName
     })

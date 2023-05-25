@@ -31,17 +31,17 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
 
     const client = await getMongoClient()
 
-    const projectsFilesCollection = client.db('stan-playground').collection('projectsFiles')
-    const projectsFile = removeIdField(await projectsFilesCollection.findOne({
+    const projectFilesCollection = client.db('stan-playground').collection('projectFiles')
+    const projectFile = removeIdField(await projectFilesCollection.findOne({
         workspaceId,
         projectId: request.projectId,
         fileName: request.scriptFileName
     }))
-    if (!projectsFile) {
+    if (!projectFile) {
         throw new Error('Project file not found')
     }
-    if (!isSPProjectFile(projectsFile)) {
-        console.warn(projectsFile)
+    if (!isSPProjectFile(projectFile)) {
+        console.warn(projectFile)
         throw new Error('Invalid projects file in database (1)')
     }
 
@@ -52,8 +52,8 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
         workspaceId,
         projectId: request.projectId,
         scriptFileName: request.scriptFileName,
-        scriptContentSha1: projectsFile.contentSha1,
-        scriptContentSize: projectsFile.contentSize,
+        scriptContentSha1: projectFile.contentSha1,
+        scriptContentSize: projectFile.contentSize,
         status: 'pending',
         computeResourceId: workspace.computeResourceId,
         timestampCreated: Date.now() / 1000,

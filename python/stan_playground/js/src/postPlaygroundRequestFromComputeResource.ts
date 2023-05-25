@@ -8,8 +8,8 @@ const postPlaygroundRequestFromComputeResource = async (req: PlaygroundRequestPa
         signature: await signMessage(req, o.computeResourceId, o.privateKey)
     }
 
-    const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'https://stan-playground.vercel.app'
-    // const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'http://localhost:3000'
+    // const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'https://stan-playground.vercel.app'
+    const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'http://localhost:3000'
 
     try {
         const resp = await fetch(`${stanPlaygroundUrl}/api/playground`, {
@@ -19,7 +19,15 @@ const postPlaygroundRequestFromComputeResource = async (req: PlaygroundRequestPa
             },
             body: JSON.stringify(rr),
         })
-        const responseData = await resp.json()
+        const responseText = await resp.text()
+        let responseData: any
+        try {
+            responseData = JSON.parse(responseText)
+        }
+        catch (err) {
+            console.warn(responseText)
+            throw Error('Unable to parse playground response')
+        }
         if (!isPlaygroundResponse(responseData)) {
             console.warn(responseData)
             throw Error('Unexpected playground response')
