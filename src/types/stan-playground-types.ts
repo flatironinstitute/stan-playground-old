@@ -38,8 +38,8 @@ export const isSPWorkspace = (x: any): x is SPWorkspace => {
     })
 }
 
-export type SPAnalysis = {
-    analysisId: string
+export type SPProject = {
+    projectId: string
     workspaceId: string
     name: string
     description: string
@@ -47,9 +47,9 @@ export type SPAnalysis = {
     timestampModified: number
 }
 
-export const isSPAnalysis = (x: any): x is SPAnalysis => {
+export const isSPProject = (x: any): x is SPProject => {
     return validateObject(x, {
-        analysisId: isString,
+        projectId: isString,
         workspaceId: isString,
         name: isString,
         description: isString,
@@ -58,8 +58,8 @@ export const isSPAnalysis = (x: any): x is SPAnalysis => {
     })
 }
 
-export type SPAnalysisFile = {
-    analysisId: string
+export type SPProjectFile = {
+    projectId: string
     workspaceId: string
     fileName: string
     contentSha1: string
@@ -67,9 +67,9 @@ export type SPAnalysisFile = {
     timestampModified: number
 }
 
-export const isSPAnalysisFile = (x: any): x is SPAnalysisFile => {
+export const isSPProjectFile = (x: any): x is SPProjectFile => {
     return validateObject(x, {
-        analysisId: isString,
+        projectId: isString,
         workspaceId: isString,
         fileName: isString,
         contentSha1: isString,
@@ -85,7 +85,7 @@ export type SPCollection = {
     description: string
     timestampCreated: number
     timestampModified: number
-    analysisIds: string[]
+    projectIds: string[]
 }
 
 export const isSPCollection = (x: any): x is SPCollection => {
@@ -96,13 +96,13 @@ export const isSPCollection = (x: any): x is SPCollection => {
         description: isString,
         timestampCreated: isNumber,
         timestampModified: isNumber,
-        analysisIds: isArrayOf(isString)
+        projectIds: isArrayOf(isString)
     })
 }
 
-export type SPAnalysisRun = {
-    analysisRunId: string
-    analysisId: string
+export type SPProjectRun = {
+    projectRunId: string
+    projectId: string
     workspaceId: string
     timestampCreated: number
     stanProgramFileName: string
@@ -118,10 +118,10 @@ export type SPAnalysisRun = {
     error?: string
 }
 
-export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
+export const isSPProjectRun = (x: any): x is SPProjectRun => {
     return validateObject(x, {
-        analysisRunId: isString,
-        analysisId: isString,
+        projectRunId: isString,
+        projectId: isString,
         workspaceId: isString,
         timestampCreated: isNumber,
         stanProgramFileName: isString,
@@ -141,7 +141,7 @@ export const isSPAnalysisRun = (x: any): x is SPAnalysisRun => {
 
 export type SPDataBlob = {
     workspaceId: string
-    analysisId: string
+    projectId: string
     sha1: string
     size: number
     content: string
@@ -150,7 +150,7 @@ export type SPDataBlob = {
 export const isSPDataBlob = (x: any): x is SPDataBlob => {
     return validateObject(x, {
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         sha1: isString,
         size: isNumber,
         content: isString
@@ -176,7 +176,7 @@ export const isSPComputeResource = (x: any): x is SPComputeResource => {
 export type SPScriptJob = {
     scriptJobId: string
     workspaceId: string
-    analysisId: string
+    projectId: string
     scriptFileName: string
     scriptContentSha1: string
     scriptContentSize: number
@@ -192,7 +192,7 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
     return validateObject(x, {
         scriptJobId: isString,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         scriptFileName: isString,
         scriptContentSha1: isString,
         scriptContentSize: isNumber,

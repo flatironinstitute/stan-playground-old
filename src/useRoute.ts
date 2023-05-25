@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom"
 export type Route = {
     page: 'home'
 } | {
-    page: 'analysis'
-    analysisId: string
+    page: 'project'
+    projectId: string
 } | {
     page: 'workspace'
     workspaceId: string
@@ -24,12 +24,12 @@ const useRoute = () => {
     const navigate = useNavigate()
     const p = location.pathname
     const route: Route = useMemo(() => {
-        if (p.startsWith('/analysis/')) {
+        if (p.startsWith('/project/')) {
             const a = p.split('/')
-            const analysisId = a[2]
+            const projectId = a[2]
             return {
-                page: 'analysis',
-                analysisId
+                page: 'project',
+                projectId
             }
         }
         else if (p.startsWith('/workspace/')) {
@@ -71,8 +71,8 @@ const useRoute = () => {
         if (r.page === 'home') {
             navigate('/')
         }
-        else if (r.page === 'analysis') {
-            navigate(`/analysis/${r.analysisId}`)
+        else if (r.page === 'project') {
+            navigate(`/project/${r.projectId}`)
         }
         else if (r.page === 'workspace') {
             navigate(`/workspace/${r.workspaceId}`)

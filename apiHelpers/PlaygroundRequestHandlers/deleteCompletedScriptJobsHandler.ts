@@ -1,5 +1,5 @@
 import { DeleteCompletedScriptJobsRequest, DeleteCompletedScriptJobsResponse } from "../../src/types/PlaygroundRequest";
-import getAnalysis from "../getAnalysis";
+import getProject from "../getProject";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
 import getWorkspaceRole from "../getWorkspaceRole";
@@ -16,16 +16,16 @@ const deleteCompletedScriptJobsHandler = async (request: DeleteCompletedScriptJo
         throw new Error('User does not have permission to delete script jobs in this workspace')
     }
 
-    const analysis = await getAnalysis(request.analysisId, {useCache: false})
+    const project = await getProject(request.projectId, {useCache: false})
     // important to check this
-    if (analysis.workspaceId !== request.workspaceId) {
+    if (project.workspaceId !== request.workspaceId) {
         throw new Error('Incorrect workspace ID')
     }
 
     const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
 
-    await scriptJobsCollection.deleteMany({analysisId: request.analysisId, scriptFileName: request.scriptFileName, status: 'completed'})
-    await scriptJobsCollection.deleteMany({analysisId: request.analysisId, scriptFileName: request.scriptFileName, status: 'failed'})
+    await scriptJobsCollection.deleteMany({projectId: request.projectId, scriptFileName: request.scriptFileName, status: 'completed'})
+    await scriptJobsCollection.deleteMany({projectId: request.projectId, scriptFileName: request.scriptFileName, status: 'failed'})
 
     return {
         type: 'deleteCompletedScriptJobs'

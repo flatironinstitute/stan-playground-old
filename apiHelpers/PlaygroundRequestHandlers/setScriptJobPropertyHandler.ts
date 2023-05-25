@@ -23,8 +23,8 @@ const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest,
         console.warn(scriptJob)
         throw new Error('Invalid script job in database')
     }
-    if ((scriptJob.analysisId !== request.analysisId) || (scriptJob.workspaceId !== request.workspaceId)) {
-        throw new Error(`Script job ID ${request.scriptJobId} does not match analysisId ${request.analysisId} and workspaceId ${request.workspaceId}`)
+    if ((scriptJob.projectId !== request.projectId) || (scriptJob.workspaceId !== request.workspaceId)) {
+        throw new Error(`Script job ID ${request.scriptJobId} does not match projectId ${request.projectId} and workspaceId ${request.workspaceId}`)
     }
     if (scriptJob.computeResourceId !== verifiedClientId) {
         throw new Error(`Script job ID ${request.scriptJobId} does not match verifiedClientId ${verifiedClientId}`)

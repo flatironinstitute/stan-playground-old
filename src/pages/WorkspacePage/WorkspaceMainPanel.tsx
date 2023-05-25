@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
-import AnalysesMenuBar from "./AnalysesMenuBar";
-import AnalysesTable from "./AnalysesTable";
+import ProjectsMenuBar from "./ProjectsMenuBar";
+import ProjectsTable from "./ProjectsTable";
 
 type Props = {
     width: number
@@ -10,8 +10,8 @@ type Props = {
 const WorkspaceMainPanel: FunctionComponent<Props> = ({ width, height }) => {
     return (
         <div>
-            <AnalysesMenuBar />
-            <AnalysesTable />
+            <ProjectsMenuBar />
+            <ProjectsTable />
         </div>
     )
 }

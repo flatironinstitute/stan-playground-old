@@ -16,7 +16,7 @@ const getDataBlobHandler = async (request: GetDataBlobRequest, o: {verifiedClien
     
     const dataBlob = removeIdField(await dataBlobsCollection.findOne({
         workspaceId: request.workspaceId,
-        analysisId: request.analysisId,
+        projectId: request.projectId,
         sha1: request.sha1
     }))
     if (!dataBlob) {

@@ -1,7 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useEffect, useMemo } from 'react';
-import { createAnalysis, deleteWorkspace, fetchAnalyses, fetchWorkspace, setWorkspaceProperty, setWorkspaceUsers } from '../../dbInterface/dbInterface';
+import { createProject, deleteWorkspace, fetchProjects, fetchWorkspace, setWorkspaceProperty, setWorkspaceUsers } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
-import { SPAnalysis, SPWorkspace } from '../../types/stan-playground-types';
+import { SPProject, SPWorkspace } from '../../types/stan-playground-types';
 
 type Props = {
     workspaceId: string
@@ -10,8 +10,8 @@ type Props = {
 type WorkspacePageContextType = {
     workspaceId: string
     workspace: SPWorkspace | undefined
-    analyses: SPAnalysis[]
-    createAnalysis: (analysisName: string) => Promise<string>
+    projects: SPProject[]
+    createProject: (projectName: string) => Promise<string>
     deleteWorkspace: () => Promise<void>
     setWorkspaceUsers: (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => Promise<void>
     setWorkspaceProperty: (property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any) => Promise<void>
@@ -21,8 +21,8 @@ type WorkspacePageContextType = {
 const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
     workspaceId: '',
     workspace: undefined,
-    analyses: [],
-    createAnalysis: async () => {return ''},
+    projects: [],
+    createProject: async () => {return ''},
     deleteWorkspace: async () => {},
     setWorkspaceUsers: async () => {},
     setWorkspaceProperty: async () => {},
@@ -30,18 +30,18 @@ const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
 })
 
 export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = ({children, workspaceId}) => {
-    const [analyses, setAnalyses] = React.useState<SPAnalysis[]>([])
+    const [projects, setProjects] = React.useState<SPProject[]>([])
     const [workspace, setWorkspace] = React.useState<SPWorkspace | undefined>(undefined)
-    const [analysesRefreshCode, setAnalysesRefreshCode] = React.useState(0)
+    const [projectsRefreshCode, setProjectsRefreshCode] = React.useState(0)
     const [workspaceRefreshCode, setWorkspaceRefreshCode] = React.useState(0)
 
     const {accessToken, userId} = useGithubAuth()
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
-    const createAnalysisHandler = useMemo(() => (async (analysisName: string): Promise<string> => {
-        const analysisId = await createAnalysis(workspaceId, analysisName, auth)
-        setAnalysesRefreshCode(rc => rc + 1)
-        return analysisId
+    const createProjectHandler = useMemo(() => (async (projectName: string): Promise<string> => {
+        const projectId = await createProject(workspaceId, projectName, auth)
+        setProjectsRefreshCode(rc => rc + 1)
+        return projectId
     }), [workspaceId, auth])
 
     const deleteWorkspaceHandler = useMemo(() => (async () => {
@@ -69,12 +69,12 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
 
     useEffect(() => {
         (async () => {
-            setAnalyses([])
+            setProjects([])
             if (!workspaceId) return
-            const analyses = await fetchAnalyses(workspaceId, auth)
-            setAnalyses(analyses)
+            const projects = await fetchProjects(workspaceId, auth)
+            setProjects(projects)
         })()
-    }, [analysesRefreshCode, workspaceId, auth])
+    }, [projectsRefreshCode, workspaceId, auth])
 
     useEffect(() => {
         (async () => {
@@ -104,13 +104,13 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const value = React.useMemo(() => ({
         workspaceId,
         workspace,
-        analyses,
-        createAnalysis: createAnalysisHandler,
+        projects,
+        createProject: createProjectHandler,
         deleteWorkspace: deleteWorkspaceHandler,
         setWorkspaceUsers: setWorkspaceUsersHandler,
         setWorkspaceProperty: setWorkspacePropertyHandler,
         workspaceRole
-    }), [analyses, workspace, createAnalysisHandler, deleteWorkspaceHandler, setWorkspaceUsersHandler, setWorkspacePropertyHandler, workspaceId, workspaceRole])
+    }), [projects, workspace, createProjectHandler, deleteWorkspaceHandler, setWorkspaceUsersHandler, setWorkspacePropertyHandler, workspaceId, workspaceRole])
 
     return (
         <WorkspacePageContext.Provider value={value}>
@@ -124,8 +124,8 @@ export const useWorkspace = () => {
     return {
         workspaceId: context.workspaceId,
         workspace: context.workspace,
-        analyses: context.analyses,
-        createAnalysis: context.createAnalysis,
+        projects: context.projects,
+        createProject: context.createProject,
         deleteWorkspace: context.deleteWorkspace,
         setWorkspaceUsers: context.setWorkspaceUsers,
         setWorkspaceProperty: context.setWorkspaceProperty,

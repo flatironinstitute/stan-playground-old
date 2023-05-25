@@ -13,14 +13,14 @@ const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verif
         throw new Error('User does not have permission to delete this workspace')
     }
 
-    const analysesCollection = client.db('stan-playground').collection('analyses')
-    analysesCollection.deleteMany({workspaceId: request.workspaceId})
+    const projectsCollection = client.db('stan-playground').collection('projects')
+    projectsCollection.deleteMany({workspaceId: request.workspaceId})
 
-    const analysisFilesCollection = client.db('stan-playground').collection('analysisFiles')
-    analysisFilesCollection.deleteMany({workspaceId: request.workspaceId})
+    const projectFilesCollection = client.db('stan-playground').collection('projectFiles')
+    projectFilesCollection.deleteMany({workspaceId: request.workspaceId})
 
-    const analysisRunsCollection = client.db('stan-playground').collection('analysisRuns')
-    analysisRunsCollection.deleteMany({workspaceId: request.workspaceId})
+    const projectRunsCollection = client.db('stan-playground').collection('projectRuns')
+    projectRunsCollection.deleteMany({workspaceId: request.workspaceId})
 
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     dataBlobsCollection.deleteMany({workspaceId: request.workspaceId})

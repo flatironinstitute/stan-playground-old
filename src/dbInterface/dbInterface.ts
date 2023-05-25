@@ -1,5 +1,5 @@
-import { CreateAnalysisRequest, CreateAnalysisRunRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteAnalysisFileRequest, DeleteAnalysisRequest, DeleteAnalysisRunRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetAnalysesRequest, GetAnalysisFileRequest, GetAnalysisFilesRequest, GetAnalysisRequest, GetAnalysisRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetAnalysisFileRequest, SetAnalysisPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
-import { SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
+import { CreateProjectRequest, CreateProjectRunRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteProjectRunRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetProjectRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { SPProject, SPProjectFile, SPProjectRun, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 export const fetchWorkspaces = async (auth: Auth): Promise<SPWorkspace[]> => {
@@ -44,30 +44,30 @@ export const createWorkspace = async (workspaceName: string, auth: Auth): Promis
     return resp.workspaceId
 }
 
-export const fetchAnalyses = async (workspaceId: string, auth: Auth): Promise<SPAnalysis[]> => {
-    const req: GetAnalysesRequest = {
-        type: 'getAnalyses',
+export const fetchProjects = async (workspaceId: string, auth: Auth): Promise<SPProject[]> => {
+    const req: GetProjectsRequest = {
+        type: 'getProjects',
         timestamp: Date.now() / 1000,
         workspaceId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'getAnalyses') {
-        throw Error(`Unexpected response type ${resp.type}. Expected getAnalyses.`)
+    if (resp.type !== 'getProjects') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProjects.`)
     }
-    return resp.analyses}
+    return resp.projects}
 
-export const createAnalysis = async (workspaceId: string, analysisName: string, auth: Auth): Promise<string> => {
-    const req: CreateAnalysisRequest = {
-        type: 'createAnalysis',
+export const createProject = async (workspaceId: string, projectName: string, auth: Auth): Promise<string> => {
+    const req: CreateProjectRequest = {
+        type: 'createProject',
         timestamp: Date.now() / 1000,
         workspaceId,
-        name: analysisName
+        name: projectName
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'createAnalysis') {
-        throw Error(`Unexpected response type ${resp.type}. Expected createAnalysis.`)
+    if (resp.type !== 'createProject') {
+        throw Error(`Unexpected response type ${resp.type}. Expected createProject.`)
     }
-    return resp.analysisId
+    return resp.projectId
 }
 
 export const setWorkspaceUsers = async (workspaceId: string, users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[], auth: Auth): Promise<void> => {
@@ -110,52 +110,52 @@ export const deleteWorkspace = async (workspaceId: string, auth: Auth): Promise<
     }
 }
 
-export const fetchAnalysis = async (analysisId: string, auth: Auth): Promise<SPAnalysis | undefined> => {
-    const req: GetAnalysisRequest = {
-        type: 'getAnalysis',
+export const fetchProject = async (projectId: string, auth: Auth): Promise<SPProject | undefined> => {
+    const req: GetProjectRequest = {
+        type: 'getProject',
         timestamp: Date.now() / 1000,
-        analysisId
+        projectId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'getAnalysis') {
-        throw Error(`Unexpected response type ${resp.type}. Expected getAnalysis.`)
+    if (resp.type !== 'getProject') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProject.`)
     }
-    return resp.analysis
+    return resp.project
 }
 
-export const fetchAnalysisFiles = async (analysisId: string, auth: Auth): Promise<SPAnalysisFile[]> => {
-    const req: GetAnalysisFilesRequest = {
-        type: 'getAnalysisFiles',
+export const fetchProjectFiles = async (projectId: string, auth: Auth): Promise<SPProjectFile[]> => {
+    const req: GetProjectFilesRequest = {
+        type: 'getProjectFiles',
         timestamp: Date.now() / 1000,
-        analysisId
+        projectId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'getAnalysisFiles') {
-        throw Error(`Unexpected response type ${resp.type}. Expected getAnalysisFiles.`)
+    if (resp.type !== 'getProjectFiles') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProjectFiles.`)
     }
-    return resp.analysisFiles
+    return resp.projectFiles
 }
 
-export const fetchAnalysisFile = async (analysisId: string, fileName: string, auth: Auth): Promise<SPAnalysisFile | undefined> => {
-    const req: GetAnalysisFileRequest = {
-        type: 'getAnalysisFile',
+export const fetchProjectFile = async (projectId: string, fileName: string, auth: Auth): Promise<SPProjectFile | undefined> => {
+    const req: GetProjectFileRequest = {
+        type: 'getProjectFile',
         timestamp: Date.now() / 1000,
-        analysisId,
+        projectId,
         fileName
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'getAnalysisFile') {
-        throw Error(`Unexpected response type ${resp.type}. Expected getAnalysisFile.`)
+    if (resp.type !== 'getProjectFile') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProjectFile.`)
     }
-    return resp.analysisFile
+    return resp.projectFile
 }
 
-export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha1: string, auth: Auth): Promise<string | undefined> => {
+export const fetchDataBlob = async (workspaceId: string, projectId: string, sha1: string, auth: Auth): Promise<string | undefined> => {
     const req: GetDataBlobRequest = {
         type: 'getDataBlob',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
+        projectId,
         sha1
     }
     const resp = await postPlaygroundRequest(req, {...auth})
@@ -165,103 +165,103 @@ export const fetchDataBlob = async (workspaceId: string, analysisId: string, sha
     return resp.content
 }
 
-export const setAnalysisFileContent = async (workspaceId: string, analysisId: string, fileName: string, fileContent: string, auth: Auth): Promise<void> => {
-    const req: SetAnalysisFileRequest = {
-        type: 'setAnalysisFile',
+export const setProjectFileContent = async (workspaceId: string, projectId: string, fileName: string, fileContent: string, auth: Auth): Promise<void> => {
+    const req: SetProjectFileRequest = {
+        type: 'setProjectFile',
         timestamp: Date.now() / 1000,
-        analysisId,
+        projectId,
         workspaceId,
         fileName,
         fileContent
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'setAnalysisFile') {
-        throw Error(`Unexpected response type ${resp.type}. Expected setAnalysisFile.`)
+    if (resp.type !== 'setProjectFile') {
+        throw Error(`Unexpected response type ${resp.type}. Expected setProjectFile.`)
     }
 }
 
-export const deleteAnalysisFile = async (workspaceId: string, analysisId: string, fileName: string, auth: Auth): Promise<void> => {
-    const req: DeleteAnalysisFileRequest = {
-        type: 'deleteAnalysisFile',
+export const deleteProjectFile = async (workspaceId: string, projectId: string, fileName: string, auth: Auth): Promise<void> => {
+    const req: DeleteProjectFileRequest = {
+        type: 'deleteProjectFile',
         timestamp: Date.now() / 1000,
-        analysisId,
+        projectId,
         workspaceId,
         fileName
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'deleteAnalysisFile') {
-        throw Error(`Unexpected response type ${resp.type}. Expected deleteAnalysisFile.`)
+    if (resp.type !== 'deleteProjectFile') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteProjectFile.`)
     }
 }
 
-export const fetchAnalysisRuns = async (analysisId: string, auth: Auth): Promise<SPAnalysisRun[]> => {
-    const req: GetAnalysisRunsRequest = {
-        type: 'getAnalysisRuns',
+export const fetchProjectRuns = async (projectId: string, auth: Auth): Promise<SPProjectRun[]> => {
+    const req: GetProjectRunsRequest = {
+        type: 'getProjectRuns',
         timestamp: Date.now() / 1000,
-        analysisId
+        projectId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'getAnalysisRuns') {
-        throw Error(`Unexpected response type ${resp.type}. Expected getAnalysisRuns.`)
+    if (resp.type !== 'getProjectRuns') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getProjectRuns.`)
     }
-    return resp.analysisRuns
+    return resp.projectRuns
 }
 
-export const createAnalysisRun = async (workspaceId: string, analysisId: string, o: {stanFileName: string, datasetFileName: string, optionsFileName: string}, auth: Auth): Promise<string> => {
-    const req: CreateAnalysisRunRequest = {
-        type: 'createAnalysisRun',
+export const createProjectRun = async (workspaceId: string, projectId: string, o: {stanFileName: string, datasetFileName: string, optionsFileName: string}, auth: Auth): Promise<string> => {
+    const req: CreateProjectRunRequest = {
+        type: 'createProjectRun',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
+        projectId,
         stanProgramFileName: o.stanFileName,
         datasetFileName: o.datasetFileName,
         optionsFileName: o.optionsFileName
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'createAnalysisRun') {
-        throw Error(`Unexpected response type ${resp.type}. Expected createAnalysisRun.`)
+    if (resp.type !== 'createProjectRun') {
+        throw Error(`Unexpected response type ${resp.type}. Expected createProjectRun.`)
     }
-    return resp.analysisRunId
+    return resp.projectRunId
 }
 
-export const deleteAnalysisRun = async (workspaceId: string, analysisId: string, analysisRunId: string, auth: Auth): Promise<void> => {
-    const req: DeleteAnalysisRunRequest = {
-        type: 'deleteAnalysisRun',
+export const deleteProjectRun = async (workspaceId: string, projectId: string, projectRunId: string, auth: Auth): Promise<void> => {
+    const req: DeleteProjectRunRequest = {
+        type: 'deleteProjectRun',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
-        analysisRunId
+        projectId,
+        projectRunId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'deleteAnalysisRun') {
-        throw Error(`Unexpected response type ${resp.type}. Expected deleteAnalysisRun.`)
+    if (resp.type !== 'deleteProjectRun') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteProjectRun.`)
     }
 }
 
-export const deleteAnalysis = async (workspaceId: string, analysisId: string, auth: Auth): Promise<void> => {
-    const req: DeleteAnalysisRequest = {
-        type: 'deleteAnalysis',
+export const deleteProject = async (workspaceId: string, projectId: string, auth: Auth): Promise<void> => {
+    const req: DeleteProjectRequest = {
+        type: 'deleteProject',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId
+        projectId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'deleteAnalysis') {
-        throw Error(`Unexpected response type ${resp.type}. Expected deleteAnalysis.`)
+    if (resp.type !== 'deleteProject') {
+        throw Error(`Unexpected response type ${resp.type}. Expected deleteProject.`)
     }
 }
 
-export const setAnalysisProperty = async (analysisId: string, property: 'name', value: any, auth: Auth): Promise<void> => {
-    const req: SetAnalysisPropertyRequest = {
-        type: 'setAnalysisProperty',
+export const setProjectProperty = async (projectId: string, property: 'name', value: any, auth: Auth): Promise<void> => {
+    const req: SetProjectPropertyRequest = {
+        type: 'setProjectProperty',
         timestamp: Date.now() / 1000,
-        analysisId,
+        projectId,
         property,
         value
     }
     const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'setAnalysisProperty') {
-        throw Error(`Unexpected response type ${resp.type}. Expected setAnalysisProperty.`)
+    if (resp.type !== 'setProjectProperty') {
+        throw Error(`Unexpected response type ${resp.type}. Expected setProjectProperty.`)
     }
 }
 
@@ -303,12 +303,12 @@ export const deleteComputeResource = async (computeResourceId: string, auth: Aut
     }
 }
 
-export const createScriptJob = async (workspaceId: string, analysisId: string, o: {scriptFileName: string}, auth: Auth): Promise<string> => {
+export const createScriptJob = async (workspaceId: string, projectId: string, o: {scriptFileName: string}, auth: Auth): Promise<string> => {
     const req: CreateScriptJobRequest = {
         type: 'createScriptJob',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
+        projectId,
         scriptFileName: o.scriptFileName
     }
     const resp = await postPlaygroundRequest(req, {...auth})
@@ -318,12 +318,12 @@ export const createScriptJob = async (workspaceId: string, analysisId: string, o
     return resp.scriptJobId
 }
 
-export const deleteScriptJob = async (workspaceId: string, analysisId: string, scriptJobId: string, auth: Auth): Promise<void> => {
+export const deleteScriptJob = async (workspaceId: string, projectId: string, scriptJobId: string, auth: Auth): Promise<void> => {
     const req: DeleteScriptJobRequest = {
         type: 'deleteScriptJob',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
+        projectId,
         scriptJobId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
@@ -332,12 +332,12 @@ export const deleteScriptJob = async (workspaceId: string, analysisId: string, s
     }
 }
 
-export const deleteCompletedScriptJobs = async (workspaceId: string, analysisId: string, scriptFileName: string, auth: Auth): Promise<void> => {
+export const deleteCompletedScriptJobs = async (workspaceId: string, projectId: string, scriptFileName: string, auth: Auth): Promise<void> => {
     const req: DeleteCompletedScriptJobsRequest = {
         type: 'deleteCompletedScriptJobs',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
+        projectId,
         scriptFileName
     }
     const resp = await postPlaygroundRequest(req, {...auth})
@@ -346,11 +346,11 @@ export const deleteCompletedScriptJobs = async (workspaceId: string, analysisId:
     }
 }
 
-export const fetchScriptJobs = async (analysisId: string, auth: Auth): Promise<SPScriptJob[]> => {
+export const fetchScriptJobs = async (projectId: string, auth: Auth): Promise<SPScriptJob[]> => {
     const req: GetScriptJobsRequest = {
         type: 'getScriptJobs',
         timestamp: Date.now() / 1000,
-        analysisId
+        projectId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'getScriptJobs') {
@@ -359,12 +359,12 @@ export const fetchScriptJobs = async (analysisId: string, auth: Auth): Promise<S
     return resp.scriptJobs
 }
 
-export const fetchScriptJob = async (workspaceId: string, analysisId: string, scriptJobId: string, auth: Auth): Promise<SPScriptJob | undefined> => {
+export const fetchScriptJob = async (workspaceId: string, projectId: string, scriptJobId: string, auth: Auth): Promise<SPScriptJob | undefined> => {
     const req: GetScriptJobRequest = {
         type: 'getScriptJob',
         timestamp: Date.now() / 1000,
         workspaceId,
-        analysisId,
+        projectId,
         scriptJobId
     }
     const resp = await postPlaygroundRequest(req, {...auth})

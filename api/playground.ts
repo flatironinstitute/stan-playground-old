@@ -1,21 +1,21 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
 import JSONStringifyDeterminsitic from '../apiHelpers/jsonStringifyDeterministic'
-import createAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisHandler'
-import createAnalysisRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createAnalysisRunHandler'
+import createProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/createProjectHandler'
+import createProjectRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createProjectRunHandler'
 import createScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/createScriptJobHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
-import deleteAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteAnalysisFileHandler'
-import deleteAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteAnalysisHandler'
+import deleteProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectFileHandler'
+import deleteProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectHandler'
 import deleteCompletedScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteCompletedScriptJobsHandler'
 import deleteComputeResourceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteComputeResourceHandler'
 import deleteScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteScriptJobHandler'
 import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
-import getAnalysesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysesHandler'
-import getAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFileHandler'
-import getAnalysisFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisFilesHandler'
-import getAnalysisHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisHandler'
-import getAnalysisRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getAnalysisRunsHandler'
+import getProjectsHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectsHandler'
+import getProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFileHandler'
+import getProjectFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFilesHandler'
+import getProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectHandler'
+import getProjectRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectRunsHandler'
 import getComputeResourcesHandler from '../apiHelpers/PlaygroundRequestHandlers/getComputeResourcesHandler'
 import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
 import getPendingScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobHandler'
@@ -24,13 +24,13 @@ import getScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getScr
 import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
 import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
 import registerComputeResourceHandler from '../apiHelpers/PlaygroundRequestHandlers/registerComputeResourceHandler'
-import setAnalysisFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisFileHandler'
-import setAnalysisPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setAnalysisPropertyHandler'
+import setProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setProjectFileHandler'
+import setProjectPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setProjectPropertyHandler'
 import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setScriptJobPropertyHandler'
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateAnalysisRequest, isCreateAnalysisRunRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteAnalysisFileRequest, isDeleteAnalysisRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetAnalysesRequest, isGetAnalysisFileRequest, isGetAnalysisFilesRequest, isGetAnalysisRequest, isGetAnalysisRunsRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetAnalysisFileRequest, isSetAnalysisPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateProjectRequest, isCreateProjectRunRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetProjectsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectRunsRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -98,32 +98,32 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         else if (isCreateWorkspaceRequest(payload)) {
             return await createWorkspaceHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysesRequest(payload)) {
-            return await getAnalysesHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isGetProjectsRequest(payload)) {
+            return await getProjectsHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisRequest(payload)) {
-            return await getAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isGetProjectRequest(payload)) {
+            return await getProjectHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isCreateAnalysisRequest(payload)) {
-            return await createAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isCreateProjectRequest(payload)) {
+            return await createProjectHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isDeleteWorkspaceRequest(payload)) {
             return await deleteWorkspaceHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisFilesRequest(payload)) {
-            return await getAnalysisFilesHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isGetProjectFilesRequest(payload)) {
+            return await getProjectFilesHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isSetAnalysisFileRequest(payload)) {
-            return await setAnalysisFileHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isSetProjectFileRequest(payload)) {
+            return await setProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisFileRequest(payload)) {
-            return await getAnalysisFileHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isGetProjectFileRequest(payload)) {
+            return await getProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetAnalysisRunsRequest(payload)) {
-            return await getAnalysisRunsHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isGetProjectRunsRequest(payload)) {
+            return await getProjectRunsHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isCreateAnalysisRunRequest(payload)) {
-            return await createAnalysisRunHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isCreateProjectRunRequest(payload)) {
+            return await createProjectRunHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isSetWorkspaceUsersRequest(payload)) {
             return await setWorkspaceUsersHandler(payload, {verifiedClientId, verifiedUserId})
@@ -134,11 +134,11 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         else if (isGetDataBlobRequest(payload)) {
             return await getDataBlobHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isDeleteAnalysisRequest(payload)) {
-            return await deleteAnalysisHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isDeleteProjectRequest(payload)) {
+            return await deleteProjectHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isSetAnalysisPropertyRequest(payload)) {
-            return await setAnalysisPropertyHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isSetProjectPropertyRequest(payload)) {
+            return await setProjectPropertyHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isGetComputeResourcesRequest(payload)) {
             return await getComputeResourcesHandler(payload, {verifiedClientId, verifiedUserId})
@@ -170,8 +170,8 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         else if (isSetScriptJobPropertyRequest(payload)) {
             return await setScriptJobPropertyHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isDeleteAnalysisFileRequest(payload)) {
-            return await deleteAnalysisFileHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isDeleteProjectFileRequest(payload)) {
+            return await deleteProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else {
             throw Error(`Unexpected request type: ${(payload as any).type}`)

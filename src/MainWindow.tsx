@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 import ApplicationBar, { applicationBarHeight } from "./ApplicationBar";
 import GitHubAuthPage from "./GitHub/GitHubAuthPage";
-import AnalysisPage from "./pages/AnalysisPage/AnalysisPage";
+import ProjectPage from "./pages/ProjectPage/ProjectPage";
 import ComputeResourcesPage from "./pages/ComputeResourcesPage/ComputeResourcesPage";
 import HomePage from "./pages/HomePage/HomePage";
 import RegisterComputeResourcePage from "./pages/RegisterComputeResourcePage/RegisterComputeResourcePage";
@@ -27,8 +27,8 @@ const MainWindow: FunctionComponent<Props> = () => {
                         <HomePage />
                     ) : route.page === 'workspace' ? (
                         <WorkspacePage workspaceId={route.workspaceId} width={width} height={height - applicationBarHeight} />
-                    ) : route.page === 'analysis' ? (
-                        <AnalysisPage analysisId={route.analysisId} width={width} height={height - applicationBarHeight} />
+                    ) : route.page === 'project' ? (
+                        <ProjectPage projectId={route.projectId} width={width} height={height - applicationBarHeight} />
                     ) : route.page === 'github-auth' ? (
                         <GitHubAuthPage />
                     ) : route.page === 'compute-resources' ? (

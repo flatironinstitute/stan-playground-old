@@ -1,19 +1,17 @@
-import { DeleteScriptJobRequest, DeleteScriptJobResponse } from "../../src/types/PlaygroundRequest";
+import { DeleteProjectRunRequest, DeleteProjectRunResponse } from "../../src/types/PlaygroundRequest";
 import getProject from "../getProject";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
-import getWorkspaceRole from "../getWorkspaceRole";
+import { userCanDeleteProjectRun } from "../permissions";
 
-const deleteScriptJobHandler = async (request: DeleteScriptJobRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteScriptJobResponse> => {
+const deleteProjectRunHandler = async (request: DeleteProjectRunRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<DeleteProjectRunResponse> => {
     const {verifiedUserId} = o
 
     const client = await getMongoClient()
 
     const workspace = await getWorkspace(request.workspaceId, {useCache: false})
-    const workspaceRole = getWorkspaceRole(workspace, verifiedUserId)
-    const okay = workspaceRole === 'admin' || workspaceRole === 'editor'
-    if (!okay) {
-        throw new Error('User does not have permission to delete a script job in this workspace')
+    if (!userCanDeleteProjectRun(workspace, verifiedUserId)) {
+        throw new Error('User does not have permission to delete an project run in this workspace')
     }
 
     const project = await getProject(request.projectId, {useCache: false})
@@ -22,8 +20,8 @@ const deleteScriptJobHandler = async (request: DeleteScriptJobRequest, o: {verif
         throw new Error('Incorrect workspace ID')
     }
 
-    const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
-    await scriptJobsCollection.deleteOne({scriptJobId: request.scriptJobId})
+    const projectRunsCollection = client.db('stan-playground').collection('projectRuns')
+    await projectRunsCollection.deleteOne({projectRunId: request.projectRunId})
 
     const projectsCollection = client.db('stan-playground').collection('projects')
     await projectsCollection.updateOne({projectId: request.projectId}, {$set: {timestampModified: Date.now() / 1000}})
@@ -32,8 +30,8 @@ const deleteScriptJobHandler = async (request: DeleteScriptJobRequest, o: {verif
     await workspacesCollection.updateOne({workspaceId: request.workspaceId}, {$set: {timestampModified: Date.now() / 1000}})
 
     return {
-        type: 'deleteScriptJob'
+        type: 'deleteProjectRun'
     }
 }
 
-export default deleteScriptJobHandler
+export default deleteProjectRunHandler

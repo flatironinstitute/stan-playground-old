@@ -1,6 +1,6 @@
 import { GetScriptJobsRequest, GetScriptJobsResponse } from "../../src/types/PlaygroundRequest";
 import { isSPScriptJob } from "../../src/types/stan-playground-types";
-import getAnalysis from "../getAnalysis";
+import getProject from "../getProject";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
 import { userCanReadWorkspace } from "../permissions";
@@ -10,16 +10,16 @@ const getScriptJobs = async (request: GetScriptJobsRequest, o: {verifiedClientId
     const client = await getMongoClient()
     const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
 
-    const analysis = await getAnalysis(request.analysisId, {useCache: true})
+    const project = await getProject(request.projectId, {useCache: true})
     
-    const workspaceId = analysis.workspaceId
+    const workspaceId = project.workspaceId
     const workspace = await getWorkspace(workspaceId, {useCache: true})
     if (!userCanReadWorkspace(workspace, o.verifiedUserId)) {
         throw new Error('User does not have permission to read this workspace')
     }
     
     const scriptJobs = removeIdField(await scriptJobsCollection.find({
-        analysisId: request.analysisId
+        projectId: request.projectId
     }).toArray())
     for (const job of scriptJobs) {
         if (!isSPScriptJob(job)) {

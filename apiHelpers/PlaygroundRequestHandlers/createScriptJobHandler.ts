@@ -1,7 +1,7 @@
 import { CreateScriptJobRequest, CreateScriptJobResponse } from "../../src/types/PlaygroundRequest";
-import { isSPAnalysisFile, SPScriptJob } from "../../src/types/stan-playground-types";
+import { isSPProjectFile, SPScriptJob } from "../../src/types/stan-playground-types";
 import createRandomId from "../createRandomId";
-import getAnalysis from "../getAnalysis";
+import getProject from "../getProject";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
 import getWorkspaceRole from "../getWorkspaceRole";
@@ -23,26 +23,26 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
         throw new Error('Workspace does not have a compute resource ID')
     }
 
-    const analysis = await getAnalysis(request.analysisId, {useCache: false})
+    const project = await getProject(request.projectId, {useCache: false})
     // important to check this
-    if (analysis.workspaceId !== workspaceId) {
+    if (project.workspaceId !== workspaceId) {
         throw new Error('Incorrect workspace ID')
     }
 
     const client = await getMongoClient()
 
-    const analysisFilesCollection = client.db('stan-playground').collection('analysisFiles')
-    const analysisFile = removeIdField(await analysisFilesCollection.findOne({
+    const projectsFilesCollection = client.db('stan-playground').collection('projectsFiles')
+    const projectsFile = removeIdField(await projectsFilesCollection.findOne({
         workspaceId,
-        analysisId: request.analysisId,
+        projectId: request.projectId,
         fileName: request.scriptFileName
     }))
-    if (!analysisFile) {
-        throw new Error('Analysis file not found')
+    if (!projectsFile) {
+        throw new Error('Project file not found')
     }
-    if (!isSPAnalysisFile(analysisFile)) {
-        console.warn(analysisFile)
-        throw new Error('Invalid analysis file in database (1)')
+    if (!isSPProjectFile(projectsFile)) {
+        console.warn(projectsFile)
+        throw new Error('Invalid projects file in database (1)')
     }
 
     const scriptJobId = createRandomId(8)
@@ -50,10 +50,10 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
     const job: SPScriptJob = {
         scriptJobId,
         workspaceId,
-        analysisId: request.analysisId,
+        projectId: request.projectId,
         scriptFileName: request.scriptFileName,
-        scriptContentSha1: analysisFile.contentSha1,
-        scriptContentSize: analysisFile.contentSize,
+        scriptContentSha1: projectsFile.contentSha1,
+        scriptContentSize: projectsFile.contentSize,
         status: 'pending',
         computeResourceId: workspace.computeResourceId,
         timestampCreated: Date.now() / 1000,

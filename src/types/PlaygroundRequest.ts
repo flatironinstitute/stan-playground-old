@@ -1,4 +1,4 @@
-import { isSPAnalysis, isSPAnalysisFile, isSPAnalysisRun, isSPComputeResource, isSPScriptJob, isSPWorkspace, SPAnalysis, SPAnalysisFile, SPAnalysisRun, SPComputeResource, SPScriptJob, SPWorkspace } from "./stan-playground-types"
+import { isSPProject, isSPProjectFile, isSPProjectRun, isSPComputeResource, isSPScriptJob, isSPWorkspace, SPProject, SPProjectFile, SPProjectRun, SPComputeResource, SPScriptJob, SPWorkspace } from "./stan-playground-types"
 import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 // getWorkspaces
@@ -83,89 +83,89 @@ export const isCreateWorkspaceResponse = (x: any): x is CreateWorkspaceResponse 
     })
 }
 
-// getAnalyses
+// getProjects
 
-export type GetAnalysesRequest = {
-    type: 'getAnalyses'
+export type GetProjectsRequest = {
+    type: 'getProjects'
     timestamp: number
     workspaceId: string
 }
 
-export const isGetAnalysesRequest = (x: any): x is GetAnalysesRequest => {
+export const isGetProjectsRequest = (x: any): x is GetProjectsRequest => {
     return validateObject(x, {
-        type: isEqualTo('getAnalyses'),
+        type: isEqualTo('getProjects'),
         timestamp: isNumber,
         workspaceId: isString
     })
 }
 
-export type GetAnalysesResponse = {
-    type: 'getAnalyses'
-    analyses: SPAnalysis[]
+export type GetProjectsResponse = {
+    type: 'getProjects'
+    projects: SPProject[]
 }
 
-export const isGetAnalysesResponse = (x: any): x is GetAnalysesResponse => {
+export const isGetProjectsResponse = (x: any): x is GetProjectsResponse => {
     return validateObject(x, {
-        type: isEqualTo('getAnalyses'),
-        analyses: isArrayOf(isSPAnalysis)
+        type: isEqualTo('getProjects'),
+        projects: isArrayOf(isSPProject)
     })
 }
 
-// getAnalysis
+// getProject
 
-export type GetAnalysisRequest = {
-    type: 'getAnalysis'
+export type GetProjectRequest = {
+    type: 'getProject'
     timestamp: number
-    analysisId: string
+    projectId: string
 }
 
-export const isGetAnalysisRequest = (x: any): x is GetAnalysisRequest => {
+export const isGetProjectRequest = (x: any): x is GetProjectRequest => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysis'),
+        type: isEqualTo('getProject'),
         timestamp: isNumber,
-        analysisId: isString
+        projectId: isString
     })
 }
 
-export type GetAnalysisResponse = {
-    type: 'getAnalysis'
-    analysis: SPAnalysis
+export type GetProjectResponse = {
+    type: 'getProject'
+    project: SPProject
 }
 
-export const isGetAnalysisResponse = (x: any): x is GetAnalysisResponse => {
+export const isGetProjectResponse = (x: any): x is GetProjectResponse => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysis'),
-        analysis: isSPAnalysis
+        type: isEqualTo('getProject'),
+        project: isSPProject
     })
 }
 
-// createAnalysis
+// createProject
 
-export type CreateAnalysisRequest = {
-    type: 'createAnalysis'
+export type CreateProjectRequest = {
+    type: 'createProject'
     timestamp: number
     workspaceId: string
     name: string
 }
 
-export const isCreateAnalysisRequest = (x: any): x is CreateAnalysisRequest => {
+export const isCreateProjectRequest = (x: any): x is CreateProjectRequest => {
     return validateObject(x, {
-        type: isEqualTo('createAnalysis'),
+        type: isEqualTo('createProject'),
         timestamp: isNumber,
         workspaceId: isString,
         name: isString
     })
 }
 
-export type CreateAnalysisResponse = {
-    type: 'createAnalysis'
-    analysisId: string
+export type CreateProjectResponse = {
+    type: 'createProject'
+    projectId: string
 }
 
-export const isCreateAnalysisResponse = (x: any): x is CreateAnalysisResponse => {
+export const isCreateProjectResponse = (x: any): x is CreateProjectResponse => {
     return validateObject(x, {
-        type: isEqualTo('createAnalysis'),
-        analysisId: isString,
+        type: isEqualTo('createProject'),
+        projectId: isString,
     })
 }
 
@@ -259,151 +259,151 @@ export const isSetWorkspacePropertyResponse = (x: any): x is SetWorkspacePropert
     })
 }
 
-// getAnalysisFiles
+// getProjectFiles
 
-export type GetAnalysisFilesRequest = {
-    type: 'getAnalysisFiles'
+export type GetProjectFilesRequest = {
+    type: 'getProjectFiles'
     timestamp: number
-    analysisId: string
+    projectId: string
 }
 
-export const isGetAnalysisFilesRequest = (x: any): x is GetAnalysisFilesRequest => {
+export const isGetProjectFilesRequest = (x: any): x is GetProjectFilesRequest => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysisFiles'),
+        type: isEqualTo('getProjectFiles'),
         timestamp: isNumber,
-        analysisId: isString
+        projectId: isString
     })
 }
 
-export type GetAnalysisFilesResponse = {
-    type: 'getAnalysisFiles'
-    analysisFiles: SPAnalysisFile[]
+export type GetProjectFilesResponse = {
+    type: 'getProjectFiles'
+    projectFiles: SPProjectFile[]
 }
 
-export const isGetAnalysisFilesResponse = (x: any): x is GetAnalysisFilesResponse => {
+export const isGetProjectFilesResponse = (x: any): x is GetProjectFilesResponse => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysisFiles'),
-        analysisFiles: isArrayOf(isSPAnalysisFile)
+        type: isEqualTo('getProjectFiles'),
+        projectFiles: isArrayOf(isSPProjectFile)
     })
 }
 
-// setAnalysisFile
+// setProjectFile
 
-export type SetAnalysisFileRequest = {
-    type: 'setAnalysisFile'
+export type SetProjectFileRequest = {
+    type: 'setProjectFile'
     timestamp: number
-    analysisId: string
+    projectId: string
     workspaceId: string
     fileName: string
     fileContent: string
 }
 
-export const isSetAnalysisFileRequest = (x: any): x is SetAnalysisFileRequest => {
+export const isSetProjectFileRequest = (x: any): x is SetProjectFileRequest => {
     return validateObject(x, {
-        type: isEqualTo('setAnalysisFile'),
+        type: isEqualTo('setProjectFile'),
         timestamp: isNumber,
-        analysisId: isString,
+        projectId: isString,
         workspaceId: isString,
         fileName: isString,
         fileContent: isString
     })
 }
 
-export type SetAnalysisFileResponse = {
-    type: 'setAnalysisFile'
+export type SetProjectFileResponse = {
+    type: 'setProjectFile'
 }
 
-export const isSetAnalysisFileResponse = (x: any): x is SetAnalysisFileResponse => {
+export const isSetProjectFileResponse = (x: any): x is SetProjectFileResponse => {
     return validateObject(x, {
-        type: isEqualTo('setAnalysisFile')
+        type: isEqualTo('setProjectFile')
     })
 }
 
-// deleteAnalysisFile
+// deleteProjectFile
 
-export type DeleteAnalysisFileRequest = {
-    type: 'deleteAnalysisFile'
+export type DeleteProjectFileRequest = {
+    type: 'deleteProjectFile'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     fileName: string
 }
 
-export const isDeleteAnalysisFileRequest = (x: any): x is DeleteAnalysisFileRequest => {
+export const isDeleteProjectFileRequest = (x: any): x is DeleteProjectFileRequest => {
     return validateObject(x, {
-        type: isEqualTo('deleteAnalysisFile'),
+        type: isEqualTo('deleteProjectFile'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         fileName: isString
     })
 }
 
-export type DeleteAnalysisFileResponse = {
-    type: 'deleteAnalysisFile'
+export type DeleteProjectFileResponse = {
+    type: 'deleteProjectFile'
 }
 
-export const isDeleteAnalysisFileResponse = (x: any): x is DeleteAnalysisFileResponse => {
+export const isDeleteProjectFileResponse = (x: any): x is DeleteProjectFileResponse => {
     return validateObject(x, {
-        type: isEqualTo('deleteAnalysisFile')
+        type: isEqualTo('deleteProjectFile')
     })
 }
 
-// getAnalysisFile
+// getProjectFile
 
-export type GetAnalysisFileRequest = {
-    type: 'getAnalysisFile'
+export type GetProjectFileRequest = {
+    type: 'getProjectFile'
     timestamp: number
-    analysisId: string
+    projectId: string
     fileName: string
 }
 
-export const isGetAnalysisFileRequest = (x: any): x is GetAnalysisFileRequest => {
+export const isGetProjectFileRequest = (x: any): x is GetProjectFileRequest => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysisFile'),
+        type: isEqualTo('getProjectFile'),
         timestamp: isNumber,
-        analysisId: isString,
+        projectId: isString,
         fileName: isString
     })
 }
 
-export type GetAnalysisFileResponse = {
-    type: 'getAnalysisFile'
-    analysisFile: SPAnalysisFile
+export type GetProjectFileResponse = {
+    type: 'getProjectFile'
+    projectFile: SPProjectFile
 }
 
-export const isGetAnalysisFileResponse = (x: any): x is GetAnalysisFileResponse => {
+export const isGetProjectFileResponse = (x: any): x is GetProjectFileResponse => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysisFile'),
-        analysisFile: isSPAnalysisFile
+        type: isEqualTo('getProjectFile'),
+        projectFile: isSPProjectFile
     })
 }
 
-// getAnalysisRuns
+// getProjectRuns
 
-export type GetAnalysisRunsRequest = {
-    type: 'getAnalysisRuns'
+export type GetProjectRunsRequest = {
+    type: 'getProjectRuns'
     timestamp: number
-    analysisId: string
+    projectId: string
 }
 
-export const isGetAnalysisRunsRequest = (x: any): x is GetAnalysisRunsRequest => {
+export const isGetProjectRunsRequest = (x: any): x is GetProjectRunsRequest => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysisRuns'),
+        type: isEqualTo('getProjectRuns'),
         timestamp: isNumber,
-        analysisId: isString
+        projectId: isString
     })
 }
 
-export type GetAnalysisRunsResponse = {
-    type: 'getAnalysisRuns'
-    analysisRuns: SPAnalysisRun[]
+export type GetProjectRunsResponse = {
+    type: 'getProjectRuns'
+    projectRuns: SPProjectRun[]
 }
 
-export const isGetAnalysisRunsResponse = (x: any): x is GetAnalysisRunsResponse => {
+export const isGetProjectRunsResponse = (x: any): x is GetProjectRunsResponse => {
     return validateObject(x, {
-        type: isEqualTo('getAnalysisRuns'),
-        analysisRuns: isArrayOf(isSPAnalysisRun)
+        type: isEqualTo('getProjectRuns'),
+        projectRuns: isArrayOf(isSPProjectRun)
     })
 }
 
@@ -413,7 +413,7 @@ export type GetDataBlobRequest = {
     type: 'getDataBlob'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     sha1: string
 }
 
@@ -422,7 +422,7 @@ export const isGetDataBlobRequest = (x: any): x is GetDataBlobRequest => {
         type: isEqualTo('getDataBlob'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         sha1: isString
     })
 }
@@ -439,23 +439,23 @@ export const isGetDataBlobResponse = (x: any): x is GetDataBlobResponse => {
     })
 }
 
-// createAnalysisRun
+// createProjectRun
 
-export type CreateAnalysisRunRequest = {
-    type: 'createAnalysisRun'
+export type CreateProjectRunRequest = {
+    type: 'createProjectRun'
     timestamp: number
-    analysisId: string
+    projectId: string
     workspaceId: string
     stanProgramFileName: string
     datasetFileName: string
     optionsFileName: string
 }
 
-export const isCreateAnalysisRunRequest = (x: any): x is CreateAnalysisRunRequest => {
+export const isCreateProjectRunRequest = (x: any): x is CreateProjectRunRequest => {
     return validateObject(x, {
-        type: isEqualTo('createAnalysisRun'),
+        type: isEqualTo('createProjectRun'),
         timestamp: isNumber,
-        analysisId: isString,
+        projectId: isString,
         workspaceId: isString,
         stanProgramFileName: isString,
         datasetFileName: isString,
@@ -463,103 +463,103 @@ export const isCreateAnalysisRunRequest = (x: any): x is CreateAnalysisRunReques
     })
 }
 
-export type CreateAnalysisRunResponse = {
-    type: 'createAnalysisRun'
-    analysisRunId: string
+export type CreateProjectRunResponse = {
+    type: 'createProjectRun'
+    projectRunId: string
 }
 
-export const isCreateAnalysisRunResponse = (x: any): x is CreateAnalysisRunResponse => {
+export const isCreateProjectRunResponse = (x: any): x is CreateProjectRunResponse => {
     return validateObject(x, {
-        type: isEqualTo('createAnalysisRun'),
-        analysisRunId: isString
+        type: isEqualTo('createProjectRun'),
+        projectRunId: isString
     })
 }
 
-// deleteAnalysisRun
+// deleteProjectRun
 
-export type DeleteAnalysisRunRequest = {
-    type: 'deleteAnalysisRun'
+export type DeleteProjectRunRequest = {
+    type: 'deleteProjectRun'
     timestamp: number
     workspaceId: string
-    analysisId: string
-    analysisRunId: string
+    projectId: string
+    projectRunId: string
 }
 
-export const isDeleteAnalysisRunRequest = (x: any): x is DeleteAnalysisRunRequest => {
+export const isDeleteProjectRunRequest = (x: any): x is DeleteProjectRunRequest => {
     return validateObject(x, {
-        type: isEqualTo('deleteAnalysisRun'),
+        type: isEqualTo('deleteProjectRun'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
-        analysisRunId: isString
+        projectId: isString,
+        projectRunId: isString
     })
 }
 
-export type DeleteAnalysisRunResponse = {
-    type: 'deleteAnalysisRun'
+export type DeleteProjectRunResponse = {
+    type: 'deleteProjectRun'
 }
 
-export const isDeleteAnalysisRunResponse = (x: any): x is DeleteAnalysisRunResponse => {
+export const isDeleteProjectRunResponse = (x: any): x is DeleteProjectRunResponse => {
     return validateObject(x, {
-        type: isEqualTo('deleteAnalysisRun')
+        type: isEqualTo('deleteProjectRun')
     })
 }
 
-// deletaAnalysis
+// deletaProject
 
-export type DeleteAnalysisRequest = {
-    type: 'deleteAnalysis'
+export type DeleteProjectRequest = {
+    type: 'deleteProject'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
 }
 
-export const isDeleteAnalysisRequest = (x: any): x is DeleteAnalysisRequest => {
+export const isDeleteProjectRequest = (x: any): x is DeleteProjectRequest => {
     return validateObject(x, {
-        type: isEqualTo('deleteAnalysis'),
+        type: isEqualTo('deleteProject'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString
+        projectId: isString
     })
 }
 
-export type DeleteAnalysisResponse = {
-    type: 'deleteAnalysis'
+export type DeleteProjectResponse = {
+    type: 'deleteProject'
 }
 
-export const isDeleteAnalysisResponse = (x: any): x is DeleteAnalysisResponse => {
+export const isDeleteProjectResponse = (x: any): x is DeleteProjectResponse => {
     return validateObject(x, {
-        type: isEqualTo('deleteAnalysis')
+        type: isEqualTo('deleteProject')
     })
 }
 
-// setAnalysisProperty
+// setProjectProperty
 
-export type SetAnalysisPropertyRequest = {
-    type: 'setAnalysisProperty'
+export type SetProjectPropertyRequest = {
+    type: 'setProjectProperty'
     timestamp: number
-    analysisId: string
+    projectId: string
     property: 'name'
     value: any
 }
 
-export const isSetAnalysisPropertyRequest = (x: any): x is SetAnalysisPropertyRequest => {
+export const isSetProjectPropertyRequest = (x: any): x is SetProjectPropertyRequest => {
     return validateObject(x, {
-        type: isEqualTo('setAnalysisProperty'),
+        type: isEqualTo('setProjectProperty'),
         timestamp: isNumber,
-        analysisId: isString,
+        projectId: isString,
         property: isEqualTo('name'),
         value: () => (true)
     })
 }
 
-export type SetAnalysisPropertyResponse = {
-    type: 'setAnalysisProperty'
+export type SetProjectPropertyResponse = {
+    type: 'setProjectProperty'
 }
 
-export const isSetAnalysisPropertyResponse = (x: any): x is SetAnalysisPropertyResponse => {
+export const isSetProjectPropertyResponse = (x: any): x is SetProjectPropertyResponse => {
     return validateObject(x, {
-        type: isEqualTo('setAnalysisProperty')
+        type: isEqualTo('setProjectProperty')
     })
 }
 
@@ -651,7 +651,7 @@ export type CreateScriptJobRequest = {
     type: 'createScriptJob'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     scriptFileName: string
 }
 
@@ -660,7 +660,7 @@ export const isCreateScriptJobRequest = (x: any): x is CreateScriptJobRequest =>
         type: isEqualTo('createScriptJob'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         scriptFileName: isString
     })
 }
@@ -682,14 +682,14 @@ export const isCreateScriptJobResponse = (x: any): x is CreateScriptJobResponse 
 export type GetScriptJobsRequest = {
     type: 'getScriptJobs'
     timestamp: number
-    analysisId: string
+    projectId: string
 }
 
 export const isGetScriptJobsRequest = (x: any): x is GetScriptJobsRequest => {
     return validateObject(x, {
         type: isEqualTo('getScriptJobs'),
         timestamp: isNumber,
-        analysisId: isString
+        projectId: isString
     })
 }
 
@@ -711,7 +711,7 @@ export type DeleteScriptJobRequest = {
     type: 'deleteScriptJob'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     scriptJobId: string
 }
 
@@ -720,7 +720,7 @@ export const isDeleteScriptJobRequest = (x: any): x is DeleteScriptJobRequest =>
         type: isEqualTo('deleteScriptJob'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         scriptJobId: isString
     })
 }
@@ -741,7 +741,7 @@ export type DeleteCompletedScriptJobsRequest = {
     type: 'deleteCompletedScriptJobs'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     scriptFileName: string
 }
 
@@ -750,7 +750,7 @@ export const isDeleteCompletedScriptJobsRequest = (x: any): x is DeleteCompleted
         type: isEqualTo('deleteCompletedScriptJobs'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         scriptFileName: isString
     })
 }
@@ -771,7 +771,7 @@ export type GetScriptJobRequest = {
     type: 'getScriptJob'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     scriptJobId: string
 }
 
@@ -780,7 +780,7 @@ export const isGetScriptJobRequest = (x: any): x is GetScriptJobRequest => {
         type: isEqualTo('getScriptJob'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         scriptJobId: isString
     })
 }
@@ -831,7 +831,7 @@ export type SetScriptJobPropertyRequest = {
     type: 'setScriptJobProperty'
     timestamp: number
     workspaceId: string
-    analysisId: string
+    projectId: string
     scriptJobId: string
     property: string
     value: any
@@ -842,7 +842,7 @@ export const isSetScriptJobPropertyRequest = (x: any): x is SetScriptJobProperty
         type: isEqualTo('setScriptJobProperty'),
         timestamp: isNumber,
         workspaceId: isString,
-        analysisId: isString,
+        projectId: isString,
         scriptJobId: isString,
         property: isString,
         value: () => (true)
@@ -865,22 +865,22 @@ export type PlaygroundRequestPayload =
     GetWorkspacesRequest |
     GetWorkspaceRequest |
     CreateWorkspaceRequest |
-    GetAnalysesRequest |
-    GetAnalysisRequest |
-    CreateAnalysisRequest |
+    GetProjectsRequest |
+    GetProjectRequest |
+    CreateProjectRequest |
     SetWorkspaceUsersRequest |
     SetWorkspacePropertyRequest |
     DeleteWorkspaceRequest |
-    GetAnalysisFilesRequest |
-    SetAnalysisFileRequest |
-    DeleteAnalysisFileRequest |
-    GetAnalysisFileRequest |
-    GetAnalysisRunsRequest |
+    GetProjectFilesRequest |
+    SetProjectFileRequest |
+    DeleteProjectFileRequest |
+    GetProjectFileRequest |
+    GetProjectRunsRequest |
     GetDataBlobRequest |
-    CreateAnalysisRunRequest |
-    DeleteAnalysisRunRequest |
-    DeleteAnalysisRequest |
-    SetAnalysisPropertyRequest |
+    CreateProjectRunRequest |
+    DeleteProjectRunRequest |
+    DeleteProjectRequest |
+    SetProjectPropertyRequest |
     GetComputeResourcesRequest |
     RegisterComputeResourceRequest |
     DeleteComputeResourceRequest |
@@ -897,22 +897,22 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetWorkspacesRequest,
         isGetWorkspaceRequest,
         isCreateWorkspaceRequest,
-        isGetAnalysesRequest,
-        isGetAnalysisRequest,
-        isCreateAnalysisRequest,
+        isGetProjectsRequest,
+        isGetProjectRequest,
+        isCreateProjectRequest,
         isSetWorkspaceUsersRequest,
         isSetWorkspacePropertyRequest,
         isDeleteWorkspaceRequest,
-        isGetAnalysisFilesRequest,
-        isSetAnalysisFileRequest,
-        isDeleteAnalysisFileRequest,
-        isGetAnalysisFileRequest,
-        isGetAnalysisRunsRequest,
+        isGetProjectFilesRequest,
+        isSetProjectFileRequest,
+        isDeleteProjectFileRequest,
+        isGetProjectFileRequest,
+        isGetProjectRunsRequest,
         isGetDataBlobRequest,
-        isCreateAnalysisRunRequest,
-        isDeleteAnalysisRunRequest,
-        isDeleteAnalysisRequest,
-        isSetAnalysisPropertyRequest,
+        isCreateProjectRunRequest,
+        isDeleteProjectRunRequest,
+        isDeleteProjectRequest,
+        isSetProjectPropertyRequest,
         isGetComputeResourcesRequest,
         isRegisterComputeResourceRequest,
         isDeleteComputeResourceRequest,
@@ -952,22 +952,22 @@ export type PlaygroundResponse =
     GetWorkspacesResponse |
     GetWorkspaceResponse |
     CreateWorkspaceResponse |
-    GetAnalysesResponse |
-    GetAnalysisResponse |
-    CreateAnalysisResponse |
+    GetProjectsResponse |
+    GetProjectResponse |
+    CreateProjectResponse |
     SetWorkspaceUsersResponse |
     SetWorkspacePropertyResponse |
     DeleteWorkspaceResponse |
-    GetAnalysisFilesResponse |
-    SetAnalysisFileResponse |
-    DeleteAnalysisFileResponse |
-    GetAnalysisFileResponse |
-    GetAnalysisRunsResponse |
+    GetProjectFilesResponse |
+    SetProjectFileResponse |
+    DeleteProjectFileResponse |
+    GetProjectFileResponse |
+    GetProjectRunsResponse |
     GetDataBlobResponse |
-    CreateAnalysisRunResponse |
-    DeleteAnalysisRunResponse |
-    DeleteAnalysisResponse |
-    SetAnalysisPropertyResponse |
+    CreateProjectRunResponse |
+    DeleteProjectRunResponse |
+    DeleteProjectResponse |
+    SetProjectPropertyResponse |
     GetComputeResourcesResponse |
     RegisterComputeResourceResponse |
     DeleteComputeResourceResponse |
@@ -984,22 +984,22 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetWorkspacesResponse,
         isGetWorkspaceResponse,
         isCreateWorkspaceResponse,
-        isGetAnalysesResponse,
-        isGetAnalysisResponse,
-        isCreateAnalysisResponse,
+        isGetProjectsResponse,
+        isGetProjectResponse,
+        isCreateProjectResponse,
         isSetWorkspaceUsersResponse,
         isSetWorkspacePropertyResponse,
         isDeleteWorkspaceResponse,
-        isGetAnalysisFilesResponse,
-        isSetAnalysisFileResponse,
-        isDeleteAnalysisFileResponse,
-        isGetAnalysisFileResponse,
-        isGetAnalysisRunsResponse,
+        isGetProjectFilesResponse,
+        isSetProjectFileResponse,
+        isDeleteProjectFileResponse,
+        isGetProjectFileResponse,
+        isGetProjectRunsResponse,
         isGetDataBlobResponse,
-        isCreateAnalysisRunResponse,
-        isDeleteAnalysisRunResponse,
-        isDeleteAnalysisResponse,
-        isSetAnalysisPropertyResponse,
+        isCreateProjectRunResponse,
+        isDeleteProjectRunResponse,
+        isDeleteProjectResponse,
+        isSetProjectPropertyResponse,
         isGetComputeResourcesResponse,
         isRegisterComputeResourceResponse,
         isDeleteComputeResourceResponse,

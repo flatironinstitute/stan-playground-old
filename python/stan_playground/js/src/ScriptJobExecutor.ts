@@ -1,4 +1,4 @@
-import { GetDataBlobRequest, GetPendingScriptJobRequest, PlaygroundRequestPayload, PlaygroundResponse, SetAnalysisFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest"
+import { GetDataBlobRequest, GetPendingScriptJobRequest, PlaygroundRequestPayload, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest"
 import fs from 'fs'
 import path from 'path'
 import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource"
@@ -56,9 +56,9 @@ class ScriptJobExecutor {
     }
     async handleScriptJob(scriptJob: SPScriptJob) {
         console.info(`Handling script job: ${scriptJob.scriptJobId} - ${scriptJob.scriptFileName}`)
-        await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'status', 'running')
+        await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'status', 'running')
         const scriptFileName = scriptJob.scriptFileName
-        const scriptFileContent = await this.loadDataBlob(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptContentSha1)
+        const scriptFileContent = await this.loadDataBlob(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptContentSha1)
         const scriptJobDir = path.join(this.a.dir, 'scriptJobs', scriptJob.scriptJobId)
         fs.mkdirSync(scriptJobDir, {recursive: true})
         fs.writeFileSync(path.join(scriptJobDir, scriptFileName), scriptFileContent)
@@ -66,7 +66,7 @@ class ScriptJobExecutor {
         let lastUpdateConsoleOutputTimestamp = Date.now()
         const updateConsoleOutput = async () => {
             lastUpdateConsoleOutputTimestamp = Date.now()
-            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'consoleOutput', consoleOutput)
+            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'consoleOutput', consoleOutput)
         }
         try {
             await new Promise<void>((resolve, reject) => {
@@ -114,8 +114,8 @@ class ScriptJobExecutor {
         }
         catch (err) {
             await updateConsoleOutput()
-            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'error', err.message)
-            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'status', 'failed')
+            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'error', err.message)
+            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'status', 'failed')
             return
         }
         await updateConsoleOutput()
@@ -134,24 +134,24 @@ class ScriptJobExecutor {
         const maxOutputFiles = 5
         if (outputFileNames.length > maxOutputFiles) {
             console.info('Too many output files.')
-            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'error', 'Too many output files.')
-            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'status', 'failed')
+            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'error', 'Too many output files.')
+            await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'status', 'failed')
             return
         }
         for (const outputFileName of outputFileNames) {
             console.info('Uploading output file: ' + outputFileName)
             const content = fs.readFileSync(path.join(scriptJobDir, outputFileName), 'utf8')
-            await this.setAnalysisFile(scriptJob.workspaceId, scriptJob.analysisId, outputFileName, content)
+            await this.setProjectFile(scriptJob.workspaceId, scriptJob.projectId, outputFileName, content)
         }
 
-        await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.analysisId, scriptJob.scriptJobId, 'status', 'completed')
+        await this.setScriptJobProperty(scriptJob.workspaceId, scriptJob.projectId, scriptJob.scriptJobId, 'status', 'completed')
     }
-    async loadDataBlob(workspaceId: string, analysisId: string, sha1: string): Promise<string> {
+    async loadDataBlob(workspaceId: string, projectId: string, sha1: string): Promise<string> {
         const req: GetDataBlobRequest = {
             type: 'getDataBlob',
             timestamp: Date.now() / 1000,
             workspaceId,
-            analysisId,
+            projectId,
             sha1
         }
         const resp = await this.postPlaygroundRequest(req)
@@ -164,12 +164,12 @@ class ScriptJobExecutor {
         }
         return resp.content
     }
-    async setScriptJobProperty(workspaceId: string, analysisId: string, scriptJobId: string, property: string, value: any) {
+    async setScriptJobProperty(workspaceId: string, projectId: string, scriptJobId: string, property: string, value: any) {
         const req: SetScriptJobPropertyRequest = {
             type: 'setScriptJobProperty',
             timestamp: Date.now() / 1000,
             workspaceId,
-            analysisId,
+            projectId,
             scriptJobId,
             property,
             value
@@ -183,22 +183,22 @@ class ScriptJobExecutor {
             throw Error('Unexpected response type. Expected setScriptJobProperty')
         }
     }
-    async setAnalysisFile(workspaceId: string, analysisId: string, fileName: string, fileContent: string) {
-        const req: SetAnalysisFileRequest = {
-            type: 'setAnalysisFile',
+    async setProjectFile(workspaceId: string, projectId: string, fileName: string, fileContent: string) {
+        const req: SetProjectFileRequest = {
+            type: 'setProjectFile',
             timestamp: Date.now() / 1000,
             workspaceId,
-            analysisId,
+            projectId,
             fileName,
             fileContent
         }
         const resp = await this.postPlaygroundRequest(req)
         if (!resp) {
-            throw Error('Unable to set analysis file')
+            throw Error('Unable to set project file')
         }
-        if (resp.type !== 'setAnalysisFile') {
+        if (resp.type !== 'setProjectFile') {
             console.warn(resp)
-            throw Error('Unexpected response type. Expected setAnalysisFile')
+            throw Error('Unexpected response type. Expected setProjectFile')
         }
     }
     async stop() {
