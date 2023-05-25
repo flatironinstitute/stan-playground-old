@@ -41,11 +41,11 @@ const createProjectHandler = async (request: CreateProjectRequest, o: {verifiedC
         },
         {
             fileName: 'data.json',
-            fileContent: '{}'
+            fileContent: defaultDataJson
         },
         {
-            fileName: 'options.yaml',
-            fileContent: defaultOptionsYaml
+            fileName: 'main.spa',
+            fileContent: defaultMainSpa
         }
     ]
 
@@ -79,6 +79,16 @@ parameters {
 model {
 }`
 
-const defaultOptionsYaml = ``
+const defaultDataJson = `{}`
+
+const defaultMainSpa = `stan: main.stan
+data: data.json
+options:
+    iter_sampling: 500
+    iter_warmup: 500
+    save_warmup: True
+    chains: 4
+    seed: 0
+`
 
 export default createProjectHandler

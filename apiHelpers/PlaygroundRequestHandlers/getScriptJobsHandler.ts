@@ -25,11 +25,11 @@ const getScriptJobs = async (request: GetScriptJobsRequest, o: {verifiedClientId
         if (!isSPScriptJob(job)) {
             console.warn(job)
 
-            // during development, delete the record
-            await scriptJobsCollection.deleteOne({
-                projectId: request.projectId,
-                scriptJobId: job.scriptJobId
-            })
+            // // during development, delete the record
+            // await scriptJobsCollection.deleteOne({
+            //     projectId: request.projectId,
+            //     scriptJobId: job.scriptJobId
+            // })
 
             throw new Error('Invalid script job in database (3)')
         }

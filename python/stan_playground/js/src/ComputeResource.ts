@@ -6,6 +6,7 @@ class ComputeResource {
         this.#scriptJobExecutor = new ScriptJobExecutor({ dir: a.dir })
     }
     async start() {
+        console.info('Starting compute resource.')
         this.#scriptJobExecutor.start()
     }
     async stop() {

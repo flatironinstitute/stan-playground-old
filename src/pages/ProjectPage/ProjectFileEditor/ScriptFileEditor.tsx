@@ -13,7 +13,8 @@ type Props = {
     height: number
 }
 
-const PyFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
+const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
+    const fileType = fileName.split('.').pop()
     return (
         <Splitter
             width={width}
@@ -24,8 +25,11 @@ const PyFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileC
             <TextEditor
                 width={0}
                 height={0}
-                // language="stan"
-                language="stan"
+                language={
+                    fileType === 'py' ? 'python' :
+                    fileType === 'spa' ? 'yaml' :
+                    'text'
+                }
                 label={fileName}
                 text={fileContent}
                 onSetText={setFileContent}
@@ -41,4 +45,4 @@ const PyFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileC
     )
 }
 
-export default PyFileEditor
+export default ScriptFileEditor

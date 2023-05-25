@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback } from "react";
 import { useProject } from "../ProjectPageContext";
-import PyFileEditor from "./PyFileEditor";
+import ScriptFileEditor from "./ScriptFileEditor";
 import StanFileEditor from "./StanFileEditor";
 import TextFileEditor from "./TextFileEditor";
 import useProjectFile from "./useProjectFile";
@@ -38,9 +38,9 @@ const ProjectFileEditor: FunctionComponent<Props> = ({fileName, readOnly, onFile
             />
         )
     }
-    else if (fileName.endsWith('.py')) {
+    else if (fileName.endsWith('.py') || fileName.endsWith('.spa')) {
         return (
-            <PyFileEditor
+            <ScriptFileEditor
                 fileName={fileName}
                 fileContent={fileContent || ''}
                 setFileContent={setFileContent}

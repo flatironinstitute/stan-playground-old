@@ -16,5 +16,10 @@ def register_compute_resource():
 def start(dir: str):
     start_function(dir)
 
+@click.command(help='Initialize the singularity container')
+def initialize_singularity_container():
+    stan_playground.initialize_singularity_container()
+
 cli.add_command(register_compute_resource)
 cli.add_command(start)
+cli.add_command(initialize_singularity_container)

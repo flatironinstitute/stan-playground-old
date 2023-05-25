@@ -1,0 +1,1 @@
+docker push magland/cmdstanpy

@@ -7,7 +7,8 @@
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "deploy": "cp _vercel.json vercel.json && vercel --prod && rm vercel.json"
+    "deploy": "cp _vercel.json vercel.json && vercel --prod && rm vercel.json",
+    "dev-compute-resource": "cd python/stan_playground/js && npm run build && cd ../.. && stan-playground start --dir ."
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
