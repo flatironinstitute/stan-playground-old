@@ -1,18 +1,17 @@
 import { GetDataBlobRequest, GetDataBlobResponse } from "../../src/types/PlaygroundRequest";
 import { isSPDataBlob } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
-import getWorkspace from "../getWorkspace";
-import { userCanReadWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const getDataBlobHandler = async (request: GetDataBlobRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<GetDataBlobResponse> => {
     const client = await getMongoClient()
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
 
-    const workspace = await getWorkspace(request.workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
-        throw new Error('User does not have permission to read this workspace')
-    }
+    // For now we allow anonymous users to read data blobs because this is needed for the MCMC Monitor to work
+    // const workspace = await getWorkspace(request.workspaceId, {useCache: true})
+    // if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
+    //     throw new Error('User does not have permission to read this workspace')
+    // }
     
     const dataBlob = removeIdField(await dataBlobsCollection.findOne({
         workspaceId: request.workspaceId,

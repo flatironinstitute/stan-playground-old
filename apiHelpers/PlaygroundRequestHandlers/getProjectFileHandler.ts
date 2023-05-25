@@ -21,10 +21,11 @@ const getProjectFileHandler = async (request: GetProjectFileRequest, o: {verifie
         throw new Error('Invalid project file in database (2)')
     }
 
-    const workspace = await getWorkspace(projectFile.workspaceId, {useCache: true})
-    if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
-        throw new Error('User does not have permission to read this workspace')
-    }
+    // For now we allow anonymous users to read project files because this is needed for the MCMC Monitor to work
+    // const workspace = await getWorkspace(projectFile.workspaceId, {useCache: true})
+    // if (!userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
+    //     throw new Error('User does not have permission to read this workspace')
+    // }
 
     return {
         type: 'getProjectFile',
