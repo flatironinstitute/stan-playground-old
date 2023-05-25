@@ -1,7 +1,7 @@
 import { AutoFixHigh } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import Splitter from "../../../components/Splitter";
-import StanFileRunsWindow from "../StanFileRunsWindow/StanFileRunsWindow";
+import StanFileAnalysesWindow from "../StanFileAnalysesWindow/StanFileAnalysesWindow";
 import runStanc from "./runStanc";
 import StanCompileResultWindow from "./StanCompileResultWindow";
 import TextEditor, { ToolbarItem } from "./TextEditor";
@@ -88,10 +88,10 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                     />
                 }
             </Splitter>
-            <StanFileRunsWindow
+            <StanFileAnalysesWindow
                 width={0}
                 height={0}
-                fileName={fileName}
+                stanFileName={fileName}
             />
         </Splitter>
     )

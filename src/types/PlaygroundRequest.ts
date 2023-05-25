@@ -1,4 +1,4 @@
-import { isSPProject, isSPProjectFile, isSPProjectRun, isSPComputeResource, isSPScriptJob, isSPWorkspace, SPProject, SPProjectFile, SPProjectRun, SPComputeResource, SPScriptJob, SPWorkspace } from "./stan-playground-types"
+import { isSPProject, isSPProjectFile, isSPComputeResource, isSPScriptJob, isSPWorkspace, SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "./stan-playground-types"
 import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 // getWorkspaces
@@ -379,34 +379,6 @@ export const isGetProjectFileResponse = (x: any): x is GetProjectFileResponse =>
     })
 }
 
-// getProjectRuns
-
-export type GetProjectRunsRequest = {
-    type: 'getProjectRuns'
-    timestamp: number
-    projectId: string
-}
-
-export const isGetProjectRunsRequest = (x: any): x is GetProjectRunsRequest => {
-    return validateObject(x, {
-        type: isEqualTo('getProjectRuns'),
-        timestamp: isNumber,
-        projectId: isString
-    })
-}
-
-export type GetProjectRunsResponse = {
-    type: 'getProjectRuns'
-    projectRuns: SPProjectRun[]
-}
-
-export const isGetProjectRunsResponse = (x: any): x is GetProjectRunsResponse => {
-    return validateObject(x, {
-        type: isEqualTo('getProjectRuns'),
-        projectRuns: isArrayOf(isSPProjectRun)
-    })
-}
-
 // getDataBlob
 
 export type GetDataBlobRequest = {
@@ -439,73 +411,7 @@ export const isGetDataBlobResponse = (x: any): x is GetDataBlobResponse => {
     })
 }
 
-// createProjectRun
-
-export type CreateProjectRunRequest = {
-    type: 'createProjectRun'
-    timestamp: number
-    projectId: string
-    workspaceId: string
-    stanProgramFileName: string
-    datasetFileName: string
-    optionsFileName: string
-}
-
-export const isCreateProjectRunRequest = (x: any): x is CreateProjectRunRequest => {
-    return validateObject(x, {
-        type: isEqualTo('createProjectRun'),
-        timestamp: isNumber,
-        projectId: isString,
-        workspaceId: isString,
-        stanProgramFileName: isString,
-        datasetFileName: isString,
-        optionsFileName: isString
-    })
-}
-
-export type CreateProjectRunResponse = {
-    type: 'createProjectRun'
-    projectRunId: string
-}
-
-export const isCreateProjectRunResponse = (x: any): x is CreateProjectRunResponse => {
-    return validateObject(x, {
-        type: isEqualTo('createProjectRun'),
-        projectRunId: isString
-    })
-}
-
-// deleteProjectRun
-
-export type DeleteProjectRunRequest = {
-    type: 'deleteProjectRun'
-    timestamp: number
-    workspaceId: string
-    projectId: string
-    projectRunId: string
-}
-
-export const isDeleteProjectRunRequest = (x: any): x is DeleteProjectRunRequest => {
-    return validateObject(x, {
-        type: isEqualTo('deleteProjectRun'),
-        timestamp: isNumber,
-        workspaceId: isString,
-        projectId: isString,
-        projectRunId: isString
-    })
-}
-
-export type DeleteProjectRunResponse = {
-    type: 'deleteProjectRun'
-}
-
-export const isDeleteProjectRunResponse = (x: any): x is DeleteProjectRunResponse => {
-    return validateObject(x, {
-        type: isEqualTo('deleteProjectRun')
-    })
-}
-
-// deletaProject
+// deleteProject
 
 export type DeleteProjectRequest = {
     type: 'deleteProject'
@@ -875,10 +781,7 @@ export type PlaygroundRequestPayload =
     SetProjectFileRequest |
     DeleteProjectFileRequest |
     GetProjectFileRequest |
-    GetProjectRunsRequest |
     GetDataBlobRequest |
-    CreateProjectRunRequest |
-    DeleteProjectRunRequest |
     DeleteProjectRequest |
     SetProjectPropertyRequest |
     GetComputeResourcesRequest |
@@ -907,10 +810,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isSetProjectFileRequest,
         isDeleteProjectFileRequest,
         isGetProjectFileRequest,
-        isGetProjectRunsRequest,
         isGetDataBlobRequest,
-        isCreateProjectRunRequest,
-        isDeleteProjectRunRequest,
         isDeleteProjectRequest,
         isSetProjectPropertyRequest,
         isGetComputeResourcesRequest,
@@ -962,10 +862,7 @@ export type PlaygroundResponse =
     SetProjectFileResponse |
     DeleteProjectFileResponse |
     GetProjectFileResponse |
-    GetProjectRunsResponse |
     GetDataBlobResponse |
-    CreateProjectRunResponse |
-    DeleteProjectRunResponse |
     DeleteProjectResponse |
     SetProjectPropertyResponse |
     GetComputeResourcesResponse |
@@ -994,10 +891,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isSetProjectFileResponse,
         isDeleteProjectFileResponse,
         isGetProjectFileResponse,
-        isGetProjectRunsResponse,
         isGetDataBlobResponse,
-        isCreateProjectRunResponse,
-        isDeleteProjectRunResponse,
         isDeleteProjectResponse,
         isSetProjectPropertyResponse,
         isGetComputeResourcesResponse,

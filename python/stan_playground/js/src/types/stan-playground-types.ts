@@ -100,45 +100,6 @@ export const isSPCollection = (x: any): x is SPCollection => {
     })
 }
 
-export type SPProjectRun = {
-    projectRunId: string
-    projectId: string
-    workspaceId: string
-    timestampCreated: number
-    stanProgramFileName: string
-    stanProgramContentSha1: string
-    stanProgramContentSize: number
-    datasetFileName: string
-    datasetContentSha1: string
-    datasetContentSize: number
-    optionsFileName: string
-    optionsContentSha1: string
-    optionsContentSize: number
-    status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
-    error?: string
-}
-
-export const isSPProjectRun = (x: any): x is SPProjectRun => {
-    return validateObject(x, {
-        projectRunId: isString,
-        projectId: isString,
-        workspaceId: isString,
-        timestampCreated: isNumber,
-        stanProgramFileName: isString,
-        stanProgramContentSha1: isString,
-        stanProgramContentSize: isNumber,
-        datasetFileName: isString,
-        datasetContentSha1: isString,
-        datasetContentSize: isNumber,
-        optionsFileName: isString,
-        optionsContentSha1: isString,
-        optionsContentSize: isNumber,
-        status: isOneOf([isEqualTo('pending'), isEqualTo('queued'), isEqualTo('running'), isEqualTo('completed'), isEqualTo('failed')]),
-        error: optional(isString)
-    })
-}
-
-
 export type SPDataBlob = {
     workspaceId: string
     projectId: string

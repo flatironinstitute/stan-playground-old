@@ -22,11 +22,11 @@ const deleteProjectHandler = async (request: DeleteProjectRequest, o: {verifiedC
     const projectsFilesCollection = client.db('stan-playground').collection('projectsFiles')
     projectsFilesCollection.deleteMany({projectId: request.projectId})
 
-    const projectRunsCollection = client.db('stan-playground').collection('projectRuns')
-    projectRunsCollection.deleteMany({projectId: request.projectId})
-
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     dataBlobsCollection.deleteMany({projectId: request.projectId})
+
+    const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
+    scriptJobsCollection.deleteMany({projectId: request.projectId})
 
     const projectsCollection = client.db('stan-playground').collection('projects')
 

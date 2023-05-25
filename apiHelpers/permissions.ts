@@ -6,11 +6,6 @@ export const userCanCreateProject = (workspace: SPWorkspace, userId: string | un
     return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
 }
 
-export const userCanCreateProjectRun = (workspace: SPWorkspace, userId: string | undefined): boolean => {
-    const workspaceRole = getWorkspaceRole(workspace, userId)
-    return ((workspaceRole === 'admin' || workspaceRole === 'editor'))
-}
-
 export const userCanCreateWorkspace = (userId: string | undefined): boolean => {
     if (userId) {
         return true
@@ -19,15 +14,6 @@ export const userCanCreateWorkspace = (userId: string | undefined): boolean => {
 }
 
 export const userCanDeleteProject = (workspace: SPWorkspace, userId: string | undefined): boolean => {
-    if (!userId) return false
-    const workspaceRole = getWorkspaceRole(workspace, userId)
-    if (workspaceRole === 'admin' || workspaceRole === 'editor') {
-        return true
-    }
-    return false
-}
-
-export const userCanDeleteProjectRun = (workspace: SPWorkspace, userId: string | undefined): boolean => {
     if (!userId) return false
     const workspaceRole = getWorkspaceRole(workspace, userId)
     if (workspaceRole === 'admin' || workspaceRole === 'editor') {

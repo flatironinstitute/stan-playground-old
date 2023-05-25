@@ -1,7 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createProjectRun, createScriptJob, deleteProject, deleteProjectFile, deleteProjectRun, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchProjectRuns, fetchScriptJobs, setProjectProperty } from '../../dbInterface/dbInterface';
+import { createScriptJob, deleteProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
-import { SPProject, SPProjectFile, SPProjectRun, SPScriptJob } from '../../types/stan-playground-types';
+import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
 
 type Props = {
     projectId: string
@@ -72,16 +72,12 @@ type ProjectPageContextType = {
     projectFiles?: SPProjectFile[]
     openTabNames: string[]
     currentTabName?: string
-    projectRuns?: SPProjectRun[]
     scriptJobs?: SPScriptJob[]
     openTab: (tabName: string) => void
     closeTab: (tabName: string) => void
     closeAllTabs: () => void
     setCurrentTab: (tabName: string) => void
     refreshFiles: () => void
-    refreshRuns: () => void
-    createProjectRun: (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => void
-    deleteProjectRun: (projectRunId: string) => void
     deleteProject: () => Promise<void>
     setProjectProperty: (property: 'name', value: any) => void
     createScriptJob: (o: {scriptFileName: string}) => void
@@ -101,9 +97,6 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     closeAllTabs: () => {},
     setCurrentTab: () => {},
     refreshFiles: () => {},
-    refreshRuns: () => {},
-    createProjectRun: () => {},
-    deleteProjectRun: () => {},
     deleteProject: async () => {},
     setProjectProperty: () => {},
     createScriptJob: () => {},
@@ -118,10 +111,6 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
     const [projectFiles, setProjectFiles] = React.useState<SPProjectFile[] | undefined>()
     const [refreshFilesCode, setRefreshFilesCode] = React.useState(0)
     const refreshFiles = useCallback(() => setRefreshFilesCode(rfc => rfc + 1), [])
-
-    const [projectRuns, setProjectRuns] = React.useState<SPProjectRun[] | undefined>(undefined)
-    const [refreshRunsCode, setRefreshRunsCode] = React.useState(0)
-    const refreshRuns = useCallback(() => setRefreshRunsCode(rfc => rfc + 1), [])
 
     const [scriptJobs, setScriptJobs] = React.useState<SPScriptJob[] | undefined>(undefined)
     const [refreshScriptJobsCode, setRefreshScriptJobsCode] = React.useState(0)
@@ -154,15 +143,6 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
     }, [refreshFilesCode, projectId, auth])
 
     useEffect(() => {
-        (async () => {
-            setProjectRuns(undefined)
-            if (!projectId) return
-            const ar = await fetchProjectRuns(projectId, auth)
-            setProjectRuns(ar)
-        })()
-    }, [refreshRunsCode, projectId, auth])
-
-    useEffect(() => {
         let canceled = false
         ;(async () => {
             setScriptJobs(undefined)
@@ -190,18 +170,6 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         }
         setPreviousScriptJobs(scriptJobs)
     }, [scriptJobs, previousScriptJobs, refreshFiles])
-
-    const createProjectRunHandler = useCallback(async (o: {stanFileName: string, datasetFileName: string, optionsFileName: string}) => {
-        if (!project) return
-        await createProjectRun(project.workspaceId, projectId, o, auth)
-        refreshRuns()
-    }, [project, projectId, refreshRuns, auth])
-
-    const deleteProjectRunHandler = useCallback(async (projectRunId: string) => {
-        if (!project) return
-        await deleteProjectRun(project.workspaceId, projectId, projectRunId, auth)
-        refreshRuns()
-    }, [project, projectId, refreshRuns, auth])
 
     const createScriptJobHandler = useCallback(async (o: {scriptFileName: string}) => {
         if (!project) return
@@ -242,7 +210,6 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         workspaceId: project?.workspaceId ?? '',
         project,
         projectFiles,
-        projectRuns,
         openTabNames: selectedTabs.openTabNames,
         currentTabName: selectedTabs.currentTabName,
         scriptJobs,
@@ -251,9 +218,6 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         closeAllTabs: () => selectedTabsDispatch({type: 'closeAllTabs'}),
         setCurrentTab: (tabName: string) => selectedTabsDispatch({type: 'setCurrentTab', tabName}),
         refreshFiles,
-        refreshRuns,
-        createProjectRun: createProjectRunHandler,
-        deleteProjectRun: deleteProjectRunHandler,
         deleteProject: deleteProjectHandler,
         setProjectProperty: setProjectPropertyHandler,
         refreshScriptJobs,
@@ -261,7 +225,7 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         deleteScriptJob: deleteScriptJobHandler,
         deleteCompletedScriptJobs: deleteCompletedScriptJobsHandler,
         deleteFile
-    }), [project, projectFiles, projectRuns, projectId, refreshFiles, selectedTabs, refreshRuns, createProjectRunHandler, deleteProjectRunHandler, deleteProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile])
+    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile])
 
     return (
         <ProjectPageContext.Provider value={value}>

@@ -2,7 +2,6 @@ import { VercelRequest, VercelResponse } from '@vercel/node'
 import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
 import JSONStringifyDeterminsitic from '../apiHelpers/jsonStringifyDeterministic'
 import createProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/createProjectHandler'
-import createProjectRunHandler from '../apiHelpers/PlaygroundRequestHandlers/createProjectRunHandler'
 import createScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/createScriptJobHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
 import deleteProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectFileHandler'
@@ -15,7 +14,6 @@ import getProjectsHandler from '../apiHelpers/PlaygroundRequestHandlers/getProje
 import getProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFileHandler'
 import getProjectFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFilesHandler'
 import getProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectHandler'
-import getProjectRunsHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectRunsHandler'
 import getComputeResourcesHandler from '../apiHelpers/PlaygroundRequestHandlers/getComputeResourcesHandler'
 import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
 import getPendingScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobHandler'
@@ -30,7 +28,7 @@ import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateProjectRequest, isCreateProjectRunRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetProjectsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectRunsRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetProjectsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -118,12 +116,6 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isGetProjectFileRequest(payload)) {
             return await getProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
-        }
-        else if (isGetProjectRunsRequest(payload)) {
-            return await getProjectRunsHandler(payload, {verifiedClientId, verifiedUserId})
-        }
-        else if (isCreateProjectRunRequest(payload)) {
-            return await createProjectRunHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isSetWorkspaceUsersRequest(payload)) {
             return await setWorkspaceUsersHandler(payload, {verifiedClientId, verifiedUserId})

@@ -19,8 +19,8 @@ const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verif
     const projectFilesCollection = client.db('stan-playground').collection('projectFiles')
     projectFilesCollection.deleteMany({workspaceId: request.workspaceId})
 
-    const projectRunsCollection = client.db('stan-playground').collection('projectRuns')
-    projectRunsCollection.deleteMany({workspaceId: request.workspaceId})
+    const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
+    scriptJobsCollection.deleteMany({workspaceId: request.workspaceId})
 
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     dataBlobsCollection.deleteMany({workspaceId: request.workspaceId})

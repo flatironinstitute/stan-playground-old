@@ -1,5 +1,5 @@
-import { CreateProjectRequest, CreateProjectRunRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteProjectRunRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetProjectRunsRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
-import { SPProject, SPProjectFile, SPProjectRun, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
+import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
 export const fetchWorkspaces = async (auth: Auth): Promise<SPWorkspace[]> => {
@@ -191,50 +191,6 @@ export const deleteProjectFile = async (workspaceId: string, projectId: string, 
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'deleteProjectFile') {
         throw Error(`Unexpected response type ${resp.type}. Expected deleteProjectFile.`)
-    }
-}
-
-export const fetchProjectRuns = async (projectId: string, auth: Auth): Promise<SPProjectRun[]> => {
-    const req: GetProjectRunsRequest = {
-        type: 'getProjectRuns',
-        timestamp: Date.now() / 1000,
-        projectId
-    }
-    const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'getProjectRuns') {
-        throw Error(`Unexpected response type ${resp.type}. Expected getProjectRuns.`)
-    }
-    return resp.projectRuns
-}
-
-export const createProjectRun = async (workspaceId: string, projectId: string, o: {stanFileName: string, datasetFileName: string, optionsFileName: string}, auth: Auth): Promise<string> => {
-    const req: CreateProjectRunRequest = {
-        type: 'createProjectRun',
-        timestamp: Date.now() / 1000,
-        workspaceId,
-        projectId,
-        stanProgramFileName: o.stanFileName,
-        datasetFileName: o.datasetFileName,
-        optionsFileName: o.optionsFileName
-    }
-    const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'createProjectRun') {
-        throw Error(`Unexpected response type ${resp.type}. Expected createProjectRun.`)
-    }
-    return resp.projectRunId
-}
-
-export const deleteProjectRun = async (workspaceId: string, projectId: string, projectRunId: string, auth: Auth): Promise<void> => {
-    const req: DeleteProjectRunRequest = {
-        type: 'deleteProjectRun',
-        timestamp: Date.now() / 1000,
-        workspaceId,
-        projectId,
-        projectRunId
-    }
-    const resp = await postPlaygroundRequest(req, {...auth})
-    if (resp.type !== 'deleteProjectRun') {
-        throw Error(`Unexpected response type ${resp.type}. Expected deleteProjectRun.`)
     }
 }
 
