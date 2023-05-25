@@ -15,7 +15,7 @@ const SmallIconButton: FunctionComponent<PropsWithChildren<Props>> = ({icon, onC
     else classNames.push('enabled')
     return (
         <span title={title}>
-            <icon.type className={classNames.join(" ")} {...icon.props} style={{fontSize: fontSize || 18, verticalAlign: 'bottom'}} onClick={!disabled && onClick} />
+            <icon.type className={classNames.join(" ")} {...icon.props} style={{fontSize: fontSize || 18, verticalAlign: 'bottom'}} onClick={!disabled ? onClick : undefined} />
         </span>
     )
 }

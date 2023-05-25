@@ -703,31 +703,31 @@ export const isGetScriptJobResponse = (x: any): x is GetScriptJobResponse => {
     })
 }
 
-// getPendingScriptJob
+// getPendingScriptJobs
 
-export type GetPendingScriptJobRequest = {
-    type: 'getPendingScriptJob'
+export type GetPendingScriptJobsRequest = {
+    type: 'getPendingScriptJobs'
     timestamp: number
     computeResourceId: string
 }
 
-export const isGetPendingScriptJobRequest = (x: any): x is GetPendingScriptJobRequest => {
+export const isGetPendingScriptJobsRequest = (x: any): x is GetPendingScriptJobsRequest => {
     return validateObject(x, {
-        type: isEqualTo('getPendingScriptJob'),
+        type: isEqualTo('getPendingScriptJobs'),
         timestamp: isNumber,
         computeResourceId: isString
     })
 }
 
-export type GetPendingScriptJobResponse = {
-    type: 'getPendingScriptJob'
-    scriptJob?: SPScriptJob
+export type GetPendingScriptJobsResponse = {
+    type: 'getPendingScriptJobs'
+    scriptJobs: SPScriptJob[]
 }
 
-export const isGetPendingScriptJobResponse = (x: any): x is GetPendingScriptJobResponse => {
+export const isGetPendingScriptJobsResponse = (x: any): x is GetPendingScriptJobsResponse => {
     return validateObject(x, {
-        type: isEqualTo('getPendingScriptJob'),
-        scriptJob: optional(isSPScriptJob)
+        type: isEqualTo('getPendingScriptJobs'),
+        scriptJobs: isArrayOf(isSPScriptJob)
     })
 }
 
@@ -792,7 +792,7 @@ export type PlaygroundRequestPayload =
     DeleteScriptJobRequest |
     DeleteCompletedScriptJobsRequest |
     GetScriptJobRequest |
-    GetPendingScriptJobRequest |
+    GetPendingScriptJobsRequest |
     SetScriptJobPropertyRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
@@ -821,7 +821,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isDeleteScriptJobRequest,
         isDeleteCompletedScriptJobsRequest,
         isGetScriptJobRequest,
-        isGetPendingScriptJobRequest,
+        isGetPendingScriptJobsRequest,
         isSetScriptJobPropertyRequest
     ])(x)
 }
@@ -873,7 +873,7 @@ export type PlaygroundResponse =
     DeleteScriptJobResponse |
     DeleteCompletedScriptJobsResponse |
     GetScriptJobResponse |
-    GetPendingScriptJobResponse |
+    GetPendingScriptJobsResponse |
     SetScriptJobPropertyResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
@@ -902,7 +902,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isDeleteScriptJobResponse,
         isDeleteCompletedScriptJobsResponse,
         isGetScriptJobResponse,
-        isGetPendingScriptJobResponse,
+        isGetPendingScriptJobsResponse,
         isSetScriptJobPropertyResponse
     ])(x)
 }

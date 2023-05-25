@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import Splitter from "../../../components/Splitter";
 import ScriptJobsWindow from "../ScriptJobsWindow/ScriptJobsWindow";
+import SpaFileEditor from "./SpaFileEditor";
 import TextEditor from "./TextEditor";
 
 type Props = {
@@ -22,20 +23,32 @@ const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setF
             initialPosition={width / 2}
             direction="horizontal"
         >
-            <TextEditor
-                width={0}
-                height={0}
-                language={
-                    fileType === 'py' ? 'python' :
-                    fileType === 'spa' ? 'yaml' :
-                    'text'
-                }
-                label={fileName}
-                text={fileContent}
-                onSetText={setFileContent}
-                readOnly={readOnly}
-                onDeleteFile={onDeleteFile}
-            />
+            {
+                fileType === 'py' ? (
+                    <TextEditor
+                        width={0}
+                        height={0}
+                        language={
+                            fileType === 'py' ? 'python' :
+                            fileType === 'spa' ? 'yaml' :
+                            'text'
+                        }
+                        label={fileName}
+                        text={fileContent}
+                        onSetText={setFileContent}
+                        readOnly={readOnly}
+                        onDeleteFile={onDeleteFile}
+                    />
+                ) : (
+                    <SpaFileEditor
+                        width={0}
+                        height={0}
+                        text={fileContent}
+                        onSetText={setFileContent}
+                        readOnly={readOnly}
+                    />
+                )
+            }
             <ScriptJobsWindow
                 width={0}
                 height={0}

@@ -22,6 +22,7 @@
     "chonky-icon-fontawesome": "^2.3.2",
     "chunky": "^0.0.0",
     "crypto-js": "^4.1.1",
+    "js-yaml": "^4.1.0",
     "lru-cache": "^5.1.1",
     "monaco-editor": "^0.38.0",
     "react": "^18.2.0",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
+    "@types/js-yaml": "^4.0.5",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@typescript-eslint/eslint-plugin": "^5.57.1",

@@ -38,12 +38,13 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
 
     const [initialized, setInitialized] = useState(false)
 
+    // if there is exactly one .spa file, open it
     useEffect(() => {
         if (!projectFiles) return
         if (initialized) return
-        const stanFiles = projectFiles.filter(f => f.fileName.endsWith('.stan'))
-        if (stanFiles.length === 1) {
-            openTab(`file:${stanFiles[0].fileName}`)
+        const spaFiles = projectFiles.filter(f => f.fileName.endsWith('.spa'))
+        if (spaFiles.length === 1) {
+            openTab(`file:${spaFiles[0].fileName}`)
         }
         setInitialized(true)
     }, [projectFiles, openTab, initialized])

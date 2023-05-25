@@ -16,7 +16,7 @@ import getProjectFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getP
 import getProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectHandler'
 import getComputeResourcesHandler from '../apiHelpers/PlaygroundRequestHandlers/getComputeResourcesHandler'
 import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
-import getPendingScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobHandler'
+import getPendingScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobsHandler'
 import getScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/getScriptJobHandler'
 import getScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getScriptJobsHandler'
 import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
@@ -28,7 +28,7 @@ import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetProjectsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetProjectsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -156,8 +156,8 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         else if (isGetScriptJobRequest(payload)) {
             return await getScriptJobHandler(payload, {verifiedClientId, verifiedUserId})
         }
-        else if (isGetPendingScriptJobRequest(payload)) {
-            return await getPendingScriptJobHandler(payload, {verifiedClientId, verifiedUserId})
+        else if (isGetPendingScriptJobsRequest(payload)) {
+            return await getPendingScriptJobsHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isSetScriptJobPropertyRequest(payload)) {
             return await setScriptJobPropertyHandler(payload, {verifiedClientId, verifiedUserId})

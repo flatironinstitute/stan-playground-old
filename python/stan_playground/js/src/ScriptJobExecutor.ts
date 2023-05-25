@@ -1,4 +1,4 @@
-import { GetDataBlobRequest, GetPendingScriptJobRequest, GetProjectFileRequest, PlaygroundRequestPayload, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest"
+import { GetDataBlobRequest, GetPendingScriptJobsRequest, GetProjectFileRequest, PlaygroundRequestPayload, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest"
 import fs from 'fs'
 import path from 'path'
 import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource"
@@ -25,20 +25,21 @@ class ScriptJobExecutor {
             if (this.#stopped) {
                 break
             }
-            const req: GetPendingScriptJobRequest = {
-                type: 'getPendingScriptJob',
+            const req: GetPendingScriptJobsRequest = {
+                type: 'getPendingScriptJobs',
                 timestamp: Date.now() / 1000,
                 computeResourceId: this.#computeResourceId
             }
             const resp = await this.postPlaygroundRequest(req)
             let handledAJob = false
             if (resp) {
-                if (resp.type !== 'getPendingScriptJob') {
+                if (resp.type !== 'getPendingScriptJobs') {
                     console.warn(resp)
-                    throw Error('Unexpected response type. Expected getPendingScriptJob')
+                    throw Error('Unexpected response type. Expected getPendingScriptJobs')
                 }
-                const {scriptJob} = resp
-                if (scriptJob) {
+                const {scriptJobs} = resp
+                if (scriptJobs.length > 0) {
+                    const scriptJob = scriptJobs[0]
                     try {
                         await this.handleScriptJob(scriptJob)
                         handledAJob = true
