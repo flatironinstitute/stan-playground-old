@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createScriptJob, deleteProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty } from '../../dbInterface/dbInterface';
+import { createScriptJob, deleteProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
 
@@ -85,6 +85,8 @@ type ProjectPageContextType = {
     refreshScriptJobs: () => void
     deleteCompletedScriptJobs: (o: {scriptFileName: string}) => void
     deleteFile: (fileName: string) => void
+    duplicateFile: (fileName: string, newFileName: string) => void
+    renameFile: (fileName: string, newFileName: string) => void
 }
 
 const ProjectPageContext = React.createContext<ProjectPageContextType>({
@@ -103,7 +105,9 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     deleteScriptJob: () => {},
     refreshScriptJobs: () => {},
     deleteCompletedScriptJobs: () => {},
-    deleteFile: () => {}
+    deleteFile: () => {},
+    duplicateFile: () => {},
+    renameFile: () => {}
 })
 
 export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({children, projectId}) => {
@@ -205,6 +209,19 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         refreshFiles()
     }, [project, projectId, refreshFiles, auth])
 
+    const duplicateFile = useCallback(async (fileName: string, newFileName: string) => {
+        if (!project) return
+        await duplicateProjectFile(project.workspaceId, projectId, fileName, newFileName, auth)
+        refreshFiles()
+    }, [project, projectId, refreshFiles, auth])
+
+    const renameFile = useCallback(async (fileName: string, newFileName: string) => {
+        if (!project) return
+        await renameProjectFile(project.workspaceId, projectId, fileName, newFileName, auth)
+        refreshFiles()
+        selectedTabsDispatch({type: 'closeTab', tabName: `file:${fileName}`})
+    }, [project, projectId, refreshFiles, auth])
+
     const value = React.useMemo(() => ({
         projectId,
         workspaceId: project?.workspaceId ?? '',
@@ -224,8 +241,10 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         createScriptJob: createScriptJobHandler,
         deleteScriptJob: deleteScriptJobHandler,
         deleteCompletedScriptJobs: deleteCompletedScriptJobsHandler,
-        deleteFile
-    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile])
+        deleteFile,
+        duplicateFile,
+        renameFile
+    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile])
 
     return (
         <ProjectPageContext.Provider value={value}>

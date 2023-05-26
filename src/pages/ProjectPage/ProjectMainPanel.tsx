@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import TabWidget from "../../TabWidget/TabWidget";
 import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
+import { FileIcon } from "./ProjectFileBrowser/ProjectFileBrowser2";
 import ProjectFileEditor from "./ProjectFileEditor/ProjectFileEditor";
 import { useProject } from "./ProjectPageContext";
 import ScriptJobView from "./ScriptJobView/ScriptJobView";
@@ -17,7 +18,8 @@ const ProjectMainPanel: FunctionComponent<{width: number, height: number}> = ({w
                 openTabNames.map(tabName => ({
                     id: tabName,
                     label: labelFromTabName(tabName),
-                    closeable: true
+                    closeable: true,
+                    icon: iconFromTabName(tabName)
                 }))
             }
             currentTabId={currentTabName}
@@ -59,6 +61,13 @@ const labelFromTabName = (tabName: string) => {
         return 'job:' + tabName.slice('scriptJob:'.length)
     }
     return tabName
+}
+
+const iconFromTabName = (tabName: string) => {
+    if (tabName.startsWith('file:')) {
+        return <FileIcon fileName={tabName.slice('file:'.length)} />
+    }
+    else return undefined
 }
 
 export default ProjectMainPanel

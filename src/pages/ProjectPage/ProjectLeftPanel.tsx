@@ -1,11 +1,10 @@
 import { Add, Edit, Refresh } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
 import SmallIconButton from "../../components/SmallIconButton";
-import { confirm, prompt } from "../../confirm_prompt_alert";
+import { alert, confirm, prompt } from "../../confirm_prompt_alert";
 import { setProjectFileContent } from "../../dbInterface/dbInterface";
 import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import useRoute from "../../useRoute";
@@ -21,7 +20,7 @@ type Props = {
 }
 
 const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
-    const {projectId, project, workspaceId, openTab, closeTab, projectFiles, setProjectProperty, refreshFiles, deleteFile} = useProject()
+    const {projectId, project, workspaceId, openTab, closeTab, projectFiles, setProjectProperty, refreshFiles, deleteFile, duplicateFile, renameFile} = useProject()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
     const {workspace, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
@@ -35,6 +34,43 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         deleteFile(fileName)
         closeTab(`file:${fileName}`)
     }, [deleteFile, closeTab])
+
+    const handleDuplicateFile = useCallback(async (fileName: string) => {
+        let newFileName: string | null
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            newFileName = await prompt('Enter new file name:', fileName)
+            if (!newFileName) return
+            if (newFileName !== fileName) {
+                break
+            }
+        }
+        const existingFile = projectFiles?.find(f => f.fileName === newFileName)
+        if (existingFile) {
+            await alert(`File ${newFileName} already exists.`)
+            return
+        }
+        duplicateFile(fileName, newFileName)
+    }, [projectFiles, duplicateFile])
+
+    const handleRenameFile = useCallback(async (fileName: string) => {
+        let newFileName
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+            newFileName = await prompt('Enter new file name:', fileName)
+            if (!newFileName) return
+            if (newFileName !== fileName) {
+                break
+            }
+        }
+        const existingFile = projectFiles?.find(f => f.fileName === newFileName)
+        if (existingFile) {
+            await alert(`File ${newFileName} already exists.`)
+            return
+        }
+        renameFile(fileName, newFileName)
+    }, [projectFiles, renameFile])
+
 
     const [initialized, setInitialized] = useState(false)
 
@@ -64,7 +100,8 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         if (!fileName) return
         await setProjectFileContent(workspaceId, projectId, fileName, '', auth)
         refreshFiles()
-    }, [workspaceId, projectId, auth, refreshFiles])
+        openTab(`file:${fileName}`)
+    }, [workspaceId, projectId, auth, refreshFiles, openTab])
 
     const topHeight = 140
     const bottomHeight = 20
@@ -107,6 +144,8 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                     projectFiles={projectFiles}
                     onOpenFile={handleOpenFile}
                     onDeleteFile={handleDeleteFile}
+                    onDuplicateFile={handleDuplicateFile}
+                    onRenameFile={handleRenameFile}
                 />
             </div>
             <div style={{position: 'absolute', width: W, top: H - bottomHeight + 5, height: bottomHeight}}>

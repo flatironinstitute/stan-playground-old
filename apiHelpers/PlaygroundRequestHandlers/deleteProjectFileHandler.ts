@@ -35,6 +35,14 @@ const deleteProjectFileHandler = async (request: DeleteProjectFileRequest, o: {v
         projectId,
         fileName: request.fileName
     })
+
+    // remove data blobs that are no longer referenced
+    const contentSha1s = await projectFilesCollection.distinct('contentSha1', {projectId})
+    const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
+    await dataBlobsCollection.deleteMany({
+        projectId,
+        sha1: {$nin: contentSha1s}
+    })
     
     return {
         type: 'deleteProjectFile'

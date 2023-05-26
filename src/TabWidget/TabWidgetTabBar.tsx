@@ -6,6 +6,7 @@ type Props = {
         id: string
         label: string
         closeable: boolean
+        icon?: any
     }[]
     currentTabIndex: number | undefined
     onCurrentTabIndexChanged: (i: number) => void
@@ -31,7 +32,12 @@ const TabWidgetTabBar: FunctionComponent<Props> = ({ tabs, currentTabIndex, onCu
                 <Tab key={i} label={
                     tab.closeable ? (
                         <span>
-                            {tab.label}
+                            {
+                                tab.icon ? (
+                                    <span style={{marginRight: 4}}>{tab.icon}</span>
+                                ) : <span />
+                            }
+                            <span style={{textTransform: 'none', fontSize: 14}}>{tab.label}</span>
                             &nbsp;&nbsp;<span onClick={() => {onCloseTab(tab.id)}}>✕</span>
                         </span>
                     ) : (

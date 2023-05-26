@@ -1,4 +1,4 @@
-import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest } from "../types/PlaygroundRequest";
+import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest } from "../types/PlaygroundRequest";
 import { SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
@@ -191,6 +191,36 @@ export const deleteProjectFile = async (workspaceId: string, projectId: string, 
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'deleteProjectFile') {
         throw Error(`Unexpected response type ${resp.type}. Expected deleteProjectFile.`)
+    }
+}
+
+export const duplicateProjectFile = async (workspaceId: string, projectId: string, fileName: string, newFileName: string, auth: Auth): Promise<void> => {
+    const req: DuplicateProjectFileRequest = {
+        type: 'duplicateProjectFile',
+        timestamp: Date.now() / 1000,
+        projectId,
+        workspaceId,
+        fileName,
+        newFileName
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'duplicateProjectFile') {
+        throw Error(`Unexpected response type ${resp.type}. Expected duplicateProjectFile.`)
+    }
+}
+
+export const renameProjectFile = async (workspaceId: string, projectId: string, fileName: string, newFileName: string, auth: Auth): Promise<void> => {
+    const req: RenameProjectFileRequest = {
+        type: 'renameProjectFile',
+        timestamp: Date.now() / 1000,
+        projectId,
+        workspaceId,
+        fileName,
+        newFileName
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'renameProjectFile') {
+        throw Error(`Unexpected response type ${resp.type}. Expected renameProjectFile.`)
     }
 }
 

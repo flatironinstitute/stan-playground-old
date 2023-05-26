@@ -6,6 +6,7 @@ type Props = {
         id: string
         label: string
         closeable: boolean
+        icon?: any
     }[]
     currentTabId: string | undefined
     setCurrentTabId: (id: string) => void

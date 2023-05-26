@@ -1,7 +1,7 @@
 import { faPython } from '@fortawesome/free-brands-svg-icons';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Delete } from '@mui/icons-material';
+import { Delete, DriveFileRenameOutline, FileCopy } from '@mui/icons-material';
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import SmallIconButton from '../../../components/SmallIconButton';
 import { timeAgoString } from '../../../timeStrings';
@@ -14,6 +14,8 @@ type Props = {
     projectFiles: SPProjectFile[] | undefined
     onOpenFile: (path: string) => void
     onDeleteFile: (path: string) => void
+    onDuplicateFile: (path: string) => void
+    onRenameFile: (path: string) => void
 }
 
 type FileItem = {
@@ -24,7 +26,7 @@ type FileItem = {
     timestampModified: number
 }
 
-const ProjectFileBrowser2: FunctionComponent<Props> = ({onOpenFile, onDeleteFile, projectFiles}) => {
+const ProjectFileBrowser2: FunctionComponent<Props> = ({onOpenFile, onDeleteFile, onDuplicateFile, onRenameFile, projectFiles}) => {
     const {currentTabName} = useProject()
 
     const files = useMemo(() => {
@@ -60,8 +62,14 @@ const ProjectFileBrowser2: FunctionComponent<Props> = ({onOpenFile, onDeleteFile
         if (action === 'delete') {
             onDeleteFile(fileId)
         }
+        else if (action === 'duplicate') {
+            onDuplicateFile(fileId)
+        }
+        else if (action === 'rename') {
+            onRenameFile(fileId)
+        }
         setContextMenu({ visible: false, x: 0, y: 0, fileId: '' })
-    }, [onDeleteFile])
+    }, [onDeleteFile, onDuplicateFile])
     
     return (
         <div onMouseLeave={() => {setContextMenu({visible: false, x: 0, y: 0, fileId: ''})}} style={{position: 'absolute'}}>
@@ -93,7 +101,7 @@ const ProjectFileBrowser2: FunctionComponent<Props> = ({onOpenFile, onDeleteFile
     )
 }
 
-const FileIcon: FunctionComponent<{fileName: string}> = ({fileName}) => {
+export const FileIcon: FunctionComponent<{fileName: string}> = ({fileName}) => {
     const ext = fileName.split('.').pop()
     if (ext === 'py') {
         return <FontAwesomeIcon icon={faPython} style={{color: 'darkblue'}} />
@@ -114,10 +122,18 @@ const FileIcon: FunctionComponent<{fileName: string}> = ({fileName}) => {
 }
 
 const ContextMenu: FunctionComponent<{ x: number, y: number, fileId: string, onAction: (fileId: string, a: string) => void}> = ({x, y, fileId, onAction}) => {
-    const options = [{
-        id: "delete",
-        label: <span><SmallIconButton icon={<Delete />} /> delete {fileId}</span>
-    }]; // just an example
+    const options = [
+        {
+            id: "delete",
+            label: <span><SmallIconButton icon={<Delete />} /> delete {fileId}</span>
+        }, {
+            id: "rename",
+            label: <span><SmallIconButton icon={<DriveFileRenameOutline />} /> rename...</span>
+        }, {
+            id: "duplicate",
+            label: <span><SmallIconButton icon={<FileCopy />} /> duplicate...</span>
+        }
+    ]
   
     const onClick = (option: string) => {
       onAction(fileId, option)
@@ -129,7 +145,7 @@ const ContextMenu: FunctionComponent<{ x: number, y: number, fileId: string, onA
           <div key={option.id} onClick={() => onClick(option.id)}>{option.label}</div>
         ))}
       </div>
-    );
-  };
+    )
+}
 
 export default ProjectFileBrowser2

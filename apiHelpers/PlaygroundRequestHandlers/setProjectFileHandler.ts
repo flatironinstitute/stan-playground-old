@@ -79,6 +79,13 @@ const setProjectFileHandler = async (request: SetProjectFileRequest, o: {verifie
     const workspacesCollection = client.db('stan-playground').collection('workspaces')
     await workspacesCollection.updateOne({workspaceId}, {$set: {timestampModified: Date.now() / 1000}})
 
+    // remove data blobs that are no longer referenced
+    const contentSha1s = await projectFilesCollection.distinct('contentSha1', {projectId})
+    await dataBlobsCollection.deleteMany({
+        projectId,
+        sha1: {$nin: contentSha1s}
+    })
+
     return {
         type: 'setProjectFile'
     }

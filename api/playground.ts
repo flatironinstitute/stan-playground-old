@@ -4,19 +4,21 @@ import JSONStringifyDeterminsitic from '../apiHelpers/jsonStringifyDeterministic
 import createProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/createProjectHandler'
 import createScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/createScriptJobHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
-import deleteProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectFileHandler'
-import deleteProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectHandler'
 import deleteCompletedScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteCompletedScriptJobsHandler'
 import deleteComputeResourceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteComputeResourceHandler'
+import deleteProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectFileHandler'
+import deleteProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteProjectHandler'
 import deleteScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteScriptJobHandler'
 import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
-import getProjectsHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectsHandler'
-import getProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFileHandler'
-import getProjectFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFilesHandler'
-import getProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectHandler'
+import duplicateProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/duplicateProjectFileHandler'
+import renameProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/renameProjectFileHandler'
 import getComputeResourcesHandler from '../apiHelpers/PlaygroundRequestHandlers/getComputeResourcesHandler'
 import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
 import getPendingScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobsHandler'
+import getProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFileHandler'
+import getProjectFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFilesHandler'
+import getProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectHandler'
+import getProjectsHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectsHandler'
 import getScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/getScriptJobHandler'
 import getScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getScriptJobsHandler'
 import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
@@ -28,7 +30,7 @@ import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isGetProjectsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -164,6 +166,12 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isDeleteProjectFileRequest(payload)) {
             return await deleteProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isDuplicateProjectFileRequest(payload)) {
+            return await duplicateProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isRenameProjectFileRequest(payload)) {
+            return await renameProjectFileHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else {
             throw Error(`Unexpected request type: ${(payload as any).type}`)

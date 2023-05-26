@@ -349,6 +349,70 @@ export const isDeleteProjectFileResponse = (x: any): x is DeleteProjectFileRespo
     })
 }
 
+// duplicateProjectFile
+
+export type DuplicateProjectFileRequest = {
+    type: 'duplicateProjectFile'
+    timestamp: number
+    workspaceId: string
+    projectId: string
+    fileName: string
+    newFileName: string
+}
+
+export const isDuplicateProjectFileRequest = (x: any): x is DuplicateProjectFileRequest => {
+    return validateObject(x, {
+        type: isEqualTo('duplicateProjectFile'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        projectId: isString,
+        fileName: isString,
+        newFileName: isString
+    })
+}
+
+export type DuplicateProjectFileResponse = {
+    type: 'duplicateProjectFile'
+}
+
+export const isDuplicateProjectFileResponse = (x: any): x is DuplicateProjectFileResponse => {
+    return validateObject(x, {
+        type: isEqualTo('duplicateProjectFile')
+    })
+}
+
+// renameProjectFile
+
+export type RenameProjectFileRequest = {
+    type: 'renameProjectFile'
+    timestamp: number
+    workspaceId: string
+    projectId: string
+    fileName: string
+    newFileName: string
+}
+
+export const isRenameProjectFileRequest = (x: any): x is RenameProjectFileRequest => {
+    return validateObject(x, {
+        type: isEqualTo('renameProjectFile'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        projectId: isString,
+        fileName: isString,
+        newFileName: isString
+    })
+}
+
+export type RenameProjectFileResponse = {
+    type: 'renameProjectFile'
+}
+
+export const isRenameProjectFileResponse = (x: any): x is RenameProjectFileResponse => {
+    return validateObject(x, {
+        type: isEqualTo('renameProjectFile')
+    })
+}
+
 // getProjectFile
 
 export type GetProjectFileRequest = {
@@ -780,6 +844,8 @@ export type PlaygroundRequestPayload =
     GetProjectFilesRequest |
     SetProjectFileRequest |
     DeleteProjectFileRequest |
+    DuplicateProjectFileRequest |
+    RenameProjectFileRequest |
     GetProjectFileRequest |
     GetDataBlobRequest |
     DeleteProjectRequest |
@@ -809,6 +875,8 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetProjectFilesRequest,
         isSetProjectFileRequest,
         isDeleteProjectFileRequest,
+        isDuplicateProjectFileRequest,
+        isRenameProjectFileRequest,
         isGetProjectFileRequest,
         isGetDataBlobRequest,
         isDeleteProjectRequest,
@@ -861,6 +929,8 @@ export type PlaygroundResponse =
     GetProjectFilesResponse |
     SetProjectFileResponse |
     DeleteProjectFileResponse |
+    DuplicateProjectFileResponse |
+    RenameProjectFileResponse |
     GetProjectFileResponse |
     GetDataBlobResponse |
     DeleteProjectResponse |
@@ -890,6 +960,8 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetProjectFilesResponse,
         isSetProjectFileResponse,
         isDeleteProjectFileResponse,
+        isDuplicateProjectFileResponse,
+        isRenameProjectFileResponse,
         isGetProjectFileResponse,
         isGetDataBlobResponse,
         isDeleteProjectResponse,
