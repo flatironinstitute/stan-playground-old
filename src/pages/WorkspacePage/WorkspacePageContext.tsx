@@ -48,25 +48,16 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     }), [workspaceId, auth])
 
     const deleteWorkspaceHandler = useMemo(() => (async () => {
-        if (!auth) {
-            throw Error('Not logged in')
-        }
         await deleteWorkspace(workspaceId, auth)
         refreshWorkspaces()
     }), [workspaceId, auth, refreshWorkspaces])
 
     const setWorkspaceUsersHandler = useMemo(() => (async (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => {
-        if (!auth) {
-            throw Error('Not logged in')
-        }
         await setWorkspaceUsers(workspaceId, users, auth)
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])
 
     const setWorkspacePropertyHandler = useMemo(() => (async (property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any) => {
-        if (!auth) {
-            throw Error('Not logged in')
-        }
         await setWorkspaceProperty(workspaceId, property, value, auth)
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])

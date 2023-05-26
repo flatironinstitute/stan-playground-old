@@ -10,7 +10,7 @@ type SPMainContextType = {
     refreshWorkspaces: () => void
 }
 
-const SPMainContext = React.createContext<SPMainContextType>({workspaces: [], createWorkspace: async () => {}, refreshWorkspaces: () => {}})
+const SPMainContext = React.createContext<SPMainContextType>({workspaces: [], createWorkspace: async () => {return ''}, refreshWorkspaces: () => {}})
 
 export const SetupSPMain = (props: {children: React.ReactNode}) => {
     const [workspaces, setWorkspaces] = React.useState<SPWorkspace[]>([])
@@ -21,10 +21,6 @@ export const SetupSPMain = (props: {children: React.ReactNode}) => {
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
     const createWorkspaceHandler = useCallback(async (workspaceName: string) => {
-        if (!auth) {
-            console.warn('Not logged in.')
-            return
-        }
         const newWorkspaceId = await createWorkspace(workspaceName, auth)
         setRefreshCode(rc => rc + 1)
         return newWorkspaceId
@@ -42,7 +38,7 @@ export const SetupSPMain = (props: {children: React.ReactNode}) => {
         workspaces,
         createWorkspace: createWorkspaceHandler,
         refreshWorkspaces
-    }), [workspaces, createWorkspaceHandler])
+    }), [workspaces, createWorkspaceHandler, refreshWorkspaces])
 
     return (
         <SPMainContext.Provider value={value}>
