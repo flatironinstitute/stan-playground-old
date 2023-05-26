@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile } from '../../dbInterface/dbInterface';
+import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile, askAboutStanProgram } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
 
@@ -88,6 +88,7 @@ type ProjectPageContextType = {
     deleteFile: (fileName: string) => void
     duplicateFile: (fileName: string, newFileName: string) => void
     renameFile: (fileName: string, newFileName: string) => void
+    askAboutStanProgram: (stanFileName: string, prompt: string) => Promise<{response: string, cumulativeTokensUsed: number}>
 }
 
 const ProjectPageContext = React.createContext<ProjectPageContextType>({
@@ -109,7 +110,8 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     deleteCompletedScriptJobs: () => {},
     deleteFile: () => {},
     duplicateFile: () => {},
-    renameFile: () => {}
+    renameFile: () => {},
+    askAboutStanProgram: async () => {return {response: '', cumulativeTokensUsed: 0}}
 })
 
 export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({children, projectId}) => {
@@ -230,6 +232,12 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         selectedTabsDispatch({type: 'closeTab', tabName: `file:${fileName}`})
     }, [project, projectId, refreshFiles, auth])
 
+    const askAboutStanProgramHandler = useMemo(() => (async (stanFileName: string, prompt: string) => {
+        if (!project) return {response: 'no-project', cumulativeTokensUsed: -1} // shouldn't happen
+        const {response, cumulativeTokensUsed} = await askAboutStanProgram(project.workspaceId, projectId, stanFileName, prompt, auth)
+        return {response, cumulativeTokensUsed}
+    }), [project, projectId, auth])
+
     const value = React.useMemo(() => ({
         projectId,
         workspaceId: project?.workspaceId ?? '',
@@ -252,8 +260,9 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         deleteCompletedScriptJobs: deleteCompletedScriptJobsHandler,
         deleteFile,
         duplicateFile,
-        renameFile
-    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile])
+        renameFile,
+        askAboutStanProgram: askAboutStanProgramHandler
+    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile, askAboutStanProgramHandler])
 
     return (
         <ProjectPageContext.Provider value={value}>

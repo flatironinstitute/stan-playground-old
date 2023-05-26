@@ -1,4 +1,4 @@
-import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest, CloneProjectRequest } from "../types/PlaygroundRequest";
+import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest, CloneProjectRequest, AskAboutStanProgramRequest } from "../types/PlaygroundRequest";
 import { SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
@@ -373,4 +373,20 @@ export const fetchScriptJob = async (workspaceId: string, projectId: string, scr
         throw Error(`Unexpected response type ${resp.type}. Expected getScriptJob.`)
     }
     return resp.scriptJob
+}
+
+export const askAboutStanProgram = async (workspaceId: string, projectId: string, stanFileName: string, prompt: string, auth: Auth) => {
+    const req: AskAboutStanProgramRequest = {
+        type: 'askAboutStanProgram',
+        timestamp: Date.now() / 1000,
+        workspaceId,
+        projectId,
+        stanFileName,
+        prompt
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'askAboutStanProgram') {
+        throw Error(`Unexpected response type ${resp.type}. Expected askAboutStanProgram.`)
+    }
+    return {response: resp.response, cumulativeTokensUsed: resp.cumulativeTokensUsed}
 }

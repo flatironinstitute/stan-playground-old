@@ -861,6 +861,41 @@ export const isSetScriptJobPropertyResponse = (x: any): x is SetScriptJobPropert
     })
 }
 
+// askAboutStanProgram
+
+export type AskAboutStanProgramRequest = {
+    type: 'askAboutStanProgram'
+    timestamp: number
+    workspaceId: string
+    projectId: string
+    stanFileName: string
+    prompt: string
+}
+
+export const isAskAboutStanProgramRequest = (x: any): x is AskAboutStanProgramRequest => {
+    return validateObject(x, {
+        type: isEqualTo('askAboutStanProgram'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        projectId: isString,
+        stanFileName: isString,
+        prompt: isString
+    })
+}
+export type AskAboutStanProgramResponse = {
+    type: 'askAboutStanProgram'
+    response: string
+    cumulativeTokensUsed: number
+}
+
+export const isAskAboutStanProgramResponse = (x: any): x is AskAboutStanProgramResponse => {
+    return validateObject(x, {
+        type: isEqualTo('askAboutStanProgram'),
+        response: isString,
+        cumulativeTokensUsed: isNumber
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
@@ -892,7 +927,8 @@ export type PlaygroundRequestPayload =
     DeleteCompletedScriptJobsRequest |
     GetScriptJobRequest |
     GetPendingScriptJobsRequest |
-    SetScriptJobPropertyRequest
+    SetScriptJobPropertyRequest |
+    AskAboutStanProgramRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -924,7 +960,8 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isDeleteCompletedScriptJobsRequest,
         isGetScriptJobRequest,
         isGetPendingScriptJobsRequest,
-        isSetScriptJobPropertyRequest
+        isSetScriptJobPropertyRequest,
+        isAskAboutStanProgramRequest
     ])(x)
 }
 
@@ -979,7 +1016,8 @@ export type PlaygroundResponse =
     DeleteCompletedScriptJobsResponse |
     GetScriptJobResponse |
     GetPendingScriptJobsResponse |
-    SetScriptJobPropertyResponse
+    SetScriptJobPropertyResponse |
+    AskAboutStanProgramResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -1011,6 +1049,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isDeleteCompletedScriptJobsResponse,
         isGetScriptJobResponse,
         isGetPendingScriptJobsResponse,
-        isSetScriptJobPropertyResponse
+        isSetScriptJobPropertyResponse,
+        isAskAboutStanProgramResponse
     ])(x)
 }

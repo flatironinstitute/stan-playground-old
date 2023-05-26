@@ -1,10 +1,12 @@
-import { AutoFixHigh } from "@mui/icons-material";
+import { AutoFixHigh, Chat } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import Splitter from "../../../components/Splitter";
-import StanFileAnalysesWindow from "../StanFileAnalysesWindow/StanFileAnalysesWindow";
 import runStanc from "./runStanc";
 import StanCompileResultWindow from "./StanCompileResultWindow";
 import TextEditor, { ToolbarItem } from "./TextEditor";
+import 'material-symbols'
+import StanFileChatGPTWindow from "../StanFileChatGPTWindow/StanFileChatGPTWindow";
+
 
 type Props = {
     fileName: string
@@ -34,6 +36,8 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
         })()
     }, [editedText, editedStanTextOverrider])
 
+    const [chatGPTOpen, setChatGPTOpen] = useState<boolean>(false)
+
     const toolbarItems: ToolbarItem[] = useMemo(() => {
         const ret: ToolbarItem[] = []
 
@@ -48,6 +52,13 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                 })
             }
         }
+
+        ret.push({
+            icon: <Chat />,
+            label: 'Ask ChatGPT',
+            onClick: () => setChatGPTOpen(a => !a),
+            color: 'darkblue'
+        })
 
         return ret
     }, [handleAutoFormat, editedText, readOnly])
@@ -88,11 +99,15 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                     />
                 }
             </Splitter>
-            <StanFileAnalysesWindow
-                width={0}
-                height={0}
-                stanFileName={fileName}
-            />
+            {
+                chatGPTOpen && (
+                    <StanFileChatGPTWindow
+                        width={0}
+                        height={0}
+                        stanFileName={fileName}
+                    />
+                )
+            }
         </Splitter>
     )
 }
