@@ -4,7 +4,6 @@ import Splitter from "../../../components/Splitter";
 import runStanc from "./runStanc";
 import StanCompileResultWindow from "./StanCompileResultWindow";
 import TextEditor, { ToolbarItem } from "./TextEditor";
-import 'material-symbols'
 import StanFileChatGPTWindow from "../StanFileChatGPTWindow/StanFileChatGPTWindow";
 
 
