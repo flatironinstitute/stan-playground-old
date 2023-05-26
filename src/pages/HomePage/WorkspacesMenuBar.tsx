@@ -2,14 +2,14 @@ import { FunctionComponent, useCallback } from "react";
 import Hyperlink from "../../components/Hyperlink";
 import { prompt } from "../../confirm_prompt_alert";
 import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
-import { useHome } from "./HomePageContext";
+import { useSPMain } from "../../SPMainContext";
 
 type Props = {
     // none
 }
 
 const WorkspacesMenuBar: FunctionComponent<Props> = () => {
-    const {createWorkspace} = useHome()
+    const {createWorkspace} = useSPMain()
 
     const handleCreateWorkspace = useCallback(() => {
         (async () => {

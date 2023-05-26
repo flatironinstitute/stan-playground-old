@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import githubVerifyAccessToken from '../apiHelpers/githubVerifyAccessToken'
 import JSONStringifyDeterminsitic from '../apiHelpers/jsonStringifyDeterministic'
+import cloneProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/cloneProjectHandler'
 import createProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/createProjectHandler'
 import createScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/createScriptJobHandler'
 import createWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/createWorkspaceHandler'
@@ -11,7 +12,6 @@ import deleteProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/delete
 import deleteScriptJobHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteScriptJobHandler'
 import deleteWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/deleteWorkspaceHandler'
 import duplicateProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/duplicateProjectFileHandler'
-import renameProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/renameProjectFileHandler'
 import getComputeResourcesHandler from '../apiHelpers/PlaygroundRequestHandlers/getComputeResourcesHandler'
 import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
 import getPendingScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobsHandler'
@@ -24,13 +24,14 @@ import getScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getScr
 import getWorkspaceHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspaceHandler'
 import getWorkspacesHandler from '../apiHelpers/PlaygroundRequestHandlers/getWorkspacesHandler'
 import registerComputeResourceHandler from '../apiHelpers/PlaygroundRequestHandlers/registerComputeResourceHandler'
+import renameProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/renameProjectFileHandler'
 import setProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/setProjectFileHandler'
 import setProjectPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setProjectPropertyHandler'
 import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setScriptJobPropertyHandler'
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isCloneProjectRequest, isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -130,6 +131,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isDeleteProjectRequest(payload)) {
             return await deleteProjectHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isCloneProjectRequest(payload)) {
+            return await cloneProjectHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isSetProjectPropertyRequest(payload)) {
             return await setProjectPropertyHandler(payload, {verifiedClientId, verifiedUserId})

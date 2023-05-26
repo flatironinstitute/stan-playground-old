@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createScriptJob, deleteProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile } from '../../dbInterface/dbInterface';
+import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
 
@@ -79,6 +79,7 @@ type ProjectPageContextType = {
     setCurrentTab: (tabName: string) => void
     refreshFiles: () => void
     deleteProject: () => Promise<void>
+    cloneProject: (newWorkspaceId: string) => Promise<string>
     setProjectProperty: (property: 'name', value: any) => void
     createScriptJob: (o: {scriptFileName: string}) => void
     deleteScriptJob: (scriptJobId: string) => void
@@ -100,6 +101,7 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     setCurrentTab: () => {},
     refreshFiles: () => {},
     deleteProject: async () => {},
+    cloneProject: async () => {return ''},
     setProjectProperty: () => {},
     createScriptJob: () => {},
     deleteScriptJob: () => {},
@@ -198,6 +200,12 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         await deleteProject(project.workspaceId, projectId, auth)
     }), [project, projectId, auth])
 
+    const cloneProjectHandler = useMemo(() => (async (newWorkspaceId: string) => {
+        if (!project) return '' // should not happen
+        const newProjectId = await cloneProject(project.workspaceId, projectId, newWorkspaceId, auth)
+        return newProjectId
+    }), [project, projectId, auth])
+
     const setProjectPropertyHandler = useCallback(async (property: 'name', val: any) => {
         await setProjectProperty(projectId, property, val, auth)
         refreshProject()
@@ -236,6 +244,7 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         setCurrentTab: (tabName: string) => selectedTabsDispatch({type: 'setCurrentTab', tabName}),
         refreshFiles,
         deleteProject: deleteProjectHandler,
+        cloneProject: cloneProjectHandler,
         setProjectProperty: setProjectPropertyHandler,
         refreshScriptJobs,
         createScriptJob: createScriptJobHandler,
@@ -244,7 +253,7 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         deleteFile,
         duplicateFile,
         renameFile
-    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile])
+    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile])
 
     return (
         <ProjectPageContext.Provider value={value}>

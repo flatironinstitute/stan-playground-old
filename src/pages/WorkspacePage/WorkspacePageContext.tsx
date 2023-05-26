@@ -1,6 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useEffect, useMemo } from 'react';
 import { createProject, deleteWorkspace, fetchProjects, fetchWorkspace, setWorkspaceProperty, setWorkspaceUsers } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
+import { useSPMain } from '../../SPMainContext';
 import { SPProject, SPWorkspace } from '../../types/stan-playground-types';
 
 type Props = {
@@ -35,6 +36,8 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const [projectsRefreshCode, setProjectsRefreshCode] = React.useState(0)
     const [workspaceRefreshCode, setWorkspaceRefreshCode] = React.useState(0)
 
+    const {refreshWorkspaces} = useSPMain()
+
     const {accessToken, userId} = useGithubAuth()
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
@@ -49,7 +52,8 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
             throw Error('Not logged in')
         }
         await deleteWorkspace(workspaceId, auth)
-    }), [workspaceId, auth])
+        refreshWorkspaces()
+    }), [workspaceId, auth, refreshWorkspaces])
 
     const setWorkspaceUsersHandler = useMemo(() => (async (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => {
         if (!auth) {

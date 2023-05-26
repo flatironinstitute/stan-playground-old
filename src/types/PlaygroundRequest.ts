@@ -503,6 +503,38 @@ export const isDeleteProjectResponse = (x: any): x is DeleteProjectResponse => {
     })
 }
 
+// cloneProject
+
+export type CloneProjectRequest = {
+    type: 'cloneProject'
+    timestamp: number
+    workspaceId: string
+    projectId: string
+    newWorkspaceId: string
+}
+
+export const isCloneProjectRequest = (x: any): x is CloneProjectRequest => {
+    return validateObject(x, {
+        type: isEqualTo('cloneProject'),
+        timestamp: isNumber,
+        workspaceId: isString,
+        projectId: isString,
+        newWorkspaceId: isString
+    })
+}
+
+export type CloneProjectResponse = {
+    type: 'cloneProject'
+    newProjectId: string
+}
+
+export const isCloneProjectResponse = (x: any): x is CloneProjectResponse => {
+    return validateObject(x, {
+        type: isEqualTo('cloneProject'),
+        newProjectId: isString
+    })
+}
+
 // setProjectProperty
 
 export type SetProjectPropertyRequest = {
@@ -849,6 +881,7 @@ export type PlaygroundRequestPayload =
     GetProjectFileRequest |
     GetDataBlobRequest |
     DeleteProjectRequest |
+    CloneProjectRequest |
     SetProjectPropertyRequest |
     GetComputeResourcesRequest |
     RegisterComputeResourceRequest |
@@ -880,6 +913,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetProjectFileRequest,
         isGetDataBlobRequest,
         isDeleteProjectRequest,
+        isCloneProjectRequest,
         isSetProjectPropertyRequest,
         isGetComputeResourcesRequest,
         isRegisterComputeResourceRequest,
@@ -934,6 +968,7 @@ export type PlaygroundResponse =
     GetProjectFileResponse |
     GetDataBlobResponse |
     DeleteProjectResponse |
+    CloneProjectResponse |
     SetProjectPropertyResponse |
     GetComputeResourcesResponse |
     RegisterComputeResourceResponse |
@@ -965,6 +1000,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetProjectFileResponse,
         isGetDataBlobResponse,
         isDeleteProjectResponse,
+        isCloneProjectResponse,
         isSetProjectPropertyResponse,
         isGetComputeResourcesResponse,
         isRegisterComputeResourceResponse,

@@ -13,6 +13,7 @@ import ProjectFileBrowser2 from "./ProjectFileBrowser/ProjectFileBrowser2";
 import { useProject } from "./ProjectPageContext";
 import ProjectSettingsWindow from "./ProjectSettingsWindow";
 import BackButton from "./BackButton";
+import CloneProjectWindow from "./CloneProjectWindow/CloneProjectWindow";
 
 type Props = {
     width: number
@@ -22,6 +23,7 @@ type Props = {
 const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
     const {projectId, project, workspaceId, openTab, closeTab, projectFiles, setProjectProperty, refreshFiles, deleteFile, duplicateFile, renameFile} = useProject()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
+    const {visible: cloneProjectWindowVisible, handleOpen: openCloneProjectWindow, handleClose: closeCloneProjectWindow} = useModalDialog()
     const {workspace, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
     const handleOpenFile = useCallback((fileName: string) => {
@@ -54,7 +56,7 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
     }, [projectFiles, duplicateFile])
 
     const handleRenameFile = useCallback(async (fileName: string) => {
-        let newFileName
+        let newFileName: string | null
         // eslint-disable-next-line no-constant-condition
         while (true) {
             newFileName = await prompt('Enter new file name:', fileName)
@@ -149,13 +151,22 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                 />
             </div>
             <div style={{position: 'absolute', width: W, top: H - bottomHeight + 5, height: bottomHeight}}>
-                <button onClick={openSettingsWindow}>Settings</button>
+                <button onClick={openSettingsWindow}>Settings</button>&nbsp;
+                <button onClick={openCloneProjectWindow}>Clone project</button>&nbsp;
             </div>
             <ModalWindow
                 open={settingsWindowVisible}
                 onClose={closeSettingsWindow}
             >
                 <ProjectSettingsWindow />
+            </ModalWindow>
+            <ModalWindow
+                open={cloneProjectWindowVisible}
+                onClose={closeCloneProjectWindow}
+            >
+                <CloneProjectWindow
+                    onClose={closeCloneProjectWindow}
+                />
             </ModalWindow>
         </div>
     )

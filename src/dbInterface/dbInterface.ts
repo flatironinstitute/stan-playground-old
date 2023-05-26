@@ -1,4 +1,4 @@
-import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest } from "../types/PlaygroundRequest";
+import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest, CloneProjectRequest } from "../types/PlaygroundRequest";
 import { SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
@@ -235,6 +235,21 @@ export const deleteProject = async (workspaceId: string, projectId: string, auth
     if (resp.type !== 'deleteProject') {
         throw Error(`Unexpected response type ${resp.type}. Expected deleteProject.`)
     }
+}
+
+export const cloneProject = async (workspaceId: string, projectId: string, newWorkspaceId: string, auth: Auth): Promise<string> => {
+    const req: CloneProjectRequest = {
+        type: 'cloneProject',
+        timestamp: Date.now() / 1000,
+        workspaceId,
+        projectId,
+        newWorkspaceId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'cloneProject') {
+        throw Error(`Unexpected response type ${resp.type}. Expected cloneProject.`)
+    }
+    return resp.newProjectId
 }
 
 export const setProjectProperty = async (projectId: string, property: 'name', value: any, auth: Auth): Promise<void> => {

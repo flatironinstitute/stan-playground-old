@@ -1,16 +1,16 @@
 import { FunctionComponent } from "react";
 import Hyperlink from "../../components/Hyperlink";
+import { useSPMain } from "../../SPMainContext";
 import { timeAgoString } from "../../timeStrings";
 import UserIdComponent from "../../UserIdComponent";
 import useRoute from "../../useRoute";
-import { useHome } from "./HomePageContext";
 
 type Props = {
     // none
 }
 
 const WorkspacesTable: FunctionComponent<Props> = () => {
-    const {workspaces} = useHome()
+    const {workspaces} = useSPMain()
     const {setRoute} = useRoute()
 
     return (

@@ -1,19 +1,21 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { createWorkspace, fetchWorkspaces } from '../../dbInterface/dbInterface';
-import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
-import { SPWorkspace } from '../../types/stan-playground-types';
+import { createWorkspace, fetchWorkspaces } from './dbInterface/dbInterface';
+import { useGithubAuth } from './GithubAuth/useGithubAuth';
+import { SPWorkspace } from './types/stan-playground-types';
 
 
-type HomePageContextType = {
+type SPMainContextType = {
     workspaces: SPWorkspace[]
-    createWorkspace: (workspaceName: string) => Promise<void>
+    createWorkspace: (workspaceName: string) => Promise<string>
+    refreshWorkspaces: () => void
 }
 
-const HomePageContext = React.createContext<HomePageContextType>({workspaces: [], createWorkspace: async () => {}})
+const SPMainContext = React.createContext<SPMainContextType>({workspaces: [], createWorkspace: async () => {}, refreshWorkspaces: () => {}})
 
-export const SetupHomePage = (props: {children: React.ReactNode}) => {
+export const SetupSPMain = (props: {children: React.ReactNode}) => {
     const [workspaces, setWorkspaces] = React.useState<SPWorkspace[]>([])
     const [refreshCode, setRefreshCode] = React.useState(0)
+    const refreshWorkspaces = useCallback(() => setRefreshCode(rc => rc + 1), [])
 
     const {accessToken, userId} = useGithubAuth()
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
@@ -23,8 +25,9 @@ export const SetupHomePage = (props: {children: React.ReactNode}) => {
             console.warn('Not logged in.')
             return
         }
-        await createWorkspace(workspaceName, auth)
+        const newWorkspaceId = await createWorkspace(workspaceName, auth)
         setRefreshCode(rc => rc + 1)
+        return newWorkspaceId
     }, [auth])
 
     useEffect(() => {
@@ -37,20 +40,22 @@ export const SetupHomePage = (props: {children: React.ReactNode}) => {
 
     const value = React.useMemo(() => ({
         workspaces,
-        createWorkspace: createWorkspaceHandler
+        createWorkspace: createWorkspaceHandler,
+        refreshWorkspaces
     }), [workspaces, createWorkspaceHandler])
 
     return (
-        <HomePageContext.Provider value={value}>
+        <SPMainContext.Provider value={value}>
             {props.children}
-        </HomePageContext.Provider>
+        </SPMainContext.Provider>
     )
 }
 
-export const useHome = () => {
-    const context = React.useContext(HomePageContext)
+export const useSPMain = () => {
+    const context = React.useContext(SPMainContext)
     return {
         workspaces: context.workspaces,
-        createWorkspace: context.createWorkspace
+        createWorkspace: context.createWorkspace,
+        refreshWorkspaces: context.refreshWorkspaces
     }
 }
