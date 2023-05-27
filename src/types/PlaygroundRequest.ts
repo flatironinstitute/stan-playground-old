@@ -1,5 +1,5 @@
 import { isSPProject, isSPProjectFile, isSPComputeResource, isSPScriptJob, isSPWorkspace, SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "./stan-playground-types"
-import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
+import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 // getWorkspaces
 
@@ -870,6 +870,7 @@ export type AskAboutStanProgramRequest = {
     projectId: string
     stanFileName: string
     prompt: string
+    cacheOnly: boolean
 }
 
 export const isAskAboutStanProgramRequest = (x: any): x is AskAboutStanProgramRequest => {
@@ -879,7 +880,8 @@ export const isAskAboutStanProgramRequest = (x: any): x is AskAboutStanProgramRe
         workspaceId: isString,
         projectId: isString,
         stanFileName: isString,
-        prompt: isString
+        prompt: isString,
+        cacheOnly: isBoolean
     })
 }
 export type AskAboutStanProgramResponse = {

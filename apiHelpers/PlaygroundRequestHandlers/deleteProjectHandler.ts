@@ -28,6 +28,9 @@ const deleteProjectHandler = async (request: DeleteProjectRequest, o: {verifiedC
     const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
     scriptJobsCollection.deleteMany({projectId: request.projectId})
 
+    const askAboutStanProgramCacheCollection = client.db('stan-playground').collection('askAboutStanProgramCache')
+    askAboutStanProgramCacheCollection.deleteMany({projectId: request.projectId})
+
     const projectsCollection = client.db('stan-playground').collection('projects')
 
     await projectsCollection.deleteOne({projectId: request.projectId})

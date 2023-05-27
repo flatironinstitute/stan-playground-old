@@ -25,6 +25,9 @@ const deleteWorkspaceHandler = async (request: DeleteWorkspaceRequest, o: {verif
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     dataBlobsCollection.deleteMany({workspaceId: request.workspaceId})
 
+    const askAboutStanProgramCacheCollection = client.db('stan-playground').collection('askAboutStanProgramCache')
+    askAboutStanProgramCacheCollection.deleteMany({workspaceId: request.workspaceId})
+
     const workspacesCollection = client.db('stan-playground').collection('workspaces')
     await workspacesCollection.deleteOne({workspaceId: request.workspaceId})
 

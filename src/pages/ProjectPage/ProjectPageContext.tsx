@@ -88,7 +88,7 @@ type ProjectPageContextType = {
     deleteFile: (fileName: string) => void
     duplicateFile: (fileName: string, newFileName: string) => void
     renameFile: (fileName: string, newFileName: string) => void
-    askAboutStanProgram: (stanFileName: string, prompt: string) => Promise<{response: string, cumulativeTokensUsed: number}>
+    askAboutStanProgram: (stanFileName: string, prompt: string, cacheOnly: boolean) => Promise<{response: string, cumulativeTokensUsed: number}>
 }
 
 const ProjectPageContext = React.createContext<ProjectPageContextType>({
@@ -111,7 +111,7 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     deleteFile: () => {},
     duplicateFile: () => {},
     renameFile: () => {},
-    askAboutStanProgram: async () => {return {response: '', cumulativeTokensUsed: 0}}
+    askAboutStanProgram: async () => {return {response: '', cumulativeTokensUsed: 0}},
 })
 
 export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({children, projectId}) => {
@@ -232,9 +232,9 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         selectedTabsDispatch({type: 'closeTab', tabName: `file:${fileName}`})
     }, [project, projectId, refreshFiles, auth])
 
-    const askAboutStanProgramHandler = useMemo(() => (async (stanFileName: string, prompt: string) => {
+    const askAboutStanProgramHandler = useMemo(() => (async (stanFileName: string, prompt: string, cacheOnly: boolean) => {
         if (!project) return {response: 'no-project', cumulativeTokensUsed: -1} // shouldn't happen
-        const {response, cumulativeTokensUsed} = await askAboutStanProgram(project.workspaceId, projectId, stanFileName, prompt, auth)
+        const {response, cumulativeTokensUsed} = await askAboutStanProgram(project.workspaceId, projectId, stanFileName, prompt, cacheOnly, auth)
         return {response, cumulativeTokensUsed}
     }), [project, projectId, auth])
 

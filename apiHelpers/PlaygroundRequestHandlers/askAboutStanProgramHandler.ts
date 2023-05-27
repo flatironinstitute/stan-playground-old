@@ -9,33 +9,7 @@ import removeIdField from '../removeIdField';
 const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<AskAboutStanProgramResponse> => {
     const {verifiedUserId, verifiedClientId} = o
 
-    if (!verifiedUserId) {
-        throw Error('You must be logged in to ask about a stan program using ChatGPT')
-    }
-
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-        throw Error('OPENAI_API_KEY environment variable not set')
-    }
-
     const client = await getMongoClient()
-
-    const chatGPTUsageCollection = client.db('stan-playground').collection('chatGPTUsage')
-    const chatGPTUsage = await chatGPTUsageCollection.findOne({
-        userId: verifiedUserId
-    })
-    if (chatGPTUsage) {
-        console.info(`ChatGPT tokens used for user ${verifiedUserId}: ${chatGPTUsage.tokensUsed}`)
-        if (chatGPTUsage.tokensUsed >= 1000 * 200) {
-            throw Error('You have used up your ChatGPT tokens')
-        }
-    }
-    else {
-        await chatGPTUsageCollection.insertOne({
-            userId: verifiedUserId,
-            tokensUsed: 0
-        })
-    }
 
     const projectId = request.projectId
 
@@ -63,6 +37,49 @@ const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o
     }
 
     const sha1 = projectFile.contentSha1
+
+    const askAboutStanProgramCacheCollection = client.db('stan-playground').collection('askAboutStanProgramCache')
+    const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
+        projectId,
+        workspaceId: request.workspaceId,
+        stanFileName: request.stanFileName,
+        stanProgramSha1: sha1,
+        prompt: request.prompt
+    })
+    if (cachedResponse) {
+        return {
+            type: 'askAboutStanProgram',
+            response: cachedResponse.response,
+            cumulativeTokensUsed: 0
+        }
+    }
+
+    if (!verifiedUserId) {
+        throw Error('You must be logged in to ask about a stan program using ChatGPT')
+    }
+
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
+        throw Error('OPENAI_API_KEY environment variable not set')
+    }
+
+    const chatGPTUsageCollection = client.db('stan-playground').collection('chatGPTUsage')
+    const chatGPTUsage = await chatGPTUsageCollection.findOne({
+        userId: verifiedUserId
+    })
+    if (chatGPTUsage) {
+        console.info(`ChatGPT tokens used for user ${verifiedUserId}: ${chatGPTUsage.tokensUsed}`)
+        if (chatGPTUsage.tokensUsed >= 1000 * 200) {
+            throw Error('You have used up your ChatGPT tokens')
+        }
+    }
+    else {
+        await chatGPTUsageCollection.insertOne({
+            userId: verifiedUserId,
+            tokensUsed: 0
+        })
+    }
+    
     const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
     const dataBlob = removeIdField(await dataBlobsCollection.findOne({
         projectId,
@@ -137,6 +154,16 @@ ${request.prompt}
         $set: {
             tokensUsed: tokensUsed2
         }
+    })
+
+    await askAboutStanProgramCacheCollection.insertOne({
+        projectId,
+        workspaceId: request.workspaceId,
+        stanFileName: request.stanFileName,
+        stanProgramSha1: sha1,
+        prompt: request.prompt,
+        response,
+        timestamp: Date.now() / 1000
     })
 
     return {

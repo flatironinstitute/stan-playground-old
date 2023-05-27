@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useGithubAuth } from "../../../GithubAuth/useGithubAuth";
 import { useProject } from "../ProjectPageContext";
 
@@ -8,22 +8,40 @@ type Props = {
     stanFileName: string
 }
 
+const initialPrompt = `Explain this model.`
+
 const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFileName}) => {
     const {askAboutStanProgram} = useProject()
-    const [prompt, setPrompt] = useState('Explain the model.')
+    const [prompt, setPrompt] = useState(initialPrompt)
     const [response, setResponse] = useState('')
     const [cumulativeTokensUsed, setCumulativeTokensUsed] = useState<number | undefined>(undefined)
     const [processing, setProcessing] = useState(false)
 
     const {userId} = useGithubAuth()
 
+    useEffect(() => {
+        let canceled = false
+        ;(async () => {
+            const cacheOnly = true
+            const {response} = await askAboutStanProgram(stanFileName, initialPrompt, cacheOnly)
+            if (canceled) return
+            if (response) {
+                setResponse(response)
+            }
+        })()
+        return () => {canceled = true}
+    }, [askAboutStanProgram, stanFileName])
+
     const handleSubmit = useCallback(async () => {
         if (processing) return
         setProcessing(true)
         try {
-            const {response, cumulativeTokensUsed} = await askAboutStanProgram(stanFileName, prompt)
+            const cacheOnly = false
+            const {response, cumulativeTokensUsed} = await askAboutStanProgram(stanFileName, prompt, cacheOnly)
             setResponse(response)
-            setCumulativeTokensUsed(cumulativeTokensUsed)
+            if (cumulativeTokensUsed) {
+                setCumulativeTokensUsed(cumulativeTokensUsed)
+            }
         }
         finally {
             setProcessing(false)
