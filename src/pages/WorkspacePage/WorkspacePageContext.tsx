@@ -80,7 +80,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         })()
     }, [workspaceId, workspaceRefreshCode, auth])
 
-    const workspaceRole = useMemo(() => {
+    const workspaceRole: 'admin' | 'viewer' | 'none' | 'editor' | undefined = useMemo(() => {
         if (!workspace) return undefined
         if (userId) {
             if (workspace.ownerId === userId) return 'admin'

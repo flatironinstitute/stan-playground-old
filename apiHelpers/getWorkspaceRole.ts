@@ -1,6 +1,6 @@
 import { SPWorkspace } from "../src/types/stan-playground-types"
 
-const getWorkspaceRole = (workspace: SPWorkspace, userId: string | undefined) => {
+const getWorkspaceRole = (workspace: SPWorkspace, userId: string | undefined): 'none' | 'viewer' | 'editor' | 'admin' => {
     if (userId) {
         if (workspace.ownerId === userId) {
             return 'admin'
