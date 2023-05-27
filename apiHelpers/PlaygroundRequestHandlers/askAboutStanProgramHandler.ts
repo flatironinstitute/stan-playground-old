@@ -38,18 +38,59 @@ const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o
 
     const sha1 = projectFile.contentSha1
 
+    const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
+    const dataBlob = removeIdField(await dataBlobsCollection.findOne({
+        projectId,
+        sha1
+    }))
+    if (!dataBlob) {
+        throw Error('Data blob not found')
+    }
+    if (!isSPDataBlob(dataBlob)) {
+        console.warn(dataBlob)
+        throw Error('Invalid data blob in database')
+    }
+
+    const stanProgram = dataBlob.content
+
+    const prompt2 = `
+I am going to provide a Stan program followed by a prompt.
+Please answer the prompt in a concise way sticking only to the topic of the stan program.
+Your response will be included in a help panel in software where the user is editing this viewing this Stan program and wants to know more about it.
+Please respond in markdown format with support for latex. Do not respond in plain text format.
+
+Here's the stan program:
+
+${stanProgram}
+
+And here's the prompt:
+
+${request.prompt}
+
+PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
+`
+
     const askAboutStanProgramCacheCollection = client.db('stan-playground').collection('askAboutStanProgramCache')
     const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
         projectId,
         workspaceId: request.workspaceId,
         stanFileName: request.stanFileName,
         stanProgramSha1: sha1,
-        prompt: request.prompt
+        prompt: request.prompt,
+        prompt2
     })
     if (cachedResponse) {
         return {
             type: 'askAboutStanProgram',
             response: cachedResponse.response,
+            cumulativeTokensUsed: 0
+        }
+    }
+
+    if (request.cacheOnly) {
+        return {
+            type: 'askAboutStanProgram',
+            response: '',
             cumulativeTokensUsed: 0
         }
     }
@@ -79,21 +120,6 @@ const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o
             tokensUsed: 0
         })
     }
-    
-    const dataBlobsCollection = client.db('stan-playground').collection('dataBlobs')
-    const dataBlob = removeIdField(await dataBlobsCollection.findOne({
-        projectId,
-        sha1
-    }))
-    if (!dataBlob) {
-        throw Error('Data blob not found')
-    }
-    if (!isSPDataBlob(dataBlob)) {
-        console.warn(dataBlob)
-        throw Error('Invalid data blob in database')
-    }
-    
-    const stanProgram = dataBlob.content
 
     if (stanProgram.length > 10000) {
         throw Error('Stan program is too long')
@@ -102,20 +128,6 @@ const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o
     if (request.prompt.length > 10000) {
         throw Error('Prompt is too long')
     }
-
-    const prompt2 = `
-I am going to provide a Stan program followed by a prompt. Please answer the prompt in a concise way sticking only to the topic of the stan program.
-Your response will be included in a help panel in software where the user is editing this viewing this Stan program and wants to know more about it.
-Your response should format nicely as plain html.
-
-Here's the stan program:
-
-${stanProgram}
-
-And here's the prompt:
-
-${request.prompt}
-`
 
     const options = {
         method: 'POST',
@@ -162,6 +174,7 @@ ${request.prompt}
         stanFileName: request.stanFileName,
         stanProgramSha1: sha1,
         prompt: request.prompt,
+        prompt2,
         response,
         timestamp: Date.now() / 1000
     })

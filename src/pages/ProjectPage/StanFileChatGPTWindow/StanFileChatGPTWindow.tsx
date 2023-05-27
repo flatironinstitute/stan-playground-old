@@ -1,5 +1,6 @@
 import { FunctionComponent, useCallback, useEffect, useState } from "react";
 import { useGithubAuth } from "../../../GithubAuth/useGithubAuth";
+import Markdown from "../../../Markdown/Markdown";
 import { useProject } from "../ProjectPageContext";
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
     stanFileName: string
 }
 
-const initialPrompt = `Explain this model.`
+const initialPrompt = `Describe this model in detail.`
 
 const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFileName}) => {
     const {askAboutStanProgram} = useProject()
@@ -48,6 +49,8 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
         }
     }, [askAboutStanProgram, stanFileName, prompt, processing])
 
+    console.log(response)
+
     return (
         <div style={{width: width, height: height, backgroundColor: 'white'}}>
             <div style={{height: 30, backgroundColor: 'lightgray'}}>
@@ -74,7 +77,7 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
 
                     {/* Submit button */}
                     <div style={{padding: 5}}>
-                        <button onClick={handleSubmit} disabled={!userId}>Submit</button>
+                        <button onClick={handleSubmit} disabled={(!userId) || (processing)}>Submit</button>
                     </div>
 
                     <div style={{padding: 5}}>
@@ -84,7 +87,7 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
                                 processing ? (
                                     <div>Processing...</div>
                                 ) : (
-                                    response
+                                    <Markdown source={response} />
                                 )
                             }
                         </div>
