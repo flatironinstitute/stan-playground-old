@@ -15,11 +15,11 @@ const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest,
         throw new Error(`User ${verifiedUserId} does not have permission to set workspace properties (owner: ${workspace.ownerId})`)
     }
 
-    if (request.property === 'anonymousUserRole') {
-        workspace.anonymousUserRole = request.value
+    if (request.property === 'publiclyReadable') {
+        workspace.publiclyReadable = request.value
     }
-    else if (request.property === 'loggedInUserRole') {
-        workspace.loggedInUserRole = request.value
+    else if (request.property === 'listed') {
+        workspace.listed = request.value
     }
     else if (request.property === 'computeResourceId') {
         workspace.computeResourceId = request.value

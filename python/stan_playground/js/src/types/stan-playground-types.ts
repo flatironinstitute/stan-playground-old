@@ -1,4 +1,4 @@
-import validateObject, { isArrayOf, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
+import validateObject, { isArrayOf, isBoolean, isEqualTo, isNumber, isOneOf, isString, optional } from "./validateObject"
 
 export type SPUser = {
     userId: string
@@ -13,8 +13,8 @@ export type SPWorkspace = {
         userId: string
         role: 'admin' | 'editor' | 'viewer'
     }[]
-    anonymousUserRole: 'viewer' | 'editor' | 'none'
-    loggedInUserRole: 'viewer' | 'editor' | 'none'
+    publiclyReadable: boolean
+    listed: boolean
     timestampCreated: number
     timestampModified: number
     computeResourceId?: string
@@ -30,8 +30,8 @@ export const isSPWorkspace = (x: any): x is SPWorkspace => {
             userId: isString,
             role: isOneOf([isEqualTo('admin'), isEqualTo('editor'), isEqualTo('viewer')])
         }))),
-        anonymousUserRole: isOneOf([isEqualTo('viewer'), isEqualTo('editor'), isEqualTo('none')]),
-        loggedInUserRole: isOneOf([isEqualTo('viewer'), isEqualTo('editor'), isEqualTo('none')]),
+        publiclyReadable: isBoolean,
+        listed: isBoolean,
         timestampCreated: isNumber,
         timestampModified: isNumber,
         computeResourceId: optional(isString)

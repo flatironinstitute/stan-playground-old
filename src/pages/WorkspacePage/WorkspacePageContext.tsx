@@ -15,7 +15,7 @@ type WorkspacePageContextType = {
     createProject: (projectName: string) => Promise<string>
     deleteWorkspace: () => Promise<void>
     setWorkspaceUsers: (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => Promise<void>
-    setWorkspaceProperty: (property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any) => Promise<void>
+    setWorkspaceProperty: (property: 'publiclyReadable' | 'listed' | 'computeResourceId', value: any) => Promise<void>
     workspaceRole: 'none' | 'admin' | 'editor' | 'viewer' | undefined
 }
 
@@ -57,7 +57,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])
 
-    const setWorkspacePropertyHandler = useMemo(() => (async (property: 'anonymousUserRole' | 'loggedInUserRole' | 'computeResourceId', value: any) => {
+    const setWorkspacePropertyHandler = useMemo(() => (async (property: 'publiclyReadable' | 'listed' | 'computeResourceId', value: any) => {
         await setWorkspaceProperty(workspaceId, property, value, auth)
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])
@@ -82,19 +82,15 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
 
     const workspaceRole = useMemo(() => {
         if (!workspace) return undefined
-        if (!userId) {
-            return workspace.anonymousUserRole
+        if (userId) {
+            if (workspace.ownerId === userId) return 'admin'
+            const user = workspace.users.find(user => user.userId === userId)
+            if (user) {
+                return user.role
+            }
         }
-        if (workspace.ownerId === userId) return 'admin'
-        const user = workspace.users.find(user => user.userId === userId)
-        if (user) {
-            return user.role
-        }
-        else {
-            return workspace.loggedInUserRole
-        }
+        return workspace.publiclyReadable ? 'viewer' : 'none'
     }, [workspace, userId])
-
 
     const value = React.useMemo(() => ({
         workspaceId,

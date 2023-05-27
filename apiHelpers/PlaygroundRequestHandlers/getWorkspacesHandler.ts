@@ -14,8 +14,21 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedC
         if (!isSPWorkspace(workspace)) {
             console.warn(workspace)
 
-            // // during development only, one-off deletion
+            // // one-off fix
+            // const workspace2 = {
+            //     workspaceId: workspace.workspaceId,
+            //     ownerId: workspace.ownerId,
+            //     name: workspace.name,
+            //     description: workspace.description,
+            //     users: workspace.users,
+            //     publiclyReadable: true,
+            //     listed: true,
+            //     timestampCreated: workspace.timestampCreated,
+            //     timestampModified: workspace.timestampModified,
+            //     computeResourceId: workspace.computeResourceId
+            // }
             // await workspacesCollection.deleteOne({workspaceId: workspace.workspaceId})
+            // await workspacesCollection.insertOne(workspace2)
 
             throw new Error('Invalid workspace in database (1)')
         }

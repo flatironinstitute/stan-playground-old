@@ -50,12 +50,12 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
         setEditingUserId(undefined)
     }, [workspace, setWorkspaceUsers])
 
-    const setAnonymousUserRoleHandler = useCallback(async (role: 'none' | 'viewer' | 'editor') => {
-        await setWorkspaceProperty('anonymousUserRole', role)
+    const setPubliclyReadableHandler = useCallback(async (readable: boolean) => {
+        await setWorkspaceProperty('publiclyReadable', readable)
     }, [setWorkspaceProperty])
 
-    const setLoggedInUserRoleHandler = useCallback(async (role: 'none' | 'viewer' | 'editor') => {
-        await setWorkspaceProperty('loggedInUserRole', role)
+    const setListedHandler = useCallback(async (listed: boolean) => {
+        await setWorkspaceProperty('listed', listed)
     }, [setWorkspaceProperty])
 
     return (
@@ -110,12 +110,12 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
             <table>
                 <tbody>
                     <tr>
-                        <td>Anonymous users:</td>
-                        <td><AnonymousOrLoggedInUsersComponent role={workspace?.anonymousUserRole} setRole={setAnonymousUserRoleHandler} editable={workspaceRole === 'admin'} anonymous={true} /></td>
+                        <td>Public visibility:</td>
+                        <td><PubliclyReadableComponent publiclyReadable={workspace?.publiclyReadable} setValue={setPubliclyReadableHandler} editable={workspaceRole === 'admin'} /></td>
                     </tr>
                     <tr>
                         <td>Logged-in users:</td>
-                        <td><AnonymousOrLoggedInUsersComponent role={workspace?.loggedInUserRole} setRole={setLoggedInUserRoleHandler} editable={workspaceRole === 'admin'} anonymous={false} /></td>
+                        <td><ListedComponent listed={workspace?.listed} setValue={setListedHandler} editable={workspaceRole === 'admin'} /></td>
                     </tr>
                 </tbody>
             </table>
@@ -138,27 +138,44 @@ const EditRoleComponent: FunctionComponent<{role: Role, onSetRole: (role: Role) 
     }
 }
 
-const AnonymousOrLoggedInUsersComponent: FunctionComponent<{role: 'none' | 'viewer' | 'editor' | undefined, setRole: (r: 'none' | 'viewer' | 'editor') => void, editable: boolean, anonymous: boolean}> = ({role, setRole, editable, anonymous}) => {
-    const x = anonymous ? 'Anonymous' : 'Logged-in'
+const PubliclyReadableComponent: FunctionComponent<{publiclyReadable: boolean | undefined, setValue: (v: boolean) => void, editable: boolean}> = ({publiclyReadable, setValue, editable}) => {
     if (editable) {
         return (
             <div>
-                <select value={role} onChange={(e) => {
-                    const newRole = e.target.value as ('none' | 'viewer' | 'editor')
-                    setRole(newRole)
+                <select value={publiclyReadable ? 'true' : 'false'} onChange={(e) => {
+                    const newVal = e.target.value === 'true' ? true : false
+                    setValue(newVal)
                 }}>
-                    <option value="none">{x} users cannot view</option>
-                    <option value="viewer">{x} users can view</option>
-                    <option value="editor">{x} users can edit</option>
+                    <option value="true">Publicly readable</option>
+                    <option value="false">Not publicly readable</option>
                 </select>
             </div>
         )
     }
     else {
         return (
-            role === 'none' ? <span>{x} users cannot view</span> :
-            role === 'viewer' ? <span>{x} users can view</span> :
-            role === 'editor' ? <span>{x} users can edit</span> : <span />
+            publiclyReadable !== undefined ? (publiclyReadable ? <span>Publicly readable</span> : <span>Not publicly readable</span>) : <span />
+        )
+    }
+}
+
+const ListedComponent: FunctionComponent<{listed: boolean | undefined, setValue: (v: boolean) => void, editable: boolean}> = ({listed, setValue, editable}) => {
+    if (editable) {
+        return (
+            <div>
+                <select value={listed ? 'true' : 'false'} onChange={(e) => {
+                    const newVal = e.target.value === 'true' ? true : false
+                    setValue(newVal)
+                }}>
+                    <option value="true">Listed</option>
+                    <option value="false">Not listed</option>
+                </select>
+            </div>
+        )
+    }
+    else {
+        return (
+            listed !== undefined ? (listed ? <span>Listed</span> : <span>Not listed</span>) : <span />
         )
     }
 }

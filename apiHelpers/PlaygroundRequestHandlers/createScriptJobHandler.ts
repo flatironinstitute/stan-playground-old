@@ -19,8 +19,12 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
         throw new Error('User does not have permission to create script jobs')
     }
 
-    if (!workspace.computeResourceId) {
-        throw new Error('Workspace does not have a compute resource ID')
+    let computeResourceId = workspace.computeResourceId
+    if (!computeResourceId) {
+        computeResourceId = process.env.DEFAULT_COMPUTE_RESOURCE_ID
+        if (!computeResourceId) {
+            throw new Error('Workspace does not have a compute resource ID, and no default DEFAULT_COMPUTE_RESOURCE_ID is set in the environment.')
+        }
     }
 
     const project = await getProject(request.projectId, {useCache: false})
@@ -53,7 +57,7 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
         projectId: request.projectId,
         scriptFileName: request.scriptFileName,
         status: 'pending',
-        computeResourceId: workspace.computeResourceId,
+        computeResourceId: workspace.computeResourceId || '',
         timestampCreated: Date.now() / 1000,
         timestampModified: Date.now() / 1000
     }

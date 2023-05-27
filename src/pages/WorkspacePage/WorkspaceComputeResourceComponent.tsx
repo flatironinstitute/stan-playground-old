@@ -1,6 +1,6 @@
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 import ComputeResourceIdComponent from "../../ComputeResourceIdComponent";
 import { useComputeResources } from "../ComputeResourcesPage/ComputeResourcesContext";
 import { useWorkspace } from "./WorkspacePageContext";
@@ -11,36 +11,44 @@ type Props = {
 
 const WorkspaceComputeResourceComponent: FunctionComponent<Props> = () => {
     const {workspace, workspaceRole, setWorkspaceProperty} = useWorkspace()
+    const [editing, setEditing] = useState(false)
 
     return (
         <div>
             {
-                workspace?.computeResourceId ? (
+                workspace && (
                     <table>
                         <tbody>
                             <tr>
                                 <td>Using compute resource:</td>
-                                <td><ComputeResourceIdComponent computeResourceId={workspace?.computeResourceId} /></td>
+                                <td>{
+                                    workspace.computeResourceId ? (
+                                        <ComputeResourceIdComponent computeResourceId={workspace.computeResourceId} />
+                                    ) : (
+                                        <span>DEFAULT</span>
+                                    )
+                                }</td>
                             </tr>
                         </tbody>
                     </table>
-                ) : (
-                    <span>No compute resource selected for this workspace</span>
                 )
             }
             {
-                workspaceRole === 'admin' && (
+                workspace && !editing && workspaceRole === 'admin' && (
+                    <IconButton onClick={() => setEditing(true)} title="Select a different compute resource">
+                        <Edit />
+                    </IconButton>
+                )
+            }
+            {
+                workspace && editing && (
                     <SelectComputeResourceComponent
+                        selectedComputeResourceId={workspace.computeResourceId}
                         onSelected={(computeResourceId) => {
-                            if (!computeResourceId) return
-                            setWorkspaceProperty('computeResourceId', computeResourceId)
+                            setWorkspaceProperty('computeResourceId', computeResourceId || '')
+                            setEditing(false)
                         }}
                     />
-                )
-            }
-            {
-                workspaceRole === 'admin' && workspace?.computeResourceId && (
-                    <IconButton onClick={() => setWorkspaceProperty('computeResourceId', '')} title="Remove this compute resource"><Delete /></IconButton>
                 )
             }
         </div>
@@ -48,15 +56,23 @@ const WorkspaceComputeResourceComponent: FunctionComponent<Props> = () => {
 }
 
 type SelectComputeResourceComponentProps = {
+    selectedComputeResourceId?: string
     onSelected: (computeResourceId: string) => void
 }
 
-const SelectComputeResourceComponent: FunctionComponent<SelectComputeResourceComponentProps> = ({onSelected}) => {
+const SelectComputeResourceComponent: FunctionComponent<SelectComputeResourceComponentProps> = ({onSelected, selectedComputeResourceId}) => {
     const {computeResources} = useComputeResources()
     return (
         <div>
-            <select onChange={e => onSelected(e.target.value)}>
-                <option value="">Select a compute resource</option>
+            <select onChange={
+                e => {
+                    const crId = e.target.value
+                    if (crId === '<none>') return
+                    onSelected(crId)
+                }
+            } value={selectedComputeResourceId || ''}>
+                <option value="<none>">Select a compute resource</option>
+                <option value="">DEFAULT</option>
                 {
                     computeResources.map(cr => (
                         <option key={cr.computeResourceId} value={cr.computeResourceId}>{cr.name} ({abbreviate(cr.computeResourceId, 10)})</option>
