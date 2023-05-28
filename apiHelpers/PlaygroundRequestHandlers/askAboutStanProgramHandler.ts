@@ -5,6 +5,7 @@ import getProject from '../getProject';
 import getWorkspace from '../getWorkspace';
 import { userCanReadWorkspace } from '../permissions';
 import removeIdField from '../removeIdField';
+import crypto from 'crypto'
 
 const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<AskAboutStanProgramResponse> => {
     const {verifiedUserId, verifiedClientId} = o
@@ -61,7 +62,9 @@ Please respond in markdown format with support for latex. Do not respond in plai
 
 Here's the stan program:
 
+\`\`\`
 ${stanProgram}
+\`\`\`
 
 And here's the prompt:
 
@@ -74,10 +77,8 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
     const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
         projectId,
         workspaceId: request.workspaceId,
-        stanFileName: request.stanFileName,
         stanProgramSha1: sha1,
-        prompt: request.prompt,
-        prompt2
+        promptSha1: stringSha1(prompt2)
     })
     if (cachedResponse) {
         return {
@@ -171,10 +172,8 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
     await askAboutStanProgramCacheCollection.insertOne({
         projectId,
         workspaceId: request.workspaceId,
-        stanFileName: request.stanFileName,
         stanProgramSha1: sha1,
-        prompt: request.prompt,
-        prompt2,
+        promptSha1: stringSha1(prompt2),
         response,
         timestamp: Date.now() / 1000
     })
@@ -184,6 +183,12 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
         response,
         cumulativeTokensUsed: tokensUsed2
     }   
+}
+
+const stringSha1 = (s: string) => {
+    const shasum = crypto.createHash('sha1')
+    shasum.update(s)
+    return shasum.digest('hex')
 }
 
 export default askAboutStanProgramHandler
