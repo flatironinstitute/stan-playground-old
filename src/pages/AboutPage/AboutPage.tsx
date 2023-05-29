@@ -1,7 +1,6 @@
 import { FunctionComponent, useEffect, useState } from "react";
 import Markdown from "../../Markdown/Markdown";
-
-const aboutMd = ''
+import './AboutPage.css'
 
 type Props = {
     // none
@@ -19,7 +18,7 @@ const AboutPage: FunctionComponent<Props> = () => {
         })
     }, [])
     return (
-        <div style={{padding: 20}}>
+        <div className="aboutpage" style={{padding: 20}}>
             <Markdown source={source} />
         </div>
     )
