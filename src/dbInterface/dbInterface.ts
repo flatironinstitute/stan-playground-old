@@ -1,4 +1,4 @@
-import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest, CloneProjectRequest, AskAboutStanProgramRequest } from "../types/PlaygroundRequest";
+import { CreateProjectRequest, CreateScriptJobRequest, CreateWorkspaceRequest, DeleteProjectFileRequest, DeleteProjectRequest, DeleteCompletedScriptJobsRequest, DeleteComputeResourceRequest, DeleteScriptJobRequest, DeleteWorkspaceRequest, GetProjectsRequest, GetProjectFileRequest, GetProjectFilesRequest, GetProjectRequest, GetComputeResourcesRequest, GetDataBlobRequest, GetScriptJobRequest, GetScriptJobsRequest, GetWorkspaceRequest, GetWorkspacesRequest, RegisterComputeResourceRequest, SetProjectFileRequest, SetProjectPropertyRequest, SetWorkspacePropertyRequest, SetWorkspaceUsersRequest, DuplicateProjectFileRequest, RenameProjectFileRequest, CloneProjectRequest, AskAboutStanProgramRequest, GetComputeResourceRequest } from "../types/PlaygroundRequest";
 import { SPProject, SPProjectFile, SPComputeResource, SPScriptJob, SPWorkspace } from "../types/stan-playground-types";
 import postPlaygroundRequest from "./postPlaygroundRequest";
 
@@ -276,6 +276,19 @@ export const fetchComputeResources = async (auth: Auth): Promise<SPComputeResour
         throw Error(`Unexpected response type ${resp.type}. Expected getComputeResources.`)
     }
     return resp.computeResources
+}
+
+export const fetchComputeResource = async (computeResourceId: string, auth: Auth): Promise<SPComputeResource | undefined> => {
+    const req: GetComputeResourceRequest = {
+        type: 'getComputeResource',
+        timestamp: Date.now() / 1000,
+        computeResourceId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'getComputeResource') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getComputeResource.`)
+    }
+    return resp.computeResource
 }
 
 export const registerComputeResource = async (computeResourceId: string, resourceCode: string, name: string, auth: Auth): Promise<void> => {

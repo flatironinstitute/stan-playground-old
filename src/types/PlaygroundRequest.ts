@@ -591,6 +591,34 @@ export const isGetComputeResourcesResponse = (x: any): x is GetComputeResourcesR
     })
 }
 
+// getComputeResource
+
+export type GetComputeResourceRequest = {
+    type: 'getComputeResource'
+    timestamp: number
+    computeResourceId: string
+}
+
+export const isGetComputeResourceRequest = (x: any): x is GetComputeResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getComputeResource'),
+        timestamp: isNumber,
+        computeResourceId: isString
+    })
+}
+
+export type GetComputeResourceResponse = {
+    type: 'getComputeResource'
+    computeResource: SPComputeResource
+}
+
+export const isGetComputeResourceResponse = (x: any): x is GetComputeResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getComputeResource'),
+        computeResource: isSPComputeResource
+    })
+}
+
 // registerComputeResource
 
 export type RegisterComputeResourceRequest = {
@@ -921,6 +949,7 @@ export type PlaygroundRequestPayload =
     CloneProjectRequest |
     SetProjectPropertyRequest |
     GetComputeResourcesRequest |
+    GetComputeResourceRequest |
     RegisterComputeResourceRequest |
     DeleteComputeResourceRequest |
     CreateScriptJobRequest |
@@ -954,6 +983,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isCloneProjectRequest,
         isSetProjectPropertyRequest,
         isGetComputeResourcesRequest,
+        isGetComputeResourceRequest,
         isRegisterComputeResourceRequest,
         isDeleteComputeResourceRequest,
         isCreateScriptJobRequest,
@@ -1010,6 +1040,7 @@ export type PlaygroundResponse =
     CloneProjectResponse |
     SetProjectPropertyResponse |
     GetComputeResourcesResponse |
+    GetComputeResourceResponse |
     RegisterComputeResourceResponse |
     DeleteComputeResourceResponse |
     CreateScriptJobResponse |
@@ -1043,6 +1074,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isCloneProjectResponse,
         isSetProjectPropertyResponse,
         isGetComputeResourcesResponse,
+        isGetComputeResourceResponse,
         isRegisterComputeResourceResponse,
         isDeleteComputeResourceResponse,
         isCreateScriptJobResponse,

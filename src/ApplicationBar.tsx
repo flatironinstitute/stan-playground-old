@@ -32,7 +32,7 @@ const ApplicationBar: FunctionComponent<Props> = () => {
                     <span style={{marginLeft: 'auto'}} />
                     {
                         signedIn && (
-                            <span style={{fontFamily: 'courier', color: 'lightgray', cursor: 'pointer'}} title={`Signed in as ${userId}`}><UserIdComponent userId={userId} />&nbsp;&nbsp;</span>
+                            <span style={{fontFamily: 'courier', color: 'lightgray', cursor: 'pointer'}} title={`Signed in as ${userId}`} onClick={openGitHubAccessWindow}><UserIdComponent userId={userId} />&nbsp;&nbsp;</span>
                         )
                     }
                     <span style={{paddingBottom: 0, color: 'white'}} title={signedIn ? "Manage log in" : "Log in"}>

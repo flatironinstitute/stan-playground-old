@@ -1,14 +1,15 @@
 import { FunctionComponent } from "react";
 import ApplicationBar, { applicationBarHeight } from "./ApplicationBar";
 import GitHubAuthPage from "./GitHub/GitHubAuthPage";
-import ProjectPage from "./pages/ProjectPage/ProjectPage";
+import ComputeResourcePage from "./pages/ComputeResourcePage/ComputeResourcePage";
 import ComputeResourcesPage from "./pages/ComputeResourcesPage/ComputeResourcesPage";
 import HomePage from "./pages/HomePage/HomePage";
+import ProjectPage from "./pages/ProjectPage/ProjectPage";
 import RegisterComputeResourcePage from "./pages/RegisterComputeResourcePage/RegisterComputeResourcePage";
 import WorkspacePage from "./pages/WorkspacePage/WorkspacePage";
+import { SetupSPMain } from "./SPMainContext";
 import useRoute from "./useRoute";
 import useWindowDimensions from "./useWindowDimensions";
-import { SetupSPMain } from "./SPMainContext";
 
 type Props = {
     // none
@@ -35,6 +36,8 @@ const MainWindow: FunctionComponent<Props> = () => {
                             <GitHubAuthPage />
                         ) : route.page === 'compute-resources' ? (
                             <ComputeResourcesPage width={width} height={height} />
+                        ) : route.page === 'compute-resource' ? (
+                            <ComputeResourcePage width={width} height={height} computeResourceId={route.computeResourceId} />
                         ) : route.page === 'register-compute-resource' ? (
                             <RegisterComputeResourcePage />
                         ) : (

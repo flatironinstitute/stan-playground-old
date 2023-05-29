@@ -1,9 +1,11 @@
 import { Delete } from "@mui/icons-material"
 import { FunctionComponent, useCallback } from "react"
+import Hyperlink from "../../components/Hyperlink"
 import ComputeResourceIdComponent from "../../ComputeResourceIdComponent"
 import { confirm } from "../../confirm_prompt_alert"
 import { timeAgoString } from "../../timeStrings"
 import UserIdComponent from "../../UserIdComponent"
+import useRoute from "../../useRoute"
 import { useComputeResources } from "./ComputeResourcesContext"
 
 type Props = {
@@ -18,6 +20,8 @@ const ComputeResourcesTable: FunctionComponent<Props> = () => {
         if (!okay) return
         deleteComputeResource(computeResourceId)
     }, [deleteComputeResource])
+
+    const { setRoute } = useRoute()
 
     return (
         <table className="scientific-table">
@@ -35,8 +39,16 @@ const ComputeResourcesTable: FunctionComponent<Props> = () => {
                     computeResources.map((cr) => (
                         <tr key={cr.computeResourceId}>
                             <td><Delete onClick={() => handleDeleteComputeResource(cr.computeResourceId)} /></td>
-                            <td>{cr.name}</td>
-                            <td><ComputeResourceIdComponent computeResourceId={cr.computeResourceId} /></td>
+                            <td>
+                                <Hyperlink onClick={() => setRoute({page: 'compute-resource', computeResourceId: cr.computeResourceId})}>
+                                    {cr.name}
+                                </Hyperlink>
+                            </td>
+                            <td>
+                                <Hyperlink onClick={() => setRoute({page: 'compute-resource', computeResourceId: cr.computeResourceId})}>
+                                    <ComputeResourceIdComponent computeResourceId={cr.computeResourceId} />
+                                </Hyperlink>
+                            </td>
                             <td><UserIdComponent userId={cr.ownerId} /></td>
                             <td>{timeAgoString(cr.timestampCreated)}</td>
                         </tr>

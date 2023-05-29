@@ -14,6 +14,9 @@ export type Route = {
 } | {
     page: 'compute-resources'
 } | {
+    page: 'compute-resource'
+    computeResourceId: string
+} | {
     page: 'register-compute-resource'
     computeResourceId: string
     resourceCode: string
@@ -50,6 +53,14 @@ const useRoute = () => {
                 page: 'compute-resources'
             }
         }
+        else if (p.startsWith('/compute-resource/')) {
+            const a = p.split('/')
+            const computeResourceId = a[2]
+            return {
+                page: 'compute-resource',
+                computeResourceId
+            }
+        }
         else if (p.startsWith('/register-compute-resource/')) {
             const a = p.split('/')
             const computeResourceId = a[2]
@@ -82,6 +93,9 @@ const useRoute = () => {
         }
         else if (r.page === 'compute-resources') {
             navigate('/compute-resources')
+        }
+        else if (r.page === 'compute-resource') {
+            navigate(`/compute-resource/${r.computeResourceId}`)
         }
         else if (r.page === 'register-compute-resource') {
             navigate(`/register-compute-resource/${r.computeResourceId}/${r.resourceCode}`)
