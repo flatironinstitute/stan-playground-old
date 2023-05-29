@@ -57,7 +57,7 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
         projectId: request.projectId,
         scriptFileName: request.scriptFileName,
         status: 'pending',
-        computeResourceId: workspace.computeResourceId || '',
+        computeResourceId,
         timestampCreated: Date.now() / 1000,
         timestampModified: Date.now() / 1000
     }

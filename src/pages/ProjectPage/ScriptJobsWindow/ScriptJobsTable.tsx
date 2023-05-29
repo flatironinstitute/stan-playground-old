@@ -2,6 +2,7 @@ import { Delete } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useMemo } from "react";
 import Hyperlink from "../../../components/Hyperlink";
 import SmallIconButton from "../../../components/SmallIconButton";
+import ComputeResourceIdComponent from "../../../ComputeResourceIdComponent";
 import { confirm } from "../../../confirm_prompt_alert";
 import { timeAgoString } from "../../../timeStrings";
 import { SPScriptJob } from "../../../types/stan-playground-types";
@@ -27,9 +28,10 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
                 <tr>
                     <th />
                     <th>Job</th>
-                    <th>Script</th>
+                    <th>File</th>
                     <th>Status</th>
                     <th>Created</th>
+                    <th>Compute</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,6 +57,7 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
                                 )
                             }</td>
                             <td>{timeAgoString(jj.timestampCreated)}</td>
+                            <td><ComputeResourceIdComponent computeResourceId={jj.computeResourceId} /></td>
                         </tr>
                     ))
                 }
