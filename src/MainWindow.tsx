@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import ApplicationBar, { applicationBarHeight } from "./ApplicationBar";
 import GitHubAuthPage from "./GitHub/GitHubAuthPage";
+import AboutPage from "./pages/AboutPage/AboutPage";
 import ComputeResourcePage from "./pages/ComputeResourcePage/ComputeResourcePage";
 import ComputeResourcesPage from "./pages/ComputeResourcesPage/ComputeResourcesPage";
 import HomePage from "./pages/HomePage/HomePage";
@@ -28,6 +29,8 @@ const MainWindow: FunctionComponent<Props> = () => {
                     {
                         route.page === 'home' ? (
                             <HomePage />
+                        ) : route.page === 'about' ? (
+                            <AboutPage />
                         ) : route.page === 'workspace' ? (
                             <WorkspacePage workspaceId={route.workspaceId} width={width} height={height - applicationBarHeight} />
                         ) : route.page === 'project' ? (

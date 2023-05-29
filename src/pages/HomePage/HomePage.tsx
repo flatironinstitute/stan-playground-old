@@ -21,6 +21,8 @@ const HomePage: FunctionComponent<Props> = () => {
                 user-friendly environment.
             </p>
 
+            <p><Hyperlink onClick={() => setRoute({page: 'about'})}>Learn more...</Hyperlink></p>
+
             <h2>Workspaces</h2>
             <WorkspacesMenuBar />
             <WorkspacesTable />

@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom"
 export type Route = {
     page: 'home'
 } | {
+    page: 'about'
+} | {
     page: 'project'
     projectId: string
 } | {
@@ -27,7 +29,12 @@ const useRoute = () => {
     const navigate = useNavigate()
     const p = location.pathname
     const route: Route = useMemo(() => {
-        if (p.startsWith('/project/')) {
+        if (p === '/about') {
+            return {
+                page: 'about'
+            }
+        }
+        else if (p.startsWith('/project/')) {
             const a = p.split('/')
             const projectId = a[2]
             return {
@@ -81,6 +88,9 @@ const useRoute = () => {
     const setRoute = useCallback((r: Route) => {
         if (r.page === 'home') {
             navigate('/')
+        }
+        else if (r.page === 'about') {
+            navigate('/about')
         }
         else if (r.page === 'project') {
             navigate(`/project/${r.projectId}`)
