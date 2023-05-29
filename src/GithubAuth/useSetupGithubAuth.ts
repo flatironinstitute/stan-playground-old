@@ -86,6 +86,9 @@ const useSetupGithubAuth = (): GithubAuthData => {
 				// })
 			}
 		}
+		else {
+			setUserName(undefined)
+		}
 	}, [loginStatus.accessToken])
 
     const clearAccessToken = useCallback(() => {

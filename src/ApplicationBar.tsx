@@ -35,7 +35,7 @@ const ApplicationBar: FunctionComponent<Props> = () => {
                             <span style={{fontFamily: 'courier', color: 'lightgray', cursor: 'pointer'}} title={`Signed in as ${userId}`}><UserIdComponent userId={userId} />&nbsp;&nbsp;</span>
                         )
                     }
-                    <span style={{paddingBottom: 0, color: 'white'}} title={signedIn ? "Manage GitHub sign in" : "Sign in with GitHub"}>
+                    <span style={{paddingBottom: 0, color: 'white'}} title={signedIn ? "Manage log in" : "Log in"}>
                         <GitHubAccessControl onOpen={openGitHubAccessWindow} />
                         &nbsp;
                     </span>
@@ -43,11 +43,10 @@ const ApplicationBar: FunctionComponent<Props> = () => {
             </AppBar>
             <ModalWindow
                 open={githubAccessWindowVisible}
-                onClose={closeGitHubAccessWindow}
+                // onClose={closeGitHubAccessWindow}
             >
                 <GitHubLoginWindow
-                    defaultScope=""
-                    onClose={() => closeGitHubAccessWindow()} onChange={() => {}}
+                    onClose={() => closeGitHubAccessWindow()}
                 />
             </ModalWindow>
         </span>

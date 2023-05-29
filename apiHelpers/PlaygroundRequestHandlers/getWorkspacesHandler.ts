@@ -7,6 +7,7 @@ import removeIdField from "../removeIdField";
 const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<GetWorkspacesResponse> => {
     const client = await getMongoClient()
     const workspacesCollection = client.db('stan-playground').collection('workspaces')
+    const userId = o.verifiedUserId
     
     const workspaces = removeIdField(await workspacesCollection.find({}).toArray())
     const workspaces2: SPWorkspace[] = []
@@ -32,7 +33,17 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedC
 
             throw new Error('Invalid workspace in database (1)')
         }
-        if (userCanReadWorkspace(workspace, o.verifiedUserId, o.verifiedClientId)) {
+        let okay = false
+        if ((userId) && (workspace.ownerId === userId)) {
+            okay = true
+        }
+        if (userId && (workspace.users.map(u => u.userId).includes(userId))) {
+            okay = true
+        }
+        if (workspace.listed) {
+            okay = true
+        }
+        if (okay) {
             workspaces2.push(workspace)
         }
     }
