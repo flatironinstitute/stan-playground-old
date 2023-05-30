@@ -25,7 +25,7 @@ const ProjectsMenuBar: FunctionComponent<Props> = () => {
         <div>
             {
                 workspaceRole === 'admin' || workspaceRole === 'editor' ? (
-                    <Hyperlink onClick={handleCreateProject}>Add Project</Hyperlink>
+                    <Hyperlink onClick={handleCreateProject}>Create Project</Hyperlink>
                 ) : (
                     <span>&nbsp;</span>
                 )

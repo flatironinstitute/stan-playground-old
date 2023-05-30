@@ -30,6 +30,7 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
             return false
         }
         if (workspaceRole === 'admin' || workspaceRole === 'editor') {
+            setCreateJobTitle('Create job')
             return true
         }
         else {

@@ -45,7 +45,6 @@ class Daemon:
         signal.signal(signal.SIGTERM, self._handle_exit)
 
     def stop(self):
-        self.stop_socket_server()
         if self.process:
             self.process.terminate()
             self.process.wait()

@@ -27,7 +27,7 @@ const WorkspacePage: FunctionComponent<Props> = ({projectId, width, height}) => 
 
 const WorkspacePageChild: FunctionComponent<Props> = ({width, height}) => {
     const {workspaceId} = useProject()
-    const initialPosition = Math.max(200, Math.min(500, width / 4))
+    const initialPosition = Math.max(250, Math.min(600, width / 4))
     return (
         <SetupWorkspacePage
             workspaceId={workspaceId}

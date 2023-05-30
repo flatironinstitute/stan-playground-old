@@ -22,9 +22,11 @@ const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
         'python'
     ) : fileName.endsWith('.js') ? (
         'javascript'
+    ) : fileName.endsWith('.md') ? (
+        'markdown'
     ) : 'text'
 
-    const wordWrap = language === 'json'
+    const wordWrap = language === 'json' || language === 'markdown'
 
     return (
         <TextEditor
