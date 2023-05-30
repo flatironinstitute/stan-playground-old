@@ -13,20 +13,18 @@ const HomePage: FunctionComponent<Props> = () => {
     const { setRoute } = useRoute()
     return (
         <div className="homepage">
-            <h1>Welcome to Stan Playground</h1>
+            <h1>Stan Playground</h1>
             <p>
-                An interactive website designed to help you learn, 
-                experiment with and share your work in the Stan programming language. Here, 
-                you can create, run, and share Stan programs in an intuitive and 
-                user-friendly environment.
+                Create, run, and share Stan programs in an intuitive and 
+                user-friendly environment. <Hyperlink onClick={() => setRoute({page: 'about'})}>Learn more...</Hyperlink>
             </p>
 
-            <p><Hyperlink onClick={() => setRoute({page: 'about'})}>Learn more...</Hyperlink></p>
-
-            <h2>Workspaces</h2>
-            <WorkspacesMenuBar />
-            <WorkspacesTable />
+            <h2>Community Workspaces</h2>
+            <WorkspacesTable filter="community" />
             <hr />
+            <h2>Your Workspaces</h2>
+            <WorkspacesMenuBar />
+            <WorkspacesTable filter="user" />
             <p><Hyperlink onClick={() => setRoute({page: 'compute-resources'})}>Manage your compute resources</Hyperlink></p>
         </div>
     )

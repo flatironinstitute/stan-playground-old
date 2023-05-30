@@ -10,7 +10,7 @@ class ScriptJobExecutor {
     #computeResourceId: string
     #privateKey: string
     #scriptJobManager: ScriptJobManager
-    #dueToCheckForPendingScriptJobs = false
+    #pubsubClient: PubsubClient | undefined
     constructor(private a: { dir: string }) {
         // read computeResourceId from .stan-playground-compute-resource.json in dir directory
         const configJson = fs.readFileSync(path.join(a.dir, '.stan-playground-compute-resource.json'), 'utf8')
@@ -22,7 +22,7 @@ class ScriptJobExecutor {
             computeResourceId: this.#computeResourceId,
             privateKey: this.#privateKey,
             onScriptJobCompletedOrFailed: () => {
-                this.#dueToCheckForPendingScriptJobs = true
+                this._processPendingScriptJobs()
             }
         })
     }
@@ -42,52 +42,39 @@ class ScriptJobExecutor {
 
         const onPubsubMessage = (message: any) => {
             if (message.type === 'newPendingScriptJob') {
-                this.#dueToCheckForPendingScriptJobs = true
+                this._processPendingScriptJobs()
             }
         }
-        const pubsubClient = new PubsubClient(respPubsub.subscriptionInfo, onPubsubMessage)
-
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-            if (this.#stopped) {
-                break
+        this.#pubsubClient = new PubsubClient(respPubsub.subscriptionInfo, onPubsubMessage)
+        this._processPendingScriptJobs()
+    }
+    private async _processPendingScriptJobs() {
+        if (this.#stopped) {
+            return
+        }
+        const req: GetPendingScriptJobsRequest = {
+            type: 'getPendingScriptJobs',
+            timestamp: Date.now() / 1000,
+            computeResourceId: this.#computeResourceId
+        }
+        const resp = await this._postPlaygroundRequest(req)
+        if (resp) {
+            if (resp.type !== 'getPendingScriptJobs') {
+                console.warn(resp)
+                throw Error('Unexpected response type. Expected getPendingScriptJobs')
             }
-            this.#dueToCheckForPendingScriptJobs = false
-            const req: GetPendingScriptJobsRequest = {
-                type: 'getPendingScriptJobs',
-                timestamp: Date.now() / 1000,
-                computeResourceId: this.#computeResourceId
-            }
-            const resp = await this._postPlaygroundRequest(req)
-            if (resp) {
-                if (resp.type !== 'getPendingScriptJobs') {
-                    console.warn(resp)
-                    throw Error('Unexpected response type. Expected getPendingScriptJobs')
+            const {scriptJobs} = resp
+            if (scriptJobs.length > 0) {
+                const scriptJob = scriptJobs[0]
+                try {
+                    await this.#scriptJobManager.initiateJob(scriptJob)
                 }
-                const {scriptJobs} = resp
-                if (scriptJobs.length > 0) {
-                    const scriptJob = scriptJobs[0]
-                    try {
-                        await this.#scriptJobManager.initiateJob(scriptJob)
-                    }
-                    catch (err) {
-                        console.warn(err)
-                        console.info(`Unable to handle script job: ${err.message}`)
-                    }
+                catch (err) {
+                    console.warn(err)
+                    console.info(`Unable to handle script job: ${err.message}`)
                 }
-            }
-
-            await sleepSec(1)
-
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                if (this.#dueToCheckForPendingScriptJobs) {
-                    break
-                }
-                await sleepSec(0.1)
             }
         }
-        pubsubClient.unsubscribe()
     }
     private async _postPlaygroundRequest(req: any): Promise<any> {
         return await postPlaygroundRequestFromComputeResource(req, {
@@ -99,15 +86,10 @@ class ScriptJobExecutor {
     async stop() {
         this.#stopped = true
         this.#scriptJobManager.stop()
+        if (this.#pubsubClient) {
+            this.#pubsubClient.unsubscribe()
+        }
     }
-}
-
-const sleepSec = async (sec: number): Promise<void> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve()
-        }, sec * 1000)
-    })
 }
 
 export default ScriptJobExecutor

@@ -1,17 +1,33 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import Hyperlink from "../../components/Hyperlink";
+import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import { useSPMain } from "../../SPMainContext";
 import { timeAgoString } from "../../timeStrings";
 import UserIdComponent from "../../UserIdComponent";
 import useRoute from "../../useRoute";
 
 type Props = {
-    // none
+    filter: 'community' | 'user'
 }
 
-const WorkspacesTable: FunctionComponent<Props> = () => {
+const WorkspacesTable: FunctionComponent<Props> = ({filter}) => {
     const {workspaces} = useSPMain()
     const {setRoute} = useRoute()
+
+    const {userId} = useGithubAuth()
+
+    const workspaces2 = useMemo(() => {
+        if (filter === 'community') {
+            return workspaces.filter(workspace => workspace.listed)
+        } else {
+            return workspaces.filter(workspace => {
+                if (!userId) return false
+                if (workspace.ownerId === userId) return true
+                if (workspace.users.map(user => user.userId).includes(userId || '')) return true
+                return false
+            })
+        }
+    }, [filter, workspaces, userId])
 
     return (
         <table className="scientific-table">
@@ -24,7 +40,7 @@ const WorkspacesTable: FunctionComponent<Props> = () => {
                     </tr>
             </thead>
             <tbody>
-                    {workspaces.map(workspace => (
+                    {workspaces2.map(workspace => (
                         <tr key={workspace.workspaceId}>
                             <td>
                                 <Hyperlink onClick={() => setRoute({page: 'workspace', workspaceId: workspace.workspaceId})}>

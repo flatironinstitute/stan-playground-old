@@ -28,6 +28,10 @@ class ScriptJobManager {
 
     }
     async initiateJob(job: SPScriptJob): Promise<boolean> {
+        // important to check whether job is already running
+        if (this.#runningJobs.filter(x => x.scriptJob.scriptJobId === job.scriptJobId).length > 0) {
+            return false
+        }
         if (job.scriptFileName.endsWith(".py")) {
             return await this._initiatePythonJob(job)
         }
