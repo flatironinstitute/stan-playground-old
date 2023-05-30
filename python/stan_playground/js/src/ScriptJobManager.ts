@@ -306,6 +306,7 @@ class RunningJob {
             await updateConsoleOutput()
             await this._setScriptJobProperty('error', err.message)
             await this._setScriptJobProperty('status', 'failed')
+            this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
             return
         }
         await updateConsoleOutput()
@@ -340,6 +341,8 @@ class RunningJob {
         }
 
         await this._setScriptJobProperty('status', 'completed')
+
+        this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
     }
 }
 

@@ -15,7 +15,14 @@ const postPlaygroundRequest = async (req: PlaygroundRequestPayload, o: {userId?:
         },
         body: JSON.stringify(rr),
     })
-    const responseData = await resp.json()
+    const responseText = await resp.text()
+    let responseData: any
+    try {
+        responseData = JSON.parse(responseText)
+    } catch (e) {
+        console.error(responseText)
+        throw Error('Problem parsing playground response')
+    }
     if (!isPlaygroundResponse(responseData)) {
         console.warn(responseData)
         throw Error('Unexpected playground response')

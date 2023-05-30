@@ -47,6 +47,7 @@ const cloneProjectHandler = async (request: CloneProjectRequest, o: {verifiedCli
     const projectFiles = removeIdField(await projectFilesCollection.find({projectId: request.projectId}).toArray()) as SPProjectFile[]
     await projectFilesCollection.insertMany(projectFiles.map(projectFile => ({
         ...projectFile,
+        workspaceId: project2.workspaceId,
         projectId: project2.projectId
     })))
 
@@ -55,6 +56,7 @@ const cloneProjectHandler = async (request: CloneProjectRequest, o: {verifiedCli
     const dataBlobs = removeIdField(await dataBlobsCollection.find({projectId: request.projectId}).toArray()) as SPDataBlob[]
     await dataBlobsCollection.insertMany(dataBlobs.map(dataBlob => ({
         ...dataBlob,
+        workspaceId: project2.workspaceId,
         projectId: project2.projectId
     })))
 

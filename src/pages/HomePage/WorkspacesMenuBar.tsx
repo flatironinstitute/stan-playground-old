@@ -26,7 +26,7 @@ const WorkspacesMenuBar: FunctionComponent<Props> = () => {
         <div>
             {
                 userId ? (
-                    <Hyperlink onClick={handleCreateWorkspace}>Add Workspace</Hyperlink>
+                    <Hyperlink onClick={handleCreateWorkspace}>Create workspace</Hyperlink>
                 ) : (
                     <span style={{cursor: 'default'}}>Log in to create your own workspace</span>
                 )

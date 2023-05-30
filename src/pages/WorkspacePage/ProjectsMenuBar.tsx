@@ -1,7 +1,8 @@
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent } from "react";
+import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
-import { confirm, prompt } from "../../confirm_prompt_alert";
-import useRoute from "../../useRoute";
+import ModalWindow from "../../components/ModalWindow/ModalWindow";
+import CreateProjectWindow from "./CreateProjectWindow/CreateProjectWindow";
 import { useWorkspace } from "./WorkspacePageContext";
 
 type Props = {
@@ -9,27 +10,35 @@ type Props = {
 }
 
 const ProjectsMenuBar: FunctionComponent<Props> = () => {
-    const {createProject, workspaceRole} = useWorkspace()
-    const {setRoute} = useRoute()
+    const {workspaceRole} = useWorkspace()
+    const {visible: createProjectWindowVisible, handleOpen: openCreateProjectWindow, handleClose: closeCreateProjectWindow} = useModalDialog()
 
-    const handleCreateProject = useCallback(() => {
-        (async () => {
-            const projectName = await prompt('Enter project name:', 'Untitled')
-            if (!projectName) return
-            const projectId = await createProject(projectName)
-            setRoute({page: 'project', projectId})
-        })()
-    }, [createProject, setRoute])
+    // const handleCreateProject = useCallback(() => {
+    //     (async () => {
+    //         const projectName = await prompt('Enter project name:', 'Untitled')
+    //         if (!projectName) return
+    //         const projectId = await createProject(projectName)
+    //         setRoute({page: 'project', projectId})
+    //     })()
+    // }, [createProject, setRoute])
     
     return (
         <div>
             {
                 workspaceRole === 'admin' || workspaceRole === 'editor' ? (
-                    <Hyperlink onClick={handleCreateProject}>Create Project</Hyperlink>
+                    <Hyperlink onClick={() => openCreateProjectWindow()}>Create Project</Hyperlink>
                 ) : (
                     <span>&nbsp;</span>
                 )
             }
+            <ModalWindow
+                open={createProjectWindowVisible}
+                onClose={closeCreateProjectWindow}
+            >
+                <CreateProjectWindow
+                    onClose={closeCreateProjectWindow}
+                />
+            </ModalWindow>
         </div>
     )
 }
