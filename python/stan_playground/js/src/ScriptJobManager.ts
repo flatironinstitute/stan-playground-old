@@ -24,7 +24,7 @@ class ScriptJobManager {
     #runningJobs: RunningJob[] = []
     #maxNumPythonJobs = 5
     #maxNumSpaJobs = 5
-    constructor(private config: {dir: string, computeResourceId: string, privateKey: string}) {
+    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: () => void}) {
 
     }
     async initiateJob(job: SPScriptJob): Promise<boolean> {
@@ -66,6 +66,7 @@ class ScriptJobManager {
         job.onCompletedOrFailed(() => {
             // remove from list of running jobs
             this.#runningJobs = this.#runningJobs.filter(j => (j.scriptJob.scriptJobId !== job.scriptJob.scriptJobId))
+            this.config.onScriptJobCompletedOrFailed()
         })
     }
 }
@@ -78,7 +79,12 @@ class RunningJob {
     async initiate(): Promise<void> {
         console.info(`Initiating script job: ${this.scriptJob.scriptJobId} - ${this.scriptJob.scriptFileName}`)
         await this._setScriptJobProperty('status', 'running')
-        this._run() // don't await this!
+        this._run().then(() => { // don't await this!
+            //
+        }).catch((err) => {
+            console.error(err)
+            console.error('Problem running script job')
+        }) 
     }
     onCompletedOrFailed(callback: () => void) {
         this.#onCompletedOrFailedCallbacks.push(callback)

@@ -1,6 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useEffect, useMemo } from 'react';
 import { createProject, deleteWorkspace, fetchProjects, fetchWorkspace, setWorkspaceProperty, setWorkspaceUsers } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
+import { setPubNubListenChannel } from '../../pubnub/pubnub';
 import { useSPMain } from '../../SPMainContext';
 import { SPProject, SPWorkspace } from '../../types/stan-playground-types';
 
@@ -91,6 +92,13 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         }
         return workspace.publiclyReadable ? 'viewer' : 'none'
     }, [workspace, userId])
+
+    useEffect(() => {
+        const computeResourceId = workspace?.computeResourceId || import.meta.env.VITE_DEFAULT_COMPUTE_RESOURCE_ID
+        if (computeResourceId) {
+            setPubNubListenChannel(computeResourceId)
+        }
+    }, [workspace?.computeResourceId])
 
     const value = React.useMemo(() => ({
         workspaceId,

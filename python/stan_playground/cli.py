@@ -4,7 +4,7 @@ from .start import start as start_function
 
 
 @click.group(help="stan-playground command line interface")
-def cli():
+def main():
     pass
 
 @click.command(help='Register a compute resource in the current directory')
@@ -20,6 +20,6 @@ def start(dir: str):
 def initialize_singularity_container():
     stan_playground.initialize_singularity_container()
 
-cli.add_command(register_compute_resource)
-cli.add_command(start)
-cli.add_command(initialize_singularity_container)
+main.add_command(register_compute_resource)
+main.add_command(start)
+main.add_command(initialize_singularity_container)

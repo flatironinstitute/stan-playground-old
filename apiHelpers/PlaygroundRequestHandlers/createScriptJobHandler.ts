@@ -6,6 +6,7 @@ import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
 import getWorkspaceRole from "../getWorkspaceRole";
 import removeIdField from "../removeIdField";
+import getPubnubClient from "../getPubnubClient"
 
 const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<CreateScriptJobResponse> => {
     const userId = o.verifiedUserId
@@ -21,9 +22,9 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
 
     let computeResourceId = workspace.computeResourceId
     if (!computeResourceId) {
-        computeResourceId = process.env.DEFAULT_COMPUTE_RESOURCE_ID
+        computeResourceId = process.env.VITE_DEFAULT_COMPUTE_RESOURCE_ID
         if (!computeResourceId) {
-            throw new Error('Workspace does not have a compute resource ID, and no default DEFAULT_COMPUTE_RESOURCE_ID is set in the environment.')
+            throw new Error('Workspace does not have a compute resource ID, and no default VITE_DEFAULT_COMPUTE_RESOURCE_ID is set in the environment.')
         }
     }
 
@@ -63,6 +64,20 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
     }
     const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
     await scriptJobsCollection.insertOne(job)
+
+    const pnClient = await getPubnubClient()
+    if (pnClient) {
+        await pnClient.publish({
+            channel: computeResourceId,
+            message: {
+                type: 'newPendingScriptJob',
+                workspaceId,
+                projectId: request.projectId,
+                scriptFileName: request.scriptFileName,
+                scriptJobId
+            }
+        })
+    }
 
     return {
         type: 'createScriptJob',

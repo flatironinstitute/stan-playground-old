@@ -926,6 +926,34 @@ export const isAskAboutStanProgramResponse = (x: any): x is AskAboutStanProgramR
     })
 }
 
+// GetPubsubSubscription
+
+export type GetPubsubSubscriptionRequest = {
+    type: 'getPubsubSubscription'
+    timestamp: number
+    computeResourceId: string
+}
+
+export const isGetPubsubSubscriptionRequest = (x: any): x is GetPubsubSubscriptionRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getPubsubSubscription'),
+        timestamp: isNumber,
+        computeResourceId: isString
+    })
+}
+
+export type GetPubsubSubscriptionResponse = {
+    type: 'getPubsubSubscription'
+    subscriptionInfo: any
+}
+
+export const isGetPubsubSubscriptionResponse = (x: any): x is GetPubsubSubscriptionResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getPubsubSubscription'),
+        subscriptionInfo: () => (true)
+    })
+}
+
 // PlaygroundRequestPayload
 
 export type PlaygroundRequestPayload =
@@ -959,7 +987,8 @@ export type PlaygroundRequestPayload =
     GetScriptJobRequest |
     GetPendingScriptJobsRequest |
     SetScriptJobPropertyRequest |
-    AskAboutStanProgramRequest
+    AskAboutStanProgramRequest |
+    GetPubsubSubscriptionRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -993,7 +1022,8 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetScriptJobRequest,
         isGetPendingScriptJobsRequest,
         isSetScriptJobPropertyRequest,
-        isAskAboutStanProgramRequest
+        isAskAboutStanProgramRequest,
+        isGetPubsubSubscriptionRequest
     ])(x)
 }
 
@@ -1050,7 +1080,8 @@ export type PlaygroundResponse =
     GetScriptJobResponse |
     GetPendingScriptJobsResponse |
     SetScriptJobPropertyResponse |
-    AskAboutStanProgramResponse
+    AskAboutStanProgramResponse |
+    GetPubsubSubscriptionResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -1084,6 +1115,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetScriptJobResponse,
         isGetPendingScriptJobsResponse,
         isSetScriptJobPropertyResponse,
-        isAskAboutStanProgramResponse
+        isAskAboutStanProgramResponse,
+        isGetPubsubSubscriptionResponse
     ])(x)
 }

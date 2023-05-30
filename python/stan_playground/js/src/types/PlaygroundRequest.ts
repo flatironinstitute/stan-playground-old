@@ -591,6 +591,34 @@ export const isGetComputeResourcesResponse = (x: any): x is GetComputeResourcesR
     })
 }
 
+// getComputeResource
+
+export type GetComputeResourceRequest = {
+    type: 'getComputeResource'
+    timestamp: number
+    computeResourceId: string
+}
+
+export const isGetComputeResourceRequest = (x: any): x is GetComputeResourceRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getComputeResource'),
+        timestamp: isNumber,
+        computeResourceId: isString
+    })
+}
+
+export type GetComputeResourceResponse = {
+    type: 'getComputeResource'
+    computeResource: SPComputeResource
+}
+
+export const isGetComputeResourceResponse = (x: any): x is GetComputeResourceResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getComputeResource'),
+        computeResource: isSPComputeResource
+    })
+}
+
 // registerComputeResource
 
 export type RegisterComputeResourceRequest = {
@@ -884,7 +912,6 @@ export const isAskAboutStanProgramRequest = (x: any): x is AskAboutStanProgramRe
         cacheOnly: isBoolean
     })
 }
-
 export type AskAboutStanProgramResponse = {
     type: 'askAboutStanProgram'
     response: string
@@ -896,6 +923,34 @@ export const isAskAboutStanProgramResponse = (x: any): x is AskAboutStanProgramR
         type: isEqualTo('askAboutStanProgram'),
         response: isString,
         cumulativeTokensUsed: isNumber
+    })
+}
+
+// GetPubsubSubscription
+
+export type GetPubsubSubscriptionRequest = {
+    type: 'getPubsubSubscription'
+    timestamp: number
+    computeResourceId: string
+}
+
+export const isGetPubsubSubscriptionRequest = (x: any): x is GetPubsubSubscriptionRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getPubsubSubscription'),
+        timestamp: isNumber,
+        computeResourceId: isString
+    })
+}
+
+export type GetPubsubSubscriptionResponse = {
+    type: 'getPubsubSubscription'
+    subscriptionInfo: any
+}
+
+export const isGetPubsubSubscriptionResponse = (x: any): x is GetPubsubSubscriptionResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getPubsubSubscription'),
+        subscriptionInfo: () => (true)
     })
 }
 
@@ -922,6 +977,7 @@ export type PlaygroundRequestPayload =
     CloneProjectRequest |
     SetProjectPropertyRequest |
     GetComputeResourcesRequest |
+    GetComputeResourceRequest |
     RegisterComputeResourceRequest |
     DeleteComputeResourceRequest |
     CreateScriptJobRequest |
@@ -931,7 +987,8 @@ export type PlaygroundRequestPayload =
     GetScriptJobRequest |
     GetPendingScriptJobsRequest |
     SetScriptJobPropertyRequest |
-    AskAboutStanProgramRequest
+    AskAboutStanProgramRequest |
+    GetPubsubSubscriptionRequest
 
 export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayload => {
     return isOneOf([
@@ -955,6 +1012,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isCloneProjectRequest,
         isSetProjectPropertyRequest,
         isGetComputeResourcesRequest,
+        isGetComputeResourceRequest,
         isRegisterComputeResourceRequest,
         isDeleteComputeResourceRequest,
         isCreateScriptJobRequest,
@@ -964,7 +1022,8 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isGetScriptJobRequest,
         isGetPendingScriptJobsRequest,
         isSetScriptJobPropertyRequest,
-        isAskAboutStanProgramRequest
+        isAskAboutStanProgramRequest,
+        isGetPubsubSubscriptionRequest
     ])(x)
 }
 
@@ -1011,6 +1070,7 @@ export type PlaygroundResponse =
     CloneProjectResponse |
     SetProjectPropertyResponse |
     GetComputeResourcesResponse |
+    GetComputeResourceResponse |
     RegisterComputeResourceResponse |
     DeleteComputeResourceResponse |
     CreateScriptJobResponse |
@@ -1020,7 +1080,8 @@ export type PlaygroundResponse =
     GetScriptJobResponse |
     GetPendingScriptJobsResponse |
     SetScriptJobPropertyResponse |
-    AskAboutStanProgramResponse
+    AskAboutStanProgramResponse |
+    GetPubsubSubscriptionResponse
 
 export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
     return isOneOf([
@@ -1044,6 +1105,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isCloneProjectResponse,
         isSetProjectPropertyResponse,
         isGetComputeResourcesResponse,
+        isGetComputeResourceResponse,
         isRegisterComputeResourceResponse,
         isDeleteComputeResourceResponse,
         isCreateScriptJobResponse,
@@ -1053,6 +1115,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isGetScriptJobResponse,
         isGetPendingScriptJobsResponse,
         isSetScriptJobPropertyResponse,
-        isAskAboutStanProgramResponse
+        isAskAboutStanProgramResponse,
+        isGetPubsubSubscriptionResponse
     ])(x)
 }

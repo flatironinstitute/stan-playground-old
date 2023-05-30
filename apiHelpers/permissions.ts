@@ -32,7 +32,8 @@ export const userCanDeleteWorkspace = (workspace: SPWorkspace, userId: string | 
 
 export const userCanReadWorkspace = (workspace: SPWorkspace, userId: string | undefined, clientId: string | undefined): boolean => {
     if (clientId) {
-        if ((workspace.computeResourceId) && (workspace.computeResourceId === clientId)) {
+        const computeResourceId = workspace.computeResourceId || process.env.VITE_DEFAULT_COMPUTE_RESOURCE_ID
+        if ((computeResourceId) && (computeResourceId === clientId)) {
             return true
         }
     }
@@ -42,7 +43,8 @@ export const userCanReadWorkspace = (workspace: SPWorkspace, userId: string | un
 
 export const userCanSetProjectFile = (workspace: SPWorkspace, userId: string | undefined, clientId: string | undefined): boolean => {
     if (clientId) {
-        if ((workspace.computeResourceId) && (workspace.computeResourceId === clientId)) {
+        const computeResourceId = workspace.computeResourceId || process.env.VITE_DEFAULT_COMPUTE_RESOURCE_ID
+        if ((computeResourceId) && (computeResourceId === clientId)) {
             return true
         }
     }

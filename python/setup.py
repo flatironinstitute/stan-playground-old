@@ -68,7 +68,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "stan-playground=stan_payground.cli:cli",
+            "stan-playground=stan_playground.cli:main",
         ],
     }
 )

@@ -1,6 +1,7 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile, askAboutStanProgram } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
+import { onPubsubMessage } from '../../pubnub/pubnub';
 import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
 
 type Props = {
@@ -178,6 +179,17 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         }
         setPreviousScriptJobs(scriptJobs)
     }, [scriptJobs, previousScriptJobs, refreshFiles])
+
+    useEffect(() => {
+        const cancel = onPubsubMessage(message => {
+            if (message.type === 'scriptJobStatusChanged') {
+                if (message.projectId === projectId) {
+                    refreshScriptJobs()
+                }
+            }
+        })
+        return () => {cancel()}
+    }, [projectId, refreshScriptJobs])
 
     const createScriptJobHandler = useCallback(async (o: {scriptFileName: string}) => {
         if (!project) return

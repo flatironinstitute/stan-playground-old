@@ -32,8 +32,9 @@ import setScriptJobPropertyHandler from '../apiHelpers/PlaygroundRequestHandlers
 import setWorkspacePropertyHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspacePropertyHandler'
 import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/setWorkspaceUsersHandler'
 import askAboutStanProgramHandler from '../apiHelpers/PlaygroundRequestHandlers/askAboutStanProgramHandler'
+import getPubsubSubscriptionHandler from '../apiHelpers/PlaygroundRequestHandlers/getPubsubSubscriptionHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isAskAboutStanProgramRequest, isCloneProjectRequest, isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourceRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isAskAboutStanProgramRequest, isCloneProjectRequest, isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourceRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetPubsubSubscriptionRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
@@ -91,7 +92,7 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
             }
             verifiedUserId = userId
         }
-
+        
         if (isGetWorkspacesRequest(payload)) {
             return await getWorkspacesHandler(payload, {verifiedClientId, verifiedUserId})
         }
@@ -184,6 +185,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isAskAboutStanProgramRequest(payload)) {
             return await askAboutStanProgramHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isGetPubsubSubscriptionRequest(payload)) {
+            return await getPubsubSubscriptionHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else {
             throw Error(`Unexpected request type: ${(payload as any).type}`)

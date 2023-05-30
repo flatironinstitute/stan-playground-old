@@ -1,6 +1,7 @@
 import { SetScriptJobPropertyRequest, SetScriptJobPropertyResponse } from "../../src/types/PlaygroundRequest";
 import { isSPScriptJob } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
+import getPubnubClient from "../getPubnubClient";
 import removeIdField from "../removeIdField";
 
 const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<SetScriptJobPropertyResponse> => {
@@ -47,6 +48,23 @@ const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest,
     update.timestampModified = Date.now() / 1000
 
     scriptJobsCollection.updateOne({scriptJobId: request.scriptJobId}, {$set: update})
+
+    if (request.property === 'status') {
+        const pnClient = await getPubnubClient()
+        if (pnClient) {
+            await pnClient.publish({
+                channel: scriptJob.computeResourceId,
+                message: {
+                    type: 'scriptJobStatusChanged',
+                    workspaceId: request.workspaceId,
+                    projectId: request.projectId,
+                    scriptFileName: scriptJob.scriptFileName,
+                    scriptJobId: scriptJob.scriptJobId,
+                    status: request.value
+                }
+            })
+        }
+    }
 
     return {
         type: 'setScriptJobProperty'
