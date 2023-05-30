@@ -10,7 +10,7 @@ Stan Playground supports various types of files within projects:
 * **.json**: Datasets used in analyses
 * **.py**: Python scripts used for generating datasets and running post-processing
 * **.spa**: Stan Playground Analysis files. These YAML files consist of a .stan file name, a .json file name, and options for running the Stan analysis.
-* **.spa.out**: These files are generated once a .spa file run completes. It contains the result of the Stan sampler for the analysis.
+* **.spa.out**: These files are generated once a .spa job completes. It contains the output of the Stan sampler for the analysis.
 
 ## Workspace and project management
 
@@ -18,11 +18,11 @@ Stan Playground supports the creation of workspaces, projects within those works
 
 ## Running Stan analyses
 
-A Stan analysis comprises a .stan file, and .json dataset file, and options for running the Stan sampler. These are specified using a .spa file within a workspace. Once a .spa file is created, it can be run using the "Run" button. This will create a job that will run the analysis on the compute resource associated with the workspace. Once the job completes, the results will be available in the .spa.out file. Results can be visualized using MCMC Monitor.
+A Stan analysis comprises a .stan file, a .json dataset file, and options for running the Stan sampler. These are specified using a .spa file within a workspace. Once a .spa file is created, it can be run using the "Run" button. This will create a job that will run the analysis on the compute resource associated with the workspace. Once the job completes, the results are available in the .spa.out file. Output can then be visualized using MCMC Monitor.
 
 ## Compute resources
 
-Each workspace has an associated compute resource which is used to run Python scripts and Stan analyses. By default, our freely-available cloud resource is used, although this is limited in terms of CPU and memory, and can only run a limited number of jobs concurrently. You can also associate your own compute resource with your workspace. This can be a local or a remote machine.
+Each workspace has an associated compute resource which is used to run Python scripts and Stan analyses. By default, our cloud resource is used, although this is limited in terms of CPU and memory, and can only run a limited number of jobs concurrently, which is shared across all users. You can also associate your own compute resource with your workspace. This can be backed by a local or a remote machine Linux machine.
 
 
 

@@ -1,5 +1,5 @@
 import { Edit } from "@mui/icons-material";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
 import SmallIconButton from "../../components/SmallIconButton";
@@ -21,7 +21,7 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
     const W = width - 2 * padding
     const H = height - 2 * padding
 
-    const handleEditProjectName = useCallback(async () => {
+    const handleEditWorkspaceName = useCallback(async () => {
         const newName = await prompt('Enter new workspace name:', workspace?.name || '')
         if (!newName) return
         setWorkspaceProperty('name', newName)
