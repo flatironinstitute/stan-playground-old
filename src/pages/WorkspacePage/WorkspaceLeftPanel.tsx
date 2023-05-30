@@ -1,6 +1,8 @@
+import { Edit } from "@mui/icons-material";
 import { FunctionComponent } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
+import SmallIconButton from "../../components/SmallIconButton";
 import ComputeResourceIdComponent from "../../ComputeResourceIdComponent";
 import UserIdComponent from "../../UserIdComponent";
 import BackButton from "./BackButton";
@@ -13,11 +15,18 @@ type Props = {
 }
 
 const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
-    const {workspaceId, workspace} = useWorkspace()
+    const {workspaceId, workspace, workspaceRole, setWorkspaceProperty} = useWorkspace()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
     const padding = 10
     const W = width - 2 * padding
     const H = height - 2 * padding
+
+    const handleEditProjectName = useCallback(async () => {
+        const newName = await prompt('Enter new workspace name:', workspace?.name || '')
+        if (!newName) return
+        setWorkspaceProperty('name', newName)
+    }, [workspace, setWorkspaceProperty])
+
     return (
         <div style={{position: 'absolute', left: padding, top: padding, width: W, height: H}}>
             <div>
@@ -25,6 +34,11 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
                 <hr />
                 <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
                     Workspace: {workspace?.name}
+                    {
+                        (workspaceRole === 'admin' || workspaceRole === 'editor') && (
+                            <SmallIconButton onClick={handleEditWorkspaceName} title="Edit workspace name" icon={<Edit />} />
+                        )
+                    }
                 </div>
             </div>
             <table>

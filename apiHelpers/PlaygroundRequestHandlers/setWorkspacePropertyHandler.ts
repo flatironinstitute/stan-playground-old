@@ -15,7 +15,10 @@ const setWorkspacePropertyHandler = async (request: SetWorkspacePropertyRequest,
         throw new Error(`User ${verifiedUserId} does not have permission to set workspace properties (owner: ${workspace.ownerId})`)
     }
 
-    if (request.property === 'publiclyReadable') {
+    if (request.property === 'name') {
+        workspace.name = request.value
+    }
+    else if (request.property === 'publiclyReadable') {
         workspace.publiclyReadable = request.value
     }
     else if (request.property === 'listed') {

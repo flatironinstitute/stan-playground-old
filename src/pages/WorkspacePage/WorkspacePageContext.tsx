@@ -16,7 +16,7 @@ type WorkspacePageContextType = {
     createProject: (projectName: string) => Promise<string>
     deleteWorkspace: () => Promise<void>
     setWorkspaceUsers: (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => Promise<void>
-    setWorkspaceProperty: (property: 'publiclyReadable' | 'listed' | 'computeResourceId', value: any) => Promise<void>
+    setWorkspaceProperty: (property: 'name' | 'publiclyReadable' | 'listed' | 'computeResourceId', value: any) => Promise<void>
     workspaceRole: 'none' | 'admin' | 'editor' | 'viewer' | undefined
 }
 
@@ -58,7 +58,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])
 
-    const setWorkspacePropertyHandler = useMemo(() => (async (property: 'publiclyReadable' | 'listed' | 'computeResourceId', value: any) => {
+    const setWorkspacePropertyHandler = useMemo(() => (async (property: 'name' | 'publiclyReadable' | 'listed' | 'computeResourceId', value: any) => {
         await setWorkspaceProperty(workspaceId, property, value, auth)
         setWorkspaceRefreshCode(rc => rc + 1)
     }), [workspaceId, auth])

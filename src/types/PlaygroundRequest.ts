@@ -235,7 +235,7 @@ export type SetWorkspacePropertyRequest = {
     type: 'setWorkspaceProperty'
     timestamp: number
     workspaceId: string
-    property: 'publiclyReadable' | 'listed' | 'computeResourceId'
+    property: 'name' | 'publiclyReadable' | 'listed' | 'computeResourceId'
     value: any
 }
 
@@ -244,7 +244,7 @@ export const isSetWorkspacePropertyRequest = (x: any): x is SetWorkspaceProperty
         type: isEqualTo('setWorkspaceProperty'),
         timestamp: isNumber,
         workspaceId: isString,
-        property: isOneOf([isEqualTo('publiclyReadable'), isEqualTo('listed'), isEqualTo('computeResourceId')]),
+        property: isOneOf([isEqualTo('name'), isEqualTo('publiclyReadable'), isEqualTo('listed'), isEqualTo('computeResourceId')]),
         value: () => (true)
     })
 }

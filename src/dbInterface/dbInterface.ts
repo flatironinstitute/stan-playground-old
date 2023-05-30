@@ -83,7 +83,7 @@ export const setWorkspaceUsers = async (workspaceId: string, users: {userId: str
     }
 }
 
-export const setWorkspaceProperty = async (workspaceId: string, property: 'publiclyReadable' | 'listed' | 'computeResourceId', value: any, auth: Auth): Promise<void> => {
+export const setWorkspaceProperty = async (workspaceId: string, property: 'name' | 'publiclyReadable' | 'listed' | 'computeResourceId', value: any, auth: Auth): Promise<void> => {
     const req: SetWorkspacePropertyRequest = {
         type: 'setWorkspaceProperty',
         timestamp: Date.now() / 1000,

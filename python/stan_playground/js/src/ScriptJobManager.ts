@@ -23,7 +23,7 @@ type SpaOutput = {
 class ScriptJobManager {
     #runningJobs: RunningJob[] = []
     #maxNumPythonJobs = 5
-    #maxNumSpaJobs = 5
+    #maxNumSpaJobs = 2
     constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: () => void}) {
 
     }

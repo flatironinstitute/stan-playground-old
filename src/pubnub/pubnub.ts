@@ -13,20 +13,6 @@ else {
     console.warn('PUBNUB_SUBSCRIBE_KEY not set. Not connecting to PubNub.')
 }
 
-if (pnClient) {
-    pnClient.addListener({
-        status: (statusEvent) => {
-            if (statusEvent.category === "PNConnectedCategory") {
-                console.info("PubNub connected");
-            }
-        },
-        message: (messageEvent: any) => {
-            console.log('PubNub message received')
-            console.log(messageEvent.message)
-        }
-    })
-}
-
 export const onPubsubMessage = (callback: (message: any) => void) => {
     const listener = {
         message: (messageEvent: any) => {
