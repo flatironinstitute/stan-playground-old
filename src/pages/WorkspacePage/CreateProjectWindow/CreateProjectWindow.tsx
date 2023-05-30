@@ -74,11 +74,13 @@ const ProjectTemplateSelector: FunctionComponent<ProjectTemplateSelectorProps> =
             const p = await fetchProjects(templatesWorkspaceId, auth)
             setProjects(p)
         })()
-    }, [])
+    }, [auth])
     useEffect(() => {
+        // select default project
         if (!projects) return
         if (!selectedProjectId) {
-            setSelectedProjectId(projects[0].projectId)
+            const defaultProjectId = projects.find(p => p.name.toLowerCase().includes('bare'))?.projectId || projects[0].projectId
+            setSelectedProjectId(defaultProjectId)
         }
     }, [projects, selectedProjectId, setSelectedProjectId])
     if (!projects) return <div>Loading...</div>

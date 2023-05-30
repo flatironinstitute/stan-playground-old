@@ -75,8 +75,6 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
 
     const askAboutStanProgramCacheCollection = client.db('stan-playground').collection('askAboutStanProgramCache')
     const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
-        projectId,
-        workspaceId: request.workspaceId,
         stanProgramSha1: sha1,
         promptSha1: stringSha1(prompt2)
     })
@@ -170,8 +168,6 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
     })
 
     await askAboutStanProgramCacheCollection.insertOne({
-        projectId,
-        workspaceId: request.workspaceId,
         stanProgramSha1: sha1,
         promptSha1: stringSha1(prompt2),
         response,

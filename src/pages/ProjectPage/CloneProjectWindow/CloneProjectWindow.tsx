@@ -1,4 +1,5 @@
 import { FunctionComponent, useCallback, useEffect, useState } from "react"
+import Hyperlink from "../../../components/Hyperlink"
 import { prompt } from "../../../confirm_prompt_alert"
 import { useSPMain } from "../../../SPMainContext"
 import useRoute from "../../../useRoute"
@@ -62,12 +63,12 @@ const CloneProjectWindow: FunctionComponent<Props> = ({onClose}) => {
                     <div>
                         <SelectWorkspaceComponent selectedWorkspaceId={selectedWorkspaceId} setSelectedWorkspaceId={setSelectedWorkspaceId} />
                         <div>&nbsp;</div>
-                        <button onClick={handleCreateWorkspace}>Create a new workspace</button>
+                        <Hyperlink onClick={handleCreateWorkspace} color="gray">Create a new workspace</Hyperlink>
                     </div>
                 )
             }
-            <hr />
-            <button onClick={handleClone}>Clone</button>
+            <div>&nbsp;</div>
+            <button onClick={handleClone}>Create a cloned project</button>
         </div>
     )
 }
