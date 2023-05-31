@@ -12,6 +12,10 @@ const ProjectsTable: FunctionComponent<Props> = () => {
     const {projects} = useWorkspace()
     const {setRoute} = useRoute()
 
+    if (!projects) {
+        return <p>Loading...</p>
+    }
+
     return (
         <table className="scientific-table">
             <thead>

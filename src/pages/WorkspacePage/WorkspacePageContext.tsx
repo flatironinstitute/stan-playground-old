@@ -12,7 +12,7 @@ type Props = {
 type WorkspacePageContextType = {
     workspaceId: string
     workspace: SPWorkspace | undefined
-    projects: SPProject[]
+    projects?: SPProject[]
     createProject: (projectName: string) => Promise<string>
     deleteWorkspace: () => Promise<void>
     setWorkspaceUsers: (users: {userId: string, role: 'admin' | 'editor' | 'viewer'}[]) => Promise<void>
@@ -23,7 +23,7 @@ type WorkspacePageContextType = {
 const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
     workspaceId: '',
     workspace: undefined,
-    projects: [],
+    projects: undefined,
     createProject: async () => {return ''},
     deleteWorkspace: async () => {},
     setWorkspaceUsers: async () => {},
@@ -32,7 +32,7 @@ const WorkspacePageContext = React.createContext<WorkspacePageContextType>({
 })
 
 export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = ({children, workspaceId}) => {
-    const [projects, setProjects] = React.useState<SPProject[]>([])
+    const [projects, setProjects] = React.useState<SPProject[] | undefined>(undefined)
     const [workspace, setWorkspace] = React.useState<SPWorkspace | undefined>(undefined)
     const [projectsRefreshCode, setProjectsRefreshCode] = React.useState(0)
     const [workspaceRefreshCode, setWorkspaceRefreshCode] = React.useState(0)
@@ -65,7 +65,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
 
     useEffect(() => {
         (async () => {
-            setProjects([])
+            setProjects(undefined)
             if (!workspaceId) return
             const projects = await fetchProjects(workspaceId, auth)
             setProjects(projects)

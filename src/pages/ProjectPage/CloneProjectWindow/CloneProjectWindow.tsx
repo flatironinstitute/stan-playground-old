@@ -89,10 +89,12 @@ const SelectWorkspaceComponent: FunctionComponent<SelectWorkspaceComponentProps>
     const {userId} = useGithubAuth()
 
     const workspacesFiltered = useMemo(() => (
-        workspaces.filter(workspace => (
+        workspaces ? workspaces.filter(workspace => (
             workspace.ownerId === userId || workspace.users.filter(u => (u.role === 'admin' || u.role === 'editor')).map(u => u.userId).includes(userId || '')
-        ))
+        )) : undefined
     ), [workspaces, userId])
+
+    if (!workspacesFiltered) return <p>Loading...</p>
 
     return (
         <div>

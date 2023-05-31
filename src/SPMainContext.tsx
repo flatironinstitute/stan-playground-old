@@ -5,7 +5,7 @@ import { SPWorkspace } from './types/stan-playground-types';
 
 
 type SPMainContextType = {
-    workspaces: SPWorkspace[]
+    workspaces?: SPWorkspace[]
     createWorkspace: (workspaceName: string) => Promise<string>
     refreshWorkspaces: () => void
 }
@@ -13,7 +13,7 @@ type SPMainContextType = {
 const SPMainContext = React.createContext<SPMainContextType>({workspaces: [], createWorkspace: async () => {return ''}, refreshWorkspaces: () => {}})
 
 export const SetupSPMain = (props: {children: React.ReactNode}) => {
-    const [workspaces, setWorkspaces] = React.useState<SPWorkspace[]>([])
+    const [workspaces, setWorkspaces] = React.useState<SPWorkspace[] | undefined>(undefined)
     const [refreshCode, setRefreshCode] = React.useState(0)
     const refreshWorkspaces = useCallback(() => setRefreshCode(rc => rc + 1), [])
 
@@ -28,7 +28,7 @@ export const SetupSPMain = (props: {children: React.ReactNode}) => {
 
     useEffect(() => {
         (async () => {
-            setWorkspaces([])
+            setWorkspaces(undefined)
             const workspaces = await fetchWorkspaces(auth)
             setWorkspaces(workspaces)
         })()

@@ -17,6 +17,7 @@ const WorkspacesTable: FunctionComponent<Props> = ({filter}) => {
     const {userId} = useGithubAuth()
 
     const workspaces2 = useMemo(() => {
+        if (!workspaces) return undefined
         if (filter === 'community') {
             return workspaces.filter(workspace => workspace.listed)
         } else {
@@ -28,6 +29,10 @@ const WorkspacesTable: FunctionComponent<Props> = ({filter}) => {
             })
         }
     }, [filter, workspaces, userId])
+
+    if (!workspaces2) {
+        return <p>Loading...</p>
+    }
 
     return (
         <table className="scientific-table">
