@@ -16,3 +16,5 @@ Some tasks for beta testers:
 
 Advanced:
 * Host a compute resource (requires Linux, Python, NodeJS, and Singularity)
+
+Please provide feedback to Jeremy Magland.
