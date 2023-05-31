@@ -10,20 +10,20 @@ Stan Playground accommodates multiple file types within projects:
 * **.json**: Datasets for analyses
 * **.py**: Python scripts for data generation and post-analysis processing
 * **.spa**: Stan Playground Analysis files. These YAML files reference a .stan file and a .json file, along with settings for performing the Stan analysis.
-* **.spa.out**: Generated once an .spa task concludes, these files contain the output of the executed Stan analysis.
+* **.spa.out**: Generated once an analysis job concludes, these files contain the output of the executed Stan analysis.
 * **.md**: Markdown files for descriptions.
 
 ## Workspace and Project Administration
 
-Stan Playground allows the establishment of workspaces, with each workspace owned by a GitHub OAuth-authenticated user. Within these workspaces, users can initiate projects, and handle files and tasks related to them. Workspace owners and admin users can control access permissions, such as public visibility and read/write permissions for different users. Additionally, workspace admins can assign compute resources to the workspace to run Python scripts and Stan analyses.
+Stan Playground allows the creation of workspaces, with each workspace owned by a GitHub OAuth-authenticated user. Within these workspaces, users can create projects, and manage the associated files and tasks. Workspace owners and admin users can control access permissions, such as public visibility and read/write permissions for different users. Additionally, workspace admins can assign compute resources to the workspace to run Python scripts and Stan analyses.
 
 ## Execution of Stan Analyses
 
-A Stan analysis involves a .stan file, a .json dataset file, and certain execution parameters for the Stan sampler, all specified using a .spa (Stan Playground analysis) file. With the "Create job" button, a created .spa file launches a job to perform the analysis using the workspace's allocated compute resources. Upon completion, results are stored in a corresponding .spa.out file and can be visualized using [MCMC Monitor](https://github.com/flatironinstitute/mcmc-monitor/blob/main/README.md).
+A Stan analysis involves a .stan file, a .json dataset file, and certain execution parameters for the Stan sampler, all specified using a .spa (Stan Playground analysis) file. With the "Create job" button, the system launches a job to perform the analysis using the workspace's allocated compute resources. Upon completion, results are stored in a corresponding .spa.out file and can be visualized using [MCMC Monitor](https://github.com/flatironinstitute/mcmc-monitor/blob/main/README.md).
 
 ## Compute Resources
 
-Every workspace comes equipped with a dedicated compute resource for executing Python scripts and Stan analyses. The default setting uses a cloud resource with specific limitations on CPU, memory, and concurrent jobs, shared among all users. Alternatively, you can [host your own compute resource](https://github.com/scratchrealm/stan-playground/blob/main/doc/host_compute_resource.md) on a local or remote Linux machine and link this to your workspaces.
+Every workspace comes equipped with a dedicated compute resource for executing Python scripts and Stan analyses. The default setting uses a cloud resource with specific limitations on CPU, memory, and number of concurrent jobs, shared among all users. Alternatively, you can [host your own compute resource](https://github.com/scratchrealm/stan-playground/blob/main/doc/host_compute_resource.md) on a local or remote machine and link this to your workspaces.
 
 ## Feedback
 
