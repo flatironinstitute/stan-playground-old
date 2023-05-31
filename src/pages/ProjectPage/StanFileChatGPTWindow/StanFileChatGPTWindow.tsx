@@ -57,8 +57,6 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
         }
     }, [askAboutStanProgram, stanFileName, prompt, processing])
 
-    console.log(response)
-
     return (
         <div style={{width: width, height: height, backgroundColor: 'white'}}>
             <div style={{height: 30, backgroundColor: 'lightgray'}}>

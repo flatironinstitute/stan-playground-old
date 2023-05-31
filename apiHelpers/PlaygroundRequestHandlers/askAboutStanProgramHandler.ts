@@ -77,7 +77,7 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
     if (request.useCache && !request.force) {
         const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
             stanProgramSha1: sha1,
-            fullPromptsha1: stringSha1(fullPrompt)
+            fullPromptSha1: stringSha1(fullPrompt)
         })
         if (cachedResponse) {
             return {
