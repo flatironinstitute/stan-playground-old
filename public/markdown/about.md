@@ -27,4 +27,4 @@ Every workspace comes equipped with a dedicated compute resource for executing P
 
 ## Feedback
 
-Please provide feedback during the [beta testing](https://github.com/scratchrealm/stan-playground/blob/main/doc/beta_testing.md) phase.
+Please provide feedback during the [beta testing](https://github.com/scratchrealm/stan-playground/blob/main/doc/beta_testing.md) phase. You can submit issues or suggestions to [this GitHub repository](https://github.com/scratchrealm/stan-playground). You can also [reach out to the author](https://www.simonsfoundation.org/people/jeremy-magland/).
