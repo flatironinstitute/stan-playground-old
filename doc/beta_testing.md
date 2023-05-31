@@ -1,6 +1,6 @@
 Some tasks for beta testers:
 
-* Visit the site
+* [Visit the site](https://stan-playground.vercel.app)
 * Click "Learn more" and read the Stan Playground overview
 * Browse the example gallery workspace
 * Log in using GitHub
