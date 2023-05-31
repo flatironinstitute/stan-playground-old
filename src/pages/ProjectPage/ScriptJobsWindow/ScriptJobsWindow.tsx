@@ -45,7 +45,7 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
         deleteCompletedScriptJobs({scriptFileName: fileName})
     }, [deleteCompletedScriptJobs, fileName])
 
-    const iconFontSize = 22
+    const iconFontSize = 28
 
     return (
         <>
