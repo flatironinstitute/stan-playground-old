@@ -1,4 +1,4 @@
-import { Edit } from "@mui/icons-material";
+import { Edit, Settings } from "@mui/icons-material";
 import { FunctionComponent, useCallback } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import ModalWindow from "../../components/ModalWindow/ModalWindow";
@@ -32,8 +32,8 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
             <div>
                 <BackButton />
                 <hr />
-                <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
-                    Workspace: {workspace?.name}
+                <div style={{fontWeight: 'bold', whiteSpace: 'nowrap', paddingBottom: 10}}>
+                    Workspace: {workspace?.name}&nbsp;
                     {
                         (workspaceRole === 'admin' || workspaceRole === 'editor') && (
                             <SmallIconButton onClick={handleEditWorkspaceName} title="Edit workspace name" icon={<Edit />} />
@@ -57,8 +57,12 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
                     </tr>
                 </tbody>
             </table>
+            <div style={{paddingTop: 10}}>
+                <button onClick={openSettingsWindow} title="Workspace settings"><SmallIconButton icon={<Settings />} /> Settings</button>
+            </div>
+
             <hr />
-            <button onClick={openSettingsWindow}>Settings</button>
+
             <ModalWindow
                 open={settingsWindowVisible}
                 onClose={closeSettingsWindow}

@@ -1,5 +1,7 @@
+import { ContentCopy } from "@mui/icons-material"
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react"
 import Hyperlink from "../../../components/Hyperlink"
+import SmallIconButton from "../../../components/SmallIconButton"
 import { prompt } from "../../../confirm_prompt_alert"
 import { useGithubAuth } from "../../../GithubAuth/useGithubAuth"
 import { useSPMain } from "../../../SPMainContext"
@@ -73,7 +75,7 @@ const CloneProjectWindow: FunctionComponent<Props> = ({onClose}) => {
                 )
             }
             <div>&nbsp;</div>
-            <button onClick={handleClone}>Create cloned project</button>
+            <button onClick={handleClone}><SmallIconButton icon={<ContentCopy />} /> Create cloned project</button>
         </div>
     )
 }

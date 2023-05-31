@@ -1,4 +1,4 @@
-import { Add, Edit, Refresh } from "@mui/icons-material";
+import { Add, ContentCopy, Edit, NoteAdd, Refresh, Settings } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
@@ -14,6 +14,7 @@ import { useProject } from "./ProjectPageContext";
 import ProjectSettingsWindow from "./ProjectSettingsWindow";
 import BackButton from "./BackButton";
 import CloneProjectWindow from "./CloneProjectWindow/CloneProjectWindow";
+import { IconButton } from "@mui/material";
 
 type Props = {
     width: number
@@ -107,55 +108,53 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
 
     const cloneProjectTitle = userId ? 'Clone this project' : 'You must be logged in to clone this project.'
 
-    const topHeight = 140
-    const bottomHeight = 20
     const padding = 10
     const W = width - 2 * padding
     const H = height - 2 * padding
     return (
         <div style={{position: 'absolute', left: padding, top: padding, width: W, height: H}}>
-            <div style={{position: 'absolute', width: W, height: topHeight}}>
-                <BackButton />
-                <hr />
-                <div style={{fontWeight: 'bold', whiteSpace: 'nowrap'}}>
-                    Project: {project?.name}&nbsp;
-                    {
-                        (workspaceRole === 'admin' || workspaceRole === 'editor') && (
-                            <SmallIconButton onClick={handleEditProjectName} title="Edit project name" icon={<Edit />} />
-                        )
-                    }
-                </div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>ID:</td>
-                            <td style={{whiteSpace: 'nowrap'}}>{projectId}</td>
-                        </tr>
-                        <tr>
-                            <td>Workspace:</td>
-                            <td style={{whiteSpace: 'nowrap'}}><Hyperlink onClick={() => {setRoute({page: 'workspace', workspaceId})}}>{workspace?.name}</Hyperlink></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <hr />
-                <div>
-                    <SmallIconButton onClick={handleCreateFile} title="Create a new file" icon={<Add />} />
-                    <SmallIconButton onClick={refreshFiles} title="Refresh files" icon={<Refresh />} />
-                </div>
+            <BackButton />
+            <hr />
+            <div style={{fontWeight: 'bold', whiteSpace: 'nowrap', paddingBottom: 10}}>
+                Project: {project?.name}&nbsp;
+                {
+                    (workspaceRole === 'admin' || workspaceRole === 'editor') && (
+                        <SmallIconButton onClick={handleEditProjectName} title="Edit project name" icon={<Edit />} />
+                    )
+                }
             </div>
-            <div style={{position: 'absolute', width: W, top: topHeight, height: H - topHeight - bottomHeight}}>
-                <ProjectFileBrowser2
-                    projectFiles={projectFiles}
-                    onOpenFile={handleOpenFile}
-                    onDeleteFile={handleDeleteFile}
-                    onDuplicateFile={handleDuplicateFile}
-                    onRenameFile={handleRenameFile}
-                />
+            <table>
+                <tbody>
+                    <tr>
+                        <td>ID:</td>
+                        <td style={{whiteSpace: 'nowrap'}}>{projectId}</td>
+                    </tr>
+                    <tr>
+                        <td>Workspace:</td>
+                        <td style={{whiteSpace: 'nowrap'}}><Hyperlink onClick={() => {setRoute({page: 'workspace', workspaceId})}}>{workspace?.name}</Hyperlink></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style={{paddingTop: 10}}>
+                <button onClick={openSettingsWindow} title="Project settings"><SmallIconButton icon={<Settings />} /> Settings</button>
+                &nbsp;
+                <button onClick={openCloneProjectWindow} title={cloneProjectTitle}><SmallIconButton disabled={!userId} icon={<ContentCopy />} /> Clone project</button>
             </div>
-            <div style={{position: 'absolute', width: W, top: H - bottomHeight + 5, height: bottomHeight}}>
-                <button onClick={openSettingsWindow}>Settings</button>&nbsp;
-                <button disabled={!userId} onClick={openCloneProjectWindow} title={cloneProjectTitle}>Clone project</button>&nbsp;
+
+            <hr />
+
+            <div style={{paddingBottom: 5}}>
+                <SmallIconButton onClick={handleCreateFile} title="Create a new file" icon={<NoteAdd />} fontSize={24} />
+                <SmallIconButton onClick={refreshFiles} title="Refresh files" icon={<Refresh />} fontSize={24} />
             </div>
+            <ProjectFileBrowser2
+                projectFiles={projectFiles}
+                onOpenFile={handleOpenFile}
+                onDeleteFile={handleDeleteFile}
+                onDuplicateFile={handleDuplicateFile}
+                onRenameFile={handleRenameFile}
+            />
+
             <ModalWindow
                 open={settingsWindowVisible}
                 onClose={closeSettingsWindow}
