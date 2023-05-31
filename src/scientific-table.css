@@ -14,11 +14,11 @@
 
 /* Table header */
 .scientific-table th {
-    background-color: #1a1a1a;
+    background-color: #c5af96;
     color: #ffffff;
     text-align: left;
     padding: 4px 8px;
-    border: 1px solid #333333;
+    border: 1px solid #aaa7a7;
 }
 
 /* Table rows */
@@ -32,7 +32,7 @@
 
 /* Table data */
 .scientific-table td {
-    padding: 2px 8px;
+    padding: 4px 8px;
     border: 1px solid #ccc;
 }
 

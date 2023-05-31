@@ -54,7 +54,7 @@ const askAboutStanProgramHandler = async (request: AskAboutStanProgramRequest, o
 
     const stanProgram = dataBlob.content
 
-    const prompt2 = `
+    const fullPrompt = `
 I am going to provide a Stan program followed by a prompt.
 Please answer the prompt in a concise way sticking only to the topic of the stan program.
 Your response will be included in a help panel in software where the user is editing this viewing this Stan program and wants to know more about it.
@@ -74,15 +74,17 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
 `
 
     const askAboutStanProgramCacheCollection = client.db('stan-playground').collection('askAboutStanProgramCache')
-    const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
-        stanProgramSha1: sha1,
-        promptSha1: stringSha1(prompt2)
-    })
-    if (cachedResponse) {
-        return {
-            type: 'askAboutStanProgram',
-            response: cachedResponse.response,
-            cumulativeTokensUsed: 0
+    if (request.useCache && !request.force) {
+        const cachedResponse = await askAboutStanProgramCacheCollection.findOne({
+            stanProgramSha1: sha1,
+            fullPromptsha1: stringSha1(fullPrompt)
+        })
+        if (cachedResponse) {
+            return {
+                type: 'askAboutStanProgram',
+                response: cachedResponse.response,
+                cumulativeTokensUsed: 0
+            }
         }
     }
 
@@ -139,7 +141,7 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
             messages: [
                 {
                     role: 'user',
-                    content: prompt2
+                    content: fullPrompt
                 }
             ]
         })
@@ -167,12 +169,16 @@ PLEASE RESPOND IN MARKDOWN FORMAT, not plain text format.
         }
     })
 
-    await askAboutStanProgramCacheCollection.insertOne({
-        stanProgramSha1: sha1,
-        promptSha1: stringSha1(prompt2),
-        response,
-        timestamp: Date.now() / 1000
-    })
+    if (request.useCache) {
+        await askAboutStanProgramCacheCollection.insertOne({
+            stanProgramSha1: sha1,
+            fullPromptSha1: stringSha1(fullPrompt),
+            prompt: request.prompt,
+            response,
+            timestamp: Date.now() / 1000,
+            userId: o.verifiedUserId
+        })
+    }
 
     return {
         type: 'askAboutStanProgram',

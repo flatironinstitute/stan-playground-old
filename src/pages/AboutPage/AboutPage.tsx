@@ -1,12 +1,12 @@
 import { FunctionComponent, useEffect, useState } from "react";
 import Markdown from "../../Markdown/Markdown";
-import './AboutPage.css'
 
 type Props = {
-    // none
+    width: number
+    height: number
 }
 
-const AboutPage: FunctionComponent<Props> = () => {
+const AboutPage: FunctionComponent<Props> = ({width, height}) => {
     const [source, setSource] = useState<string>('')
     useEffect(() => {
         fetch('/markdown/about.md').then((response) => {
@@ -17,9 +17,16 @@ const AboutPage: FunctionComponent<Props> = () => {
             }
         })
     }, [])
+    const W = Math.min(800, width - 40)
     return (
-        <div className="aboutpage" style={{padding: 20}}>
-            <Markdown source={source} />
+        <div style={{position: 'absolute', width, height, overflowY: 'auto'}}>
+            <div style={{position: 'absolute', left: (width - W) / 2, width: W}}>
+                <div>&nbsp;</div>
+                <Markdown source={source} />
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+            </div>
         </div>
     )
 }

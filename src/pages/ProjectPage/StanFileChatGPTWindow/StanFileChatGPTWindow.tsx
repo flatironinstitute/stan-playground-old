@@ -9,11 +9,11 @@ type Props = {
     stanFileName: string
 }
 
-const initialPrompt = `Describe this model in detail.`
+const defaultPrompt = `Describe this model in detail.`
 
 const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFileName}) => {
     const {askAboutStanProgram} = useProject()
-    const [prompt, setPrompt] = useState(initialPrompt)
+    const [prompt, setPrompt] = useState(defaultPrompt)
     const [response, setResponse] = useState('')
     const [cumulativeTokensUsed, setCumulativeTokensUsed] = useState<number | undefined>(undefined)
     const [processing, setProcessing] = useState(false)
@@ -23,8 +23,12 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
     useEffect(() => {
         let canceled = false
         ;(async () => {
-            const cacheOnly = true
-            const {response} = await askAboutStanProgram(stanFileName, initialPrompt, cacheOnly)
+            const opts = {
+                useCache: true,
+                cacheOnly: true,
+                force: false
+            }
+            const {response} = await askAboutStanProgram(stanFileName, defaultPrompt, opts)
             if (canceled) return
             if (response) {
                 setResponse(response)
@@ -37,8 +41,12 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
         if (processing) return
         setProcessing(true)
         try {
-            const cacheOnly = false
-            const {response, cumulativeTokensUsed} = await askAboutStanProgram(stanFileName, prompt, cacheOnly)
+            const opts = {
+                useCache: true,
+                cacheOnly: false,
+                force: true
+            }
+            const {response, cumulativeTokensUsed} = await askAboutStanProgram(stanFileName, prompt, opts)
             setResponse(response)
             if (cumulativeTokensUsed) {
                 setCumulativeTokensUsed(cumulativeTokensUsed)

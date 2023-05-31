@@ -1,5 +1,6 @@
 import { FunctionComponent } from "react";
 import Splitter from "../../../components/Splitter";
+import { useProject } from "../ProjectPageContext";
 import ScriptJobsWindow from "../ScriptJobsWindow/ScriptJobsWindow";
 import SpaFileEditor from "./SpaFileEditor";
 import TextEditor from "./TextEditor";
@@ -16,6 +17,8 @@ type Props = {
 
 const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
     const fileType = fileName.split('.').pop()
+    const {projectFiles} = useProject()
+    const outputFileName = fileType === 'spa' ? projectFiles?.find(f => (f.fileName === `${fileName}.out`))?.fileName : undefined
     return (
         <Splitter
             width={width}
@@ -46,6 +49,7 @@ const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setF
                         text={fileContent}
                         onSetText={setFileContent}
                         readOnly={readOnly}
+                        outputFileName={outputFileName}
                     />
                 )
             }

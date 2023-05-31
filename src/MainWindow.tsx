@@ -28,9 +28,9 @@ const MainWindow: FunctionComponent<Props> = () => {
                 <div style={{position: 'absolute', top: applicationBarHeight, width, height: height - applicationBarHeight}}>
                     {
                         route.page === 'home' ? (
-                            <HomePage />
+                            <HomePage width={width} height={height - applicationBarHeight} />
                         ) : route.page === 'about' ? (
-                            <AboutPage />
+                            <AboutPage width={width} height={height - applicationBarHeight} />
                         ) : route.page === 'workspace' ? (
                             <WorkspacePage workspaceId={route.workspaceId} width={width} height={height - applicationBarHeight} />
                         ) : route.page === 'project' ? (

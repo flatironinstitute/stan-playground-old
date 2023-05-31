@@ -12,6 +12,7 @@ type Props = {
     text: string
     onSetText: (text: string) => void
     readOnly: boolean
+    outputFileName?: string
 }
 
 type Spa = {
@@ -39,7 +40,7 @@ const options: {
     {key: 'seed', label: 'seed', type: 'number', required: false}
 ]
 
-const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText, readOnly}) => {
+const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText, readOnly, outputFileName}) => {
     const {openTab} = useProject()
     const [editText, setEditText] = useState<string | undefined>(undefined)
     useEffect(() => {
@@ -84,7 +85,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
     }
     const iconButtonFontSize = 22
     return (
-        <div className="spa-table" style={{position: 'absolute', width, height, overflow: 'auto', background: '#aaa'}}>
+        <div className="spa-table" style={{position: 'absolute', width, height, overflow: 'auto', background: '#eee'}}>
             <div style={{padding: 10}}>
                 <div>
                     {
@@ -130,6 +131,16 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                                 }
                             </td>
                         </tr>
+                        {
+                            !editing && (
+                                <tr>
+                                    <td>Output file</td>
+                                    <td>
+                                        <Hyperlink onClick={() => {outputFileName && openTab(`file:${outputFileName}`)}}>{outputFileName || ''}</Hyperlink>
+                                    </td>
+                                </tr>
+                            )
+                        }
                         {
                             options.map(option => (
                                 <tr key={option.key}>

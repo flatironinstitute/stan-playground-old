@@ -898,7 +898,9 @@ export type AskAboutStanProgramRequest = {
     projectId: string
     stanFileName: string
     prompt: string
+    useCache: boolean
     cacheOnly: boolean
+    force: boolean
 }
 
 export const isAskAboutStanProgramRequest = (x: any): x is AskAboutStanProgramRequest => {
@@ -909,9 +911,12 @@ export const isAskAboutStanProgramRequest = (x: any): x is AskAboutStanProgramRe
         projectId: isString,
         stanFileName: isString,
         prompt: isString,
-        cacheOnly: isBoolean
+        useCache: isBoolean,
+        cacheOnly: isBoolean,
+        force: isBoolean
     })
 }
+
 export type AskAboutStanProgramResponse = {
     type: 'askAboutStanProgram'
     response: string

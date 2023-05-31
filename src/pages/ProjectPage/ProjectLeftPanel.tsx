@@ -105,6 +105,8 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
         openTab(`file:${fileName}`)
     }, [workspaceId, projectId, auth, refreshFiles, openTab])
 
+    const cloneProjectTitle = userId ? 'Clone this project' : 'You must be logged in to clone this project.'
+
     const topHeight = 140
     const bottomHeight = 20
     const padding = 10
@@ -152,7 +154,7 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
             </div>
             <div style={{position: 'absolute', width: W, top: H - bottomHeight + 5, height: bottomHeight}}>
                 <button onClick={openSettingsWindow}>Settings</button>&nbsp;
-                <button onClick={openCloneProjectWindow}>Clone project</button>&nbsp;
+                <button disabled={!userId} onClick={openCloneProjectWindow} title={cloneProjectTitle}>Clone project</button>&nbsp;
             </div>
             <ModalWindow
                 open={settingsWindowVisible}

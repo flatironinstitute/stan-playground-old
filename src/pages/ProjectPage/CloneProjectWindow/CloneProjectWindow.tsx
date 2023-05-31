@@ -1,6 +1,7 @@
-import { FunctionComponent, useCallback, useEffect, useState } from "react"
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react"
 import Hyperlink from "../../../components/Hyperlink"
 import { prompt } from "../../../confirm_prompt_alert"
+import { useGithubAuth } from "../../../GithubAuth/useGithubAuth"
 import { useSPMain } from "../../../SPMainContext"
 import useRoute from "../../../useRoute"
 import { useWorkspace } from "../../WorkspacePage/WorkspacePageContext"
@@ -32,7 +33,11 @@ const CloneProjectWindow: FunctionComponent<Props> = ({onClose}) => {
         onClose()
     }, [cloneProject, selectedWorkspaceId, setRoute, onClose])
     useEffect(() => {
-        if (!canEditWorkspace) {
+        // initialization
+        if (canEditWorkspace) {
+            setCloneIntoThisWorkspace(true)
+        }
+        else {
             setCloneIntoThisWorkspace(false)
         }
     }, [canEditWorkspace])
@@ -68,7 +73,7 @@ const CloneProjectWindow: FunctionComponent<Props> = ({onClose}) => {
                 )
             }
             <div>&nbsp;</div>
-            <button onClick={handleClone}>Create a cloned project</button>
+            <button onClick={handleClone}>Create cloned project</button>
         </div>
     )
 }
@@ -81,18 +86,26 @@ type SelectWorkspaceComponentProps = {
 const SelectWorkspaceComponent: FunctionComponent<SelectWorkspaceComponentProps> = ({selectedWorkspaceId, setSelectedWorkspaceId}) => {
     const {workspaces} = useSPMain()
 
+    const {userId} = useGithubAuth()
+
+    const workspacesFiltered = useMemo(() => (
+        workspaces.filter(workspace => (
+            workspace.ownerId === userId || workspace.users.filter(u => (u.role === 'admin' || u.role === 'editor')).map(u => u.userId).includes(userId || '')
+        ))
+    ), [workspaces, userId])
+
     return (
         <div>
             <select value={selectedWorkspaceId} onChange={e => setSelectedWorkspaceId(e.target.value)}>
                 <option value={undefined}>Select a workspace</option>
                 {
-                    workspaces.map(workspace => (
+                    workspacesFiltered.map(workspace => (
                         <option key={workspace.workspaceId} value={workspace.workspaceId}>{workspace.name}</option>
                     ))
                 }
             </select>
         </div>
     )
-}                   
+}
 
 export default CloneProjectWindow

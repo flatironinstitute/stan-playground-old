@@ -388,7 +388,7 @@ export const fetchScriptJob = async (workspaceId: string, projectId: string, scr
     return resp.scriptJob
 }
 
-export const askAboutStanProgram = async (workspaceId: string, projectId: string, stanFileName: string, prompt: string, cacheOnly: boolean, auth: Auth) => {
+export const askAboutStanProgram = async (workspaceId: string, projectId: string, stanFileName: string, prompt: string, opts: {cacheOnly: boolean, useCache: boolean, force: boolean}, auth: Auth) => {
     const req: AskAboutStanProgramRequest = {
         type: 'askAboutStanProgram',
         timestamp: Date.now() / 1000,
@@ -396,7 +396,9 @@ export const askAboutStanProgram = async (workspaceId: string, projectId: string
         projectId,
         stanFileName,
         prompt,
-        cacheOnly
+        useCache: opts.useCache,
+        cacheOnly: opts.cacheOnly,
+        force: opts.force
     }
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'askAboutStanProgram') {

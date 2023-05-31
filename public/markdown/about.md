@@ -1,28 +1,26 @@
-# Stan Playground
+# Overview of Stan Playground
 
-Stan Playground is a web-based application designed for creating, running, and sharing Stan analyses conveniently through a browser interface. You can create workspaces, initiate projects within those workspaces, and then manage files and jobs within those projects.
+Stan Playground is a browser-based application designed to simplify the creation, execution, and sharing of Stan analyses. It enables users to establish workspaces, create projects within those workspaces, and efficiently manage project files and tasks.
 
-## Project file types
+## Supported File Types
 
-Stan Playground supports various types of files within projects:
+Stan Playground accommodates multiple file types within projects:
 
-* **.stan**: Stan programs
-* **.json**: Datasets used in analyses
-* **.py**: Python scripts used for generating datasets and running post-processing
-* **.spa**: Stan Playground Analysis files. These YAML files consist of a .stan file name, a .json file name, and options for running the Stan analysis.
-* **.spa.out**: These files are generated once a .spa job completes. It contains the output of the Stan sampler for the analysis.
+* **.stan**: Stan programs or models
+* **.json**: Datasets for analyses
+* **.py**: Python scripts for data generation and post-analysis processing
+* **.spa**: Stan Playground Analysis files. These YAML files reference a .stan file and a .json file, along with settings for performing the Stan analysis.
+* **.spa.out**: Generated once an .spa task concludes, these files contain the output of the executed Stan analysis.
+* **.mf**: Markdown files for descriptions.
 
-## Workspace and project management
+## Workspace and Project Administration
 
-Stan Playground supports the creation of workspaces, projects within those workspaces, and files and jobs within those projects. Each workspace is owned by a user authenticated using GitHub OAuth. Workspace owners and admin users can control whether the workspace is publicly readable, whether it is listed or unlisted, and which users have permission to read and write to the workspace. Workspace admins can also associate compute resources with the workspace, which are used to run Python scripts and Stan analyses.
+Stan Playground allows the establishment of workspaces, with each workspace owned by a GitHub OAuth-authenticated user. Within these workspaces, users can initiate projects, and handle files and tasks related to them. Workspace owners and admin users can control access permissions, such as public visibility and read/write permissions for different users. Additionally, workspace admins can assign compute resources to the workspace to run Python scripts and Stan analyses.
 
-## Running Stan analyses
+## Execution of Stan Analyses
 
-A Stan analysis comprises a .stan file, a .json dataset file, and options for running the Stan sampler. These are specified using a .spa file within a workspace. Once a .spa file is created, it can be run using the "Run" button. This will create a job that will run the analysis on the compute resource associated with the workspace. Once the job completes, the results are available in the .spa.out file. Output can then be visualized using MCMC Monitor.
+A Stan analysis involves a .stan file, a .json dataset file, and certain execution parameters for the Stan sampler, all specified using a .spa file. With the "Run" button, a created .spa file launches a job to perform the analysis using the workspace's allocated compute resources. Upon completion, results are stored in a corresponding .spa.out file and can be visualized using MCMC Monitor.
 
-## Compute resources
+## Compute Resources
 
-Each workspace has an associated compute resource which is used to run Python scripts and Stan analyses. By default, our cloud resource is used, although this is limited in terms of CPU and memory, and can only run a limited number of jobs concurrently, which is shared across all users. You can also associate your own compute resource with your workspace. This can be backed by a local or a remote machine Linux machine.
-
-
-
+Every workspace comes equipped with a dedicated compute resource for executing Python scripts and Stan analyses. The default setting uses a cloud resource with specific limitations on CPU, memory, and concurrent jobs, shared among all users. Alternatively, users can link their own compute resources, local or remote Linux machines, to their workspace.
