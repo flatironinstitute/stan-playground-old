@@ -6,7 +6,7 @@ type Props = {
 
 const ComputeResourceIdComponent: FunctionComponent<Props> = ({ computeResourceId }) => {
     const x = abbreviate(computeResourceId || '', 10)
-    return <span style={{color: '#345', fontStyle: 'italic'}}>{x}</span>
+    return <span style={{color: '#345', fontStyle: 'italic'}}>{x || 'DEFAULT'}</span>
 }
 
 function abbreviate(s: string, maxLength: number) {

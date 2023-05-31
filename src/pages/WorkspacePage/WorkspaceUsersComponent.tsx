@@ -114,7 +114,7 @@ const WorkspaceUsersComponent: FunctionComponent<Props> = () => {
                         <td><PubliclyReadableComponent publiclyReadable={workspace?.publiclyReadable} setValue={setPubliclyReadableHandler} editable={workspaceRole === 'admin'} /></td>
                     </tr>
                     <tr>
-                        <td>Logged-in users:</td>
+                        <td>Listed:</td>
                         <td><ListedComponent listed={workspace?.listed} setValue={setListedHandler} editable={workspaceRole === 'admin'} /></td>
                     </tr>
                 </tbody>
