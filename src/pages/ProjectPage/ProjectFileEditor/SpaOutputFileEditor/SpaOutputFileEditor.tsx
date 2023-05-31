@@ -36,7 +36,7 @@ const SpaOutputFileEditor: FunctionComponent<Props> = ({fileName, fileContent, w
     }, [fileContent, fileName])
 
     const {projectId} = useProject()
-    const mcmcMonitorUrl = `https://flatironinstitute.github.io/mcmc-monitor/dev?s=spa#/spa/${projectId}/${fileName}`
+    const mcmcMonitorUrl = `https://flatironinstitute.github.io/mcmc-monitor?s=spa#/spa/${projectId}/${fileName}`
     // const mcmcMonitorUrl = `http://localhost:5173/mcmc-monitor?s=spa#/spa/${projectId}/${fileName}`
 
     return (
