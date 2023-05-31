@@ -23,10 +23,10 @@ class ScriptJobExecutor {
             privateKey: this.#privateKey,
             onScriptJobCompletedOrFailed: (job) => {
                 if (job.status === 'completed') {
-                    console.info(`Script job completed: ${job.scriptJobId}`)
+                    console.info(`Script job completed`)
                 }
                 else if (job.status === 'failed') {
-                    console.info(`Script job failed: ${job.scriptJobId}`)
+                    console.info(`Script job failed`)
                 }
                 else {
                     console.warn(`Unexpected script job status: ${job.status}`)

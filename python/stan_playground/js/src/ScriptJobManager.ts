@@ -24,7 +24,7 @@ class ScriptJobManager {
     #runningJobs: RunningJob[] = []
     #maxNumPythonJobs = 5
     #maxNumSpaJobs = 2
-    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: (scriptJob: SPScriptJob) => void}) {
+    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: (job: RunningJob) => void}) {
 
     }
     async initiateJob(job: SPScriptJob): Promise<boolean> {
@@ -70,19 +70,21 @@ class ScriptJobManager {
         job.onCompletedOrFailed(() => {
             // remove from list of running jobs
             this.#runningJobs = this.#runningJobs.filter(j => (j.scriptJob.scriptJobId !== job.scriptJob.scriptJobId))
-            this.config.onScriptJobCompletedOrFailed(job.scriptJob)
+            this.config.onScriptJobCompletedOrFailed(job)
         })
     }
 }
 
-class RunningJob {
+export class RunningJob {
     #onCompletedOrFailedCallbacks: (() => void)[] = []
     #childProcess: ChildProcessWithoutNullStreams | null = null
+    #status: 'pending' | 'running' | 'completed' | 'failed' = 'pending'
     constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceId: string, privateKey: string}) {
     }
     async initiate(): Promise<void> {
         console.info(`Initiating script job: ${this.scriptJob.scriptJobId} - ${this.scriptJob.scriptFileName}`)
         await this._setScriptJobProperty('status', 'running')
+        this.#status = 'running'
         this._run().then(() => { // don't await this!
             //
         }).catch((err) => {
@@ -103,6 +105,9 @@ class RunningJob {
                 console.warn('Unable to kill child process in RunningJob:stop()')
             }
         }
+    }
+    public get status() {
+        return this.#status
     }
     private async _setScriptJobProperty(property: string, value: any) {
         const req: SetScriptJobPropertyRequest = {
@@ -306,6 +311,7 @@ class RunningJob {
             await updateConsoleOutput()
             await this._setScriptJobProperty('error', err.message)
             await this._setScriptJobProperty('status', 'failed')
+            this.#status = 'failed'
             this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
             return
         }
@@ -331,6 +337,8 @@ class RunningJob {
                 console.info('Too many output files.')
                 await this._setScriptJobProperty('error', 'Too many output files.')
                 await this._setScriptJobProperty('status', 'failed')
+                this.#status = 'failed'
+                this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
                 return
             }
             for (const outputFileName of outputFileNames) {
@@ -341,6 +349,7 @@ class RunningJob {
         }
 
         await this._setScriptJobProperty('status', 'completed')
+        this.#status = 'completed'
 
         this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
     }
