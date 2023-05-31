@@ -24,7 +24,7 @@ class ScriptJobManager {
     #runningJobs: RunningJob[] = []
     #maxNumPythonJobs = 5
     #maxNumSpaJobs = 2
-    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: () => void}) {
+    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: (scriptJob: SPScriptJob) => void}) {
 
     }
     async initiateJob(job: SPScriptJob): Promise<boolean> {
@@ -70,7 +70,7 @@ class ScriptJobManager {
         job.onCompletedOrFailed(() => {
             // remove from list of running jobs
             this.#runningJobs = this.#runningJobs.filter(j => (j.scriptJob.scriptJobId !== job.scriptJob.scriptJobId))
-            this.config.onScriptJobCompletedOrFailed()
+            this.config.onScriptJobCompletedOrFailed(job.scriptJob)
         })
     }
 }

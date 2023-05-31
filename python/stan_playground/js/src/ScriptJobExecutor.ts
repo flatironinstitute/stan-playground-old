@@ -21,7 +21,16 @@ class ScriptJobExecutor {
             dir: a.dir,
             computeResourceId: this.#computeResourceId,
             privateKey: this.#privateKey,
-            onScriptJobCompletedOrFailed: () => {
+            onScriptJobCompletedOrFailed: (job) => {
+                if (job.status === 'completed') {
+                    console.info(`Script job completed: ${job.scriptJobId}`)
+                }
+                else if (job.status === 'failed') {
+                    console.info(`Script job failed: ${job.scriptJobId}`)
+                }
+                else {
+                    console.warn(`Unexpected script job status: ${job.status}`)
+                }
                 this._processPendingScriptJobs()
             }
         })
@@ -41,6 +50,7 @@ class ScriptJobExecutor {
         }
 
         const onPubsubMessage = (message: any) => {
+            console.info(`Received pubsub message: ${message.type}`)
             if (message.type === 'newPendingScriptJob') {
                 this._processPendingScriptJobs()
             }
@@ -65,9 +75,13 @@ class ScriptJobExecutor {
             }
             const {scriptJobs} = resp
             if (scriptJobs.length > 0) {
+                console.info(`Found ${scriptJobs.length} pending script jobs.`)
                 const scriptJob = scriptJobs[0]
                 try {
-                    await this.#scriptJobManager.initiateJob(scriptJob)
+                    const initiated = await this.#scriptJobManager.initiateJob(scriptJob)
+                    if (initiated) {
+                        console.info(`Initiated script job: ${scriptJob.scriptJobId}`)
+                    }
                 }
                 catch (err) {
                     console.warn(err)
