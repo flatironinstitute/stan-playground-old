@@ -138,7 +138,7 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
             <div style={{paddingTop: 10}}>
                 <button onClick={openSettingsWindow} title="Project settings"><SmallIconButton icon={<Settings />} /> Settings</button>
                 &nbsp;
-                <button onClick={openCloneProjectWindow} title={cloneProjectTitle}><SmallIconButton disabled={!userId} icon={<ContentCopy />} /> Clone project</button>
+                <button disabled={!userId} onClick={openCloneProjectWindow} title={cloneProjectTitle}><SmallIconButton disabled={!userId} icon={<ContentCopy />} /> Clone project</button>
             </div>
 
             <hr />
