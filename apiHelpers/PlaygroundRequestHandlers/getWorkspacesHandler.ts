@@ -47,6 +47,10 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedC
             workspaces2.push(workspace)
         }
     }
+    // sort workspaces by name
+    workspaces2.sort((w1, w2) => (
+        w1.name.localeCompare(w2.name)
+    ))
     return {
         type: 'getWorkspaces',
         workspaces: workspaces2

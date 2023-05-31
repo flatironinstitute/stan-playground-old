@@ -1,5 +1,5 @@
 import { GetProjectsRequest, GetProjectsResponse } from "../../src/types/PlaygroundRequest";
-import { isSPProject } from "../../src/types/stan-playground-types";
+import { isSPProject, SPProject } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
 import getWorkspace from "../getWorkspace";
 import { userCanReadWorkspace } from "../permissions";
@@ -23,6 +23,10 @@ const getProjectsHandler = async (request: GetProjectsRequest, o: {verifiedClien
             throw new Error('Invalid project in database')
         }
     }
+    // sort projects by name
+    (projects as SPProject[]).sort((p1, p2) => (
+        p1.name.localeCompare(p2.name)
+    ))
     return {
         type: 'getProjects',
         projects

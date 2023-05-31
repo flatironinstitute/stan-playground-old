@@ -54,7 +54,8 @@ export const fetchProjects = async (workspaceId: string, auth: Auth): Promise<SP
     if (resp.type !== 'getProjects') {
         throw Error(`Unexpected response type ${resp.type}. Expected getProjects.`)
     }
-    return resp.projects}
+    return resp.projects
+}
 
 export const createProject = async (workspaceId: string, projectName: string, auth: Auth): Promise<string> => {
     const req: CreateProjectRequest = {
