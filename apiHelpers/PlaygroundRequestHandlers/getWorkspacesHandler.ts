@@ -1,7 +1,6 @@
 import { GetWorkspacesRequest, GetWorkspacesResponse } from "../../src/types/PlaygroundRequest";
 import { isSPWorkspace, SPWorkspace } from "../../src/types/stan-playground-types";
 import { getMongoClient } from "../getMongoClient";
-import { userCanReadWorkspace } from "../permissions";
 import removeIdField from "../removeIdField";
 
 const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedClientId?: string, verifiedUserId?: string}): Promise<GetWorkspacesResponse> => {
@@ -34,13 +33,16 @@ const getWorkspacesHandler = async (request: GetWorkspacesRequest, o: {verifiedC
             throw new Error('Invalid workspace in database (1)')
         }
         let okay = false
+        if (userId?.startsWith('admin|')) {
+            okay = true
+        }
         if ((userId) && (workspace.ownerId === userId)) {
             okay = true
         }
-        if (userId && (workspace.users.map(u => u.userId).includes(userId))) {
+        else if (userId && (workspace.users.map(u => u.userId).includes(userId))) {
             okay = true
         }
-        if (workspace.listed) {
+        else if (workspace.listed) {
             okay = true
         }
         if (okay) {

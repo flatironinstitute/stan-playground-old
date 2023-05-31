@@ -92,7 +92,7 @@ const SelectWorkspaceComponent: FunctionComponent<SelectWorkspaceComponentProps>
 
     const workspacesFiltered = useMemo(() => (
         workspaces ? workspaces.filter(workspace => (
-            workspace.ownerId === userId || workspace.users.filter(u => (u.role === 'admin' || u.role === 'editor')).map(u => u.userId).includes(userId || '')
+            userId?.startsWith('admin|') || workspace.ownerId === userId || workspace.users.filter(u => (u.role === 'admin' || u.role === 'editor')).map(u => u.userId).includes(userId || '')
         )) : undefined
     ), [workspaces, userId])
 

@@ -23,6 +23,7 @@ const WorkspacesTable: FunctionComponent<Props> = ({filter}) => {
         } else {
             return workspaces.filter(workspace => {
                 if (!userId) return false
+                if (userId.startsWith('admin|')) return true
                 if (workspace.ownerId === userId) return true
                 if (workspace.users.map(user => user.userId).includes(userId || '')) return true
                 return false

@@ -84,6 +84,7 @@ export const SetupWorkspacePage: FunctionComponent<PropsWithChildren<Props>> = (
     const workspaceRole: 'admin' | 'viewer' | 'none' | 'editor' | undefined = useMemo(() => {
         if (!workspace) return undefined
         if (userId) {
+            if (userId.startsWith('admin|')) return 'admin'
             if (workspace.ownerId === userId) return 'admin'
             const user = workspace.users.find(user => user.userId === userId)
             if (user) {

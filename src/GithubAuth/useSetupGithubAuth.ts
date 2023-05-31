@@ -18,6 +18,9 @@ export const initialGithubAuth = {
 	accessToken: initialLoginStatus.accessToken
 }
 
+const queryParams = parseQuery(window.location.href)
+const adminMode = queryParams['admin'] === '1'
+
 const useSetupGithubAuth = (): GithubAuthData => {
     const [loginStatus, setLoginStatus] = useState<GithubLoginStatus>(initialLoginStatus)
     const [userName, setUserName] = useState(initialUserName)
@@ -97,12 +100,24 @@ const useSetupGithubAuth = (): GithubAuthData => {
 
     return useMemo(() => ({
         signedIn: loginStatus.status === 'logged-in',
-        userId: userName,
+        userId: adminMode ? `admin|${userName}` : userName,
         accessToken: loginStatus.accessToken,
         isPersonalAccessToken: loginStatus.isPersonalAccessToken,
         loginStatus: loginStatus.status,
         clearAccessToken
     }), [clearAccessToken, loginStatus.accessToken, loginStatus.isPersonalAccessToken, loginStatus.status, userName])
+}
+
+function parseQuery(queryString: string) {
+    const ind = queryString.indexOf('?')
+    if (ind <0) return {}
+    const query: {[k: string]: string} = {};
+    const pairs = queryString.slice(ind + 1).split('&');
+    for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i].split('=');
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+    }
+    return query;
 }
 
 export default useSetupGithubAuth

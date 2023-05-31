@@ -36,6 +36,8 @@ import getPubsubSubscriptionHandler from '../apiHelpers/PlaygroundRequestHandler
 import verifySignature from '../apiHelpers/verifySignature'
 import { isAskAboutStanProgramRequest, isCloneProjectRequest, isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourceRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetPubsubSubscriptionRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
+const ADMIN_USER_IDS = JSON.parse(process.env.ADMIN_USER_IDS || '[]') as string[]
+
 module.exports = (req: VercelRequest, res: VercelResponse) => {
     const {body: request} = req
 
@@ -89,6 +91,19 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         if ((userId) && (userId.startsWith('github|')) && (githubAccessToken)) {
             if (!(await githubVerifyAccessToken(userId.slice('github|'.length), githubAccessToken))) {
                 throw Error('Unable to verify github user ID')
+            }
+            verifiedUserId = userId
+        }
+        else if ((userId) && (userId.startsWith('admin|'))) {
+            const x = userId.slice('admin|'.length)
+            if (!ADMIN_USER_IDS.includes(x)) {
+                throw Error('Invalid admin user ID')
+            }
+            if (!x.startsWith('github|')) {
+                throw Error('Invalid admin user ID (does not start with github|)')
+            }
+            if (!(await githubVerifyAccessToken(x.slice('github|'.length), githubAccessToken))) {
+                throw Error('Unable to verify github user ID (for admin)')
             }
             verifiedUserId = userId
         }
