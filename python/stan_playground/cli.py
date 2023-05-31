@@ -1,6 +1,6 @@
 import click
 import stan_playground
-from .start_compute_resource import start as start_compute_resource_function
+from .start_compute_resource import start_compute_resource as start_compute_resource_function
 
 
 @click.group(help="stan-playground command line interface")
@@ -20,6 +20,11 @@ def start_compute_resource(dir: str):
 def initialize_singularity_container():
     stan_playground.initialize_singularity_container()
 
+@click.command(help='Initialize the docker container')
+def initialize_docker_container():
+    stan_playground.initialize_docker_container()
+
 main.add_command(register_compute_resource)
 main.add_command(start_compute_resource)
 main.add_command(initialize_singularity_container)
+main.add_command(initialize_docker_container)

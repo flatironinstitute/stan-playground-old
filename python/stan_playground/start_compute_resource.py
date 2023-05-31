@@ -50,7 +50,7 @@ class Daemon:
             self.process.wait()
 
 
-def start(dir: str):
+def start_compute_resource(dir: str):
     daemon = Daemon(dir=dir)
     daemon.start()
 

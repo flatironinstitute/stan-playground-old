@@ -15,7 +15,8 @@ def register_compute_resource(*, dir: str):
         public_key_hex, private_key_hex = generate_keypair()
         x = {
             'computeResourceId': public_key_hex,
-            'privateKey': private_key_hex
+            'privateKey': private_key_hex,
+            'containerMethod': 'docker'
         }
         with open(config_fname, 'w') as f:
             json.dump(x, f, indent=4)

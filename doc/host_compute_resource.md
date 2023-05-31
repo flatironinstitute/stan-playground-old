@@ -4,10 +4,9 @@ Every workspace comes equipped with a dedicated compute resource for executing P
 
 Prerequisites
 
-* Linux
 * Python >= 3.9
 * NodeJS >= v18
-* Singularity >= 3.11
+* Docker or (Singularity >= 3.11)
 
 Clone this repo, then
 
@@ -23,6 +22,18 @@ export COMPUTE_RESOURCE_DIR=/some/path
 cd $COMPUTE_RESOURCE_DIR
 stan-playground register-compute-resource
 # Open the provided link in a browser and log in using GitHub
+```
+
+Edit `$COMPUTE_RESOURCE_DIR/.stan-playground-compute-resource.json` and set `containerMethod` to `docker` or `singularity`. By default it is set to `docker`.
+
+```bash
+# If using docker, initialize the docker container
+stan-playground initialize-docker-container
+
+# --- or ---
+
+# If using singularity, initialize the singularity container
+stan-playground initialize-singularity-container
 ```
 
 ```bash

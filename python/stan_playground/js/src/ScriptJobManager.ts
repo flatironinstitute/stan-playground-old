@@ -24,7 +24,7 @@ class ScriptJobManager {
     #runningJobs: RunningJob[] = []
     #maxNumPythonJobs = 5
     #maxNumSpaJobs = 2
-    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, onScriptJobCompletedOrFailed: (job: RunningJob) => void}) {
+    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, containerMethod: 'none' | 'singularity' | 'docker', onScriptJobCompletedOrFailed: (job: RunningJob) => void}) {
 
     }
     async initiateJob(job: SPScriptJob): Promise<boolean> {
@@ -79,7 +79,7 @@ export class RunningJob {
     #onCompletedOrFailedCallbacks: (() => void)[] = []
     #childProcess: ChildProcessWithoutNullStreams | null = null
     #status: 'pending' | 'running' | 'completed' | 'failed' = 'pending'
-    constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceId: string, privateKey: string}) {
+    constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceId: string, privateKey: string, containerMethod: 'none' | 'docker' | 'singularity'}) {
     }
     async initiate(): Promise<void> {
         console.info(`Initiating script job: ${this.scriptJob.scriptJobId} - ${this.scriptJob.scriptFileName}`)
@@ -233,29 +233,92 @@ export class RunningJob {
                 // const cmd = 'python'
                 // const args = [scriptFileName]
 
-                const cmd = 'singularity'
-                let args = [
-                    'exec',
-                    '-C', // do not mount home directory, tmp directory, etc
-                    '--pwd', '/working',
-                    '--bind', `.:/working`
-                ]
-                let timeoutSec = 10
+                let cmd: string
+                let args: string[]
+
+                const containerMethod = this.config.containerMethod
+
+                const absScriptJobDir = path.resolve(scriptJobDir)
+
+                if (containerMethod === 'singularity') {
+                    cmd = 'singularity'
+                    args = [
+                        'exec',
+                        '-C', // do not mount home directory, tmp directory, etc
+                        '--pwd', '/working',
+                        '--bind', `${absScriptJobDir}:/working`
+                    ]
+                    if (scriptFileName.endsWith('.py')) {
+                        args = [...args, ...[
+                            // '--cpus', '1', // limit CPU - having trouble with this - cgroups issue
+                            '--memory', '1G', // limit memory
+                            'docker://jstoropoli/cmdstanpy',
+                            'python3', scriptFileName
+                        ]]
+                    }
+                    else if (scriptFileName.endsWith('.spa')) {
+                        args = [...args, ...[
+                            // '--cpus', '4', // limit CPU - having trouble with this - cgroups issue
+                            '--memory', '4G', // limit memory
+                            'docker://jstoropoli/cmdstanpy',
+                            'python3', 'run.py'
+                        ]]
+                    }
+                    else {
+                        throw Error(`Unsupported script file name: ${scriptFileName}`)
+                    }
+                }
+                else if (containerMethod === 'docker') {
+                    cmd = 'docker'
+                    args = [
+                        'run',
+                        '--rm', // remove container after running
+                        '-v', `${absScriptJobDir}:/working`,
+                        '-w', '/working'
+                    ]
+                    if (scriptFileName.endsWith('.py')) {
+                        args = [...args, ...[
+                            '--cpus', '1', // limit CPU
+                            '--memory', '1g', // limit memory
+                            'jstoropoli/cmdstanpy',
+                            '-c', `python3 ${scriptFileName}` // tricky - need to put the last two args together so that it ends up in a quoted argument
+                        ]]
+                    }
+                    else if (scriptFileName.endsWith('.spa')) {
+                        args = [...args, ...[
+                            '--cpus', '4', // limit CPU
+                            '--memory', '4g', // limit memory
+                            'jstoropoli/cmdstanpy',
+                            '-c', 'python3 run.py' // tricky - need to put the last two args together so that it ends up in a quoted argument
+                        ]]
+                    }
+                    else {
+                        throw Error(`Unsupported script file name: ${scriptFileName}`)
+                    }
+                }
+                else if (containerMethod === 'none') {
+                    cmd = 'python3'
+                    if (scriptFileName.endsWith('.py')) {
+                        args = [scriptFileName]
+                    }
+                    else if (scriptFileName.endsWith('.spa')) {
+                        args = ['run.py']
+                    }
+                    else {
+                        throw Error(`Unsupported script file name: ${scriptFileName}`)
+                    }
+                }
+                else {
+                    throw Error(`Unsupported container: ${containerMethod}`)
+                }
+
+                console.info('EXECUTING:', `${cmd} ${args.join(' ')}`)
+
+                let timeoutSec: number
                 if (scriptFileName.endsWith('.py')) {
-                    args = [...args, ...[
-                        // '--cpus', '1', // limit CPU - having trouble with this - cgroups issue
-                        '--memory', '1G', // limit memory
-                        'docker://jstoropoli/cmdstanpy',
-                        'python3', scriptFileName
-                    ]]
+                    timeoutSec = 10
                 }
                 else if (scriptFileName.endsWith('.spa')) {
-                    args = [...args, ...[
-                        // '--cpus', '2', // limit CPU - having trouble with this - cgroups issue
-                        '--memory', '4G', // limit memory
-                        'docker://jstoropoli/cmdstanpy',
-                        'python3', 'run.py'
-                    ]]
                     timeoutSec = 60 * 10
                 }
                 else {

@@ -11,16 +11,28 @@ class ScriptJobExecutor {
     #privateKey: string
     #scriptJobManager: ScriptJobManager
     #pubsubClient: PubsubClient | undefined
+    #containerMethod: 'none' | 'docker' | 'singularity'
     constructor(private a: { dir: string }) {
         // read computeResourceId from .stan-playground-compute-resource.json in dir directory
         const configJson = fs.readFileSync(path.join(a.dir, '.stan-playground-compute-resource.json'), 'utf8')
         const config = JSON.parse(configJson)
         this.#computeResourceId = config.computeResourceId
         this.#privateKey = config.privateKey
+        this.#containerMethod = config.containerMethod
+        if (!['none', 'docker', 'singularity'].includes(this.#containerMethod)) {
+            throw Error(`Invalid containerMethod: ${this.#containerMethod}`)
+        }
+        if (this.#containerMethod === 'none') {
+            console.info('Container method is set to none. Script jobs will be executed on the host.')
+            if (process.env.STAN_PLAYGROUND_DANGEROUS_CONTAINER_METHOD_NONE !== 'true') {
+                throw Error('Container method is set to none. Set environment variable STAN_PLAYGROUND_DANGEROUS_CONTAINER_METHOD_NONE to true to allow this.')
+            }
+        }
         this.#scriptJobManager = new ScriptJobManager({
             dir: a.dir,
             computeResourceId: this.#computeResourceId,
             privateKey: this.#privateKey,
+            containerMethod: this.#containerMethod,
             onScriptJobCompletedOrFailed: (job) => {
                 if (job.status === 'completed') {
                     console.info(`Script job completed`)
