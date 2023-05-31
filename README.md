@@ -7,7 +7,7 @@ Stan Playground is a browser-based application designed to simplify the creation
 * [Live site](https://stan-playground.vercel.app)
 * [About](https://stan-playground.vercel.app)
 * [Host a compute resource](./doc/host_compute_resource.md)
-* [Beta testing]()
+* [Beta testing](./doc/beta_testing.md)
 
 ## LICENSE
 
