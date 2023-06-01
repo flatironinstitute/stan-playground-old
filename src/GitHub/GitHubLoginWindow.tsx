@@ -87,12 +87,18 @@ const NotLoggedInComponent: FunctionComponent<Props> = ({onClose}) => {
             <hr />
             <div onClick={() => setMode('github')} style={{cursor: 'pointer'}}>
                 <input type="radio" checked={mode === 'github'} onChange={() => {}} />&nbsp;
-                <a
+                {/* <a
                     href={
                         `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}`
                     }
                     target="_blank"
                     rel="noreferrer"
+                >{ghIcon} Log in using GitHub</a> */}
+                <a
+                    onClick={() => {
+                        window.open(`https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}`, 'Login with GitHub', 'width=600,height=600')
+                    }}
+                    style={{cursor: 'pointer', textDecoration: 'underline'}}
                 >{ghIcon} Log in using GitHub</a>
             </div>
             <div>&nbsp;</div>

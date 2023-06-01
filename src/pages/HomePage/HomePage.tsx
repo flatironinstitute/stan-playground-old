@@ -37,7 +37,7 @@ const HomePage: FunctionComponent<Props> = ({width, height}) => {
                                 <p><Hyperlink onClick={() => setRoute({page: 'compute-resources'})}>Manage your compute resources</Hyperlink></p>
                             </>
                         ) : (
-                            <p>Log in to view your workspaces.</p>
+                            <p>To view your workspaces, log in using the button at the top of this window.</p>
                         )
                     }
                 </div>

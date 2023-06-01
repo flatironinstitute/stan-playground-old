@@ -46,7 +46,7 @@ const GitHubAuthPage: FunctionComponent<Props> = () => {
 				status === 'checking' ? (
 					<div>Checking authorization</div>
 				) : status === 'okay' ? (
-					<div>Logged in. You may now close this tab.</div>
+					<div>Logged in. You may now close this window.</div>
 				) : status === 'error' ? (
 					<div style={{color: 'red'}}>Error: {error}</div>
 				) : (

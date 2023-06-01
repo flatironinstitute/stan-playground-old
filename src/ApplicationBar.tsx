@@ -1,8 +1,8 @@
+import { Login, Logout } from "@mui/icons-material";
 import { AppBar, Toolbar } from "@mui/material";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import ModalWindow from "./components/ModalWindow/ModalWindow";
 import GitHubLoginWindow from "./GitHub/GitHubLoginWindow";
-import GitHubAccessControl from "./GitHubAccessControl/GitHubAccessControl";
 import { useGithubAuth } from "./GithubAuth/useGithubAuth";
 import UserIdComponent from "./UserIdComponent";
 import useRoute from "./useRoute";
@@ -35,9 +35,20 @@ const ApplicationBar: FunctionComponent<Props> = () => {
                             <span style={{fontFamily: 'courier', color: 'lightgray', cursor: 'pointer'}} title={`Signed in as ${userId}`} onClick={openGitHubAccessWindow}><UserIdComponent userId={userId} />&nbsp;&nbsp;</span>
                         )
                     }
-                    <span style={{paddingBottom: 0, color: 'white'}} title={signedIn ? "Manage log in" : "Log in"}>
-                        <GitHubAccessControl onOpen={openGitHubAccessWindow} />
+                    <span style={{paddingBottom: 0, cursor: 'pointer'}} onClick={openGitHubAccessWindow} title={signedIn ? "Manage log in" : "Log in"}>
+                        {
+                            signedIn ? (
+                                <Logout />
+                            ) : (
+                                <Login />
+                            )
+                        }
                         &nbsp;
+                        {
+                            !signedIn && (
+                                <span style={{position: 'relative', top: -5}}>Log in</span>
+                            )
+                        }
                     </span>
                 </Toolbar>
             </AppBar>

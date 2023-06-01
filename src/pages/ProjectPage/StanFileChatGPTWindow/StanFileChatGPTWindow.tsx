@@ -77,7 +77,7 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
                     {
                         !userId && (
                             <div style={{padding: 5}}>
-                                <div style={{fontWeight: 'bold', color: 'gray'}}>You must log in to use ChatGPT</div>
+                                <div style={{fontWeight: 'bold', color: 'gray'}}>You must be logged in to use ChatGPT</div>
                             </div>
                         )
                     }
