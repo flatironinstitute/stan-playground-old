@@ -45,6 +45,22 @@ class ScriptJobManager {
     stop() {
         this.#runningJobs.forEach(j => j.stop())
     }
+    async cleanupOldJobs() {
+        // list all folders in scriptJobs directory
+        const folders = await fs.promises.readdir(path.join(this.config.dir, 'scriptJobs'))
+        for (const folder of folders) {
+            const folderPath = path.join(this.config.dir, 'scriptJobs', folder)
+            const stat = await fs.promises.stat(folderPath)
+            if (stat.isDirectory()) {
+                // check how old the folder is
+                const elapsedSec = (Date.now() - stat.mtimeMs) / 1000
+                if (elapsedSec > 60 * 60 * 24) {
+                    console.info(`Removing old script job folder: ${folderPath}`)
+                    await fs.promises.rmdir(folderPath, {recursive: true})
+                }
+            }
+        }
+    }
     private async _initiatePythonJob(job: SPScriptJob): Promise<boolean> {
         const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.py'))
         if (x.length >= this.#maxNumPythonJobs) {
@@ -212,6 +228,19 @@ export class RunningJob {
             fs.writeFileSync(path.join(scriptJobDir, dataFileName), dataFileContent)
             const runPyContent = createRunPyContent(spaFileName)
             fs.writeFileSync(path.join(scriptJobDir, 'run.py'), runPyContent)
+            // make sure all files are readable by everyone so that they can be deleted even if owned by docker user
+            const runShContent = `
+python3 run.py
+chmod -R 777 *
+`
+            fs.writeFileSync(path.join(scriptJobDir, 'run.sh'), runShContent)
+        }
+        else if (scriptFileName.endsWith('.py')) {
+            const runShContent = `
+python3 ${scriptFileName}
+chmod -R 777 *
+`
+            fs.writeFileSync(path.join(scriptJobDir, 'run.sh'), runShContent)
         }
 
         const uploadSpaOutput = async () => {
@@ -253,7 +282,7 @@ export class RunningJob {
                             // '--cpus', '1', // limit CPU - having trouble with this - cgroups issue
                             '--memory', '1G', // limit memory
                             'docker://jstoropoli/cmdstanpy',
-                            'python3', scriptFileName
+                            'bash', 'run.sh'
                         ]]
                     }
                     else if (scriptFileName.endsWith('.spa')) {
@@ -261,7 +290,7 @@ export class RunningJob {
                             // '--cpus', '4', // limit CPU - having trouble with this - cgroups issue
                             '--memory', '4G', // limit memory
                             'docker://jstoropoli/cmdstanpy',
-                            'python3', 'run.py'
+                            'bash', 'run.sh'
                         ]]
                     }
                     else {
@@ -281,7 +310,7 @@ export class RunningJob {
                             '--cpus', '1', // limit CPU
                             '--memory', '1g', // limit memory
                             'jstoropoli/cmdstanpy',
-                            '-c', `python3 ${scriptFileName}` // tricky - need to put the last two args together so that it ends up in a quoted argument
+                            '-c', `bash run.sh` // tricky - need to put the last two args together so that it ends up in a quoted argument
                         ]]
                     }
                     else if (scriptFileName.endsWith('.spa')) {
@@ -289,7 +318,7 @@ export class RunningJob {
                             '--cpus', '4', // limit CPU
                             '--memory', '4g', // limit memory
                             'jstoropoli/cmdstanpy',
-                            '-c', 'python3 run.py' // tricky - need to put the last two args together so that it ends up in a quoted argument
+                            '-c', 'bash run.sh' // tricky - need to put the last two args together so that it ends up in a quoted argument
                         ]]
                     }
                     else {
@@ -297,16 +326,8 @@ export class RunningJob {
                     }
                 }
                 else if (containerMethod === 'none') {
-                    cmd = 'python3'
-                    if (scriptFileName.endsWith('.py')) {
-                        args = [scriptFileName]
-                    }
-                    else if (scriptFileName.endsWith('.spa')) {
-                        args = ['run.py']
-                    }
-                    else {
-                        throw Error(`Unsupported script file name: ${scriptFileName}`)
-                    }
+                    cmd = 'bash'
+                    args = ['run.sh']
                 }
                 else {
                     throw Error(`Unsupported container: ${containerMethod}`)

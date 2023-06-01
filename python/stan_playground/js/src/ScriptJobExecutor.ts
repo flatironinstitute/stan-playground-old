@@ -69,6 +69,16 @@ class ScriptJobExecutor {
         }
         this.#pubsubClient = new PubsubClient(respPubsub.subscriptionInfo, onPubsubMessage)
         this._processPendingScriptJobs()
+
+        // periodically clean up old script jobs
+        const doCleanup = async () => {
+            if (this.#stopped) {
+                return
+            }
+            await this.#scriptJobManager.cleanupOldJobs()
+            setTimeout(doCleanup, 1000 * 60 * 10)
+        }
+        doCleanup()
     }
     private async _processPendingScriptJobs() {
         if (this.#stopped) {
