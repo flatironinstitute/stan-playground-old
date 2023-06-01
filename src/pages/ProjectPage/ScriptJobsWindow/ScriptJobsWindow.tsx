@@ -45,7 +45,7 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
         deleteCompletedScriptJobs({scriptFileName: fileName})
     }, [deleteCompletedScriptJobs, fileName])
 
-    const iconFontSize = 28
+    const iconFontSize = 22
 
     return (
         <>
@@ -55,18 +55,23 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
                     onClick={handleCreateJob}
                     disabled={!canCreateJob}
                     title={createJobTitle}
+                    label="Run"
                     fontSize={iconFontSize}
                 />
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 <SmallIconButton
                     icon={<Refresh />}
                     onClick={refreshScriptJobs}
                     title="Refresh jobs"
+                    label="Refresh"
                     fontSize={iconFontSize}
                 />
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 <SmallIconButton
                     icon={<Delete />}
                     onClick={handleDeleteCompletedJobs}
-                    title="Delete completed jobs"
+                    title="Delete completed or failed jobs"
+                    label="Delete completed"
                     fontSize={iconFontSize}
                 />
             </div>

@@ -144,7 +144,8 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
             <hr />
 
             <div style={{paddingBottom: 5}}>
-                <SmallIconButton onClick={handleCreateFile} title="Create a new file" icon={<NoteAdd />} fontSize={24} />
+                <SmallIconButton onClick={handleCreateFile} title="Create a new file" icon={<NoteAdd />} label="new file" fontSize={24} />
+                &nbsp;&nbsp;&nbsp;&nbsp;
                 <SmallIconButton onClick={refreshFiles} title="Refresh files" icon={<Refresh />} fontSize={24} />
             </div>
             <ProjectFileBrowser2

@@ -27,6 +27,7 @@ type Props = {
 }
 
 export type ToolbarItem = {
+    tooltip?: string
     label?: string
     icon?: any
     onClick?: () => void
@@ -161,8 +162,14 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
                     {label}
                     &nbsp;&nbsp;&nbsp;
                     {!readOnly && (
-                        <SmallIconButton onClick={handleSave} icon={<Save />} title="Save file" disabled={text === internalText} />
+                        <SmallIconButton onClick={handleSave} icon={<Save />} title="Save file" disabled={text === internalText} label="save" />
                     )}
+                    &nbsp;&nbsp;&nbsp;
+                    {
+                        internalText !== text && (
+                            <span style={{color: '#a33', fontSize: 12}}>edited</span>
+                        )
+                    }
                     &nbsp;&nbsp;&nbsp;
                     {readOnly && <span style={{color: 'gray'}}>read only</span>}
                     &nbsp;&nbsp;&nbsp;
@@ -204,14 +211,15 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
 }
 
 const ToolbarItemComponent: FunctionComponent<{item: ToolbarItem}> = ({item}) => {
-    const {onClick, color, label, icon} = item
+    const {onClick, color, label, tooltip, icon} = item
     if (icon) {
         return (
             <span>
             <SmallIconButton
                 onClick={onClick}
                 icon={icon}
-                title={label}
+                title={tooltip}
+                label={label}
             />
             &nbsp;&nbsp;&nbsp;
             </span>

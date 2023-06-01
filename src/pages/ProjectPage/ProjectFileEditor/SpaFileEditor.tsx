@@ -93,7 +93,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                             readOnly ? (
                                 <span>read only</span>
                             ) : (
-                                <SmallIconButton icon={<Edit />} onClick={() => setEditing(true)} title="Edit .spa file" fontSize={iconButtonFontSize} />
+                                <SmallIconButton icon={<Edit />} onClick={() => setEditing(true)} title="Edit .spa file" label="Edit" fontSize={iconButtonFontSize} />
                             )
                         )
                     }

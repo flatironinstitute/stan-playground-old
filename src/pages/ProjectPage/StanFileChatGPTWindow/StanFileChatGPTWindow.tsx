@@ -7,11 +7,12 @@ type Props = {
     width: number
     height: number
     stanFileName: string
+    textHasBeenEdited: boolean
 }
 
 const defaultPrompt = `Describe this model in detail.`
 
-const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFileName}) => {
+const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFileName, textHasBeenEdited}) => {
     const {askAboutStanProgram} = useProject()
     const [prompt, setPrompt] = useState(defaultPrompt)
     const [response, setResponse] = useState('')
@@ -83,7 +84,12 @@ const StanFileChatGPTWindow: FunctionComponent<Props> = ({width, height, stanFil
 
                     {/* Submit button */}
                     <div style={{padding: 5}}>
-                        <button onClick={handleSubmit} disabled={(!userId) || (processing)}>Submit</button>
+                        <button onClick={handleSubmit} disabled={(!userId) || (processing) || textHasBeenEdited}>Submit</button>
+                        {
+                            userId && !processing && textHasBeenEdited && (
+                                <div style={{color: 'gray'}}>You must save your changes before submitting to ChatGPT.</div>
+                            )
+                        }
                     </div>
 
                     <div style={{padding: 5}}>

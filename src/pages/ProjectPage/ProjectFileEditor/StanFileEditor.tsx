@@ -45,7 +45,8 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
             if (editedText !== undefined) {
                 ret.push({
                     icon: <AutoFixHigh />,
-                    label: 'Auto Format',
+                    tooltip: 'Auto format this stan file',
+                    label: 'auto format',
                     onClick: handleAutoFormat,
                     color: 'darkblue'
                 })
@@ -54,7 +55,8 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
 
         ret.push({
             icon: <Chat />,
-            label: 'Ask ChatGPT',
+            tooltip: 'Ask ChatGPT',
+            label: 'ask',
             onClick: () => setChatGPTOpen(a => !a),
             color: 'darkblue'
         })
@@ -68,6 +70,7 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
             height={height}
             initialPosition={width / 2}
             direction="horizontal"
+            hideSecondChild={!chatGPTOpen}
         >
             <Splitter
                 width={0}
@@ -98,15 +101,13 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                     />
                 }
             </Splitter>
-            {
-                chatGPTOpen && (
-                    <StanFileChatGPTWindow
-                        width={0}
-                        height={0}
-                        stanFileName={fileName}
-                    />
-                )
-            }
+            {/* Important to unconditionally include this second panel because otherwise the first window get removed from DOM when toggled, and that causes the editor changes to be undone */}
+            <StanFileChatGPTWindow
+                width={0}
+                height={0}
+                stanFileName={fileName}
+                textHasBeenEdited={editedText !== fileContent}
+            />
         </Splitter>
     )
 }
