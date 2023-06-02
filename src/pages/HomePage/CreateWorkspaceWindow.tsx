@@ -24,7 +24,8 @@ const CreateWorkspaceWindow: FunctionComponent<Props> = () => {
                 Stan Playground is organized into workspaces and projects, with
                 each workspace containing one or more projects. You can control access
                 privileges at the workspace level. If this is your first workspace,
-                consider using your user name as the name of your workspace.
+                consider using your user name as the name of your workspace. You can
+                edit this later.
             </p>
             <p>
                 <b>Workspace name:</b>&nbsp;&nbsp;
