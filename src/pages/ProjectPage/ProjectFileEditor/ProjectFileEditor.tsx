@@ -1,39 +1,71 @@
-import { FunctionComponent, useCallback } from "react";
+import { FunctionComponent, useCallback, useEffect, useMemo } from "react";
+import { fetchDataBlob, fetchProjectFile, setProjectFileContent } from "../../../dbInterface/dbInterface";
+import { useGithubAuth } from "../../../GithubAuth/useGithubAuth";
 import { useProject } from "../ProjectPageContext";
 import ScriptFileEditor from "./ScriptFileEditor";
 import SpaOutputFileEditor from "./SpaOutputFileEditor/SpaOutputFileEditor";
 import StanFileEditor from "./StanFileEditor";
 import TextFileEditor from "./TextFileEditor";
-import useProjectFile from "./useProjectFile";
 
 type Props = {
     fileName: string
     readOnly: boolean
-    onFileDeleted: () => void
+    fileContent?: string
+    setFileContent: (content: string | undefined) => void
+    editedFileContent?: string
+    setEditedFileContent: (content: string) => void
     width: number
     height: number
 }
 
-const ProjectFileEditor: FunctionComponent<Props> = ({fileName, readOnly, onFileDeleted, width, height}) => {
-    const {project, projectId} = useProject()
+const ProjectFileEditor: FunctionComponent<Props> = ({fileName, readOnly, fileContent, setFileContent, editedFileContent, setEditedFileContent, width, height}) => {
+    const {projectId, workspaceId} = useProject()
 
-    const {fileContent, setFileContent, deleteFile} = useProjectFile(project?.workspaceId || '', projectId, fileName)
+    const {accessToken, userId} = useGithubAuth()
+    const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
-    const handleDeleteFile = useCallback(async () => {
-        const okay = window.confirm(`Delete ${fileName}?`)
-        if (!okay) return
-        await deleteFile()
-        onFileDeleted()
-    }, [deleteFile, onFileDeleted, fileName])
+    useEffect(() => {
+        // initial setting of edited content
+        if (editedFileContent !== undefined) return // already set initially
+        if (fileContent === undefined) return
+        setEditedFileContent(fileContent)
+    }, [fileContent, editedFileContent, setEditedFileContent])
+
+    useEffect(() => {
+        // loading of file content
+        let canceled = false
+        if (fileContent !== undefined) return
+        ;(async () => {
+            const pf = await fetchProjectFile(projectId, fileName, auth)
+            if (canceled) return
+            const sha1 = pf?.contentSha1
+            if (!sha1) return
+            const txt = await fetchDataBlob(workspaceId, projectId, sha1, auth)
+            if (canceled) return
+            setFileContent(txt || '')
+        })()
+        return () => {canceled = true}
+    }, [fileName, projectId, workspaceId, fileContent, setFileContent, auth])
+
+    const handleSaveContent = useCallback(async (text: string) => {
+        let canceled = false
+        ;(async () => {
+            await setProjectFileContent(workspaceId, projectId, fileName, text, auth)
+            if (canceled) return
+            setFileContent(undefined) // trigger reloading
+        })()
+        return () => {canceled = true}
+    }, [auth, workspaceId, projectId, fileName, setFileContent])
 
     if (fileName.endsWith('.stan')) {
         return (
             <StanFileEditor
                 fileName={fileName}
                 fileContent={fileContent || ''}
-                setFileContent={setFileContent}
+                onSaveContent={handleSaveContent}
+                editedFileContent={editedFileContent || ''}
+                setEditedFileContent={setEditedFileContent}
                 readOnly={readOnly}
-                onDeleteFile={handleDeleteFile}
                 width={width}
                 height={height}
             />
@@ -44,9 +76,10 @@ const ProjectFileEditor: FunctionComponent<Props> = ({fileName, readOnly, onFile
             <ScriptFileEditor
                 fileName={fileName}
                 fileContent={fileContent || ''}
-                setFileContent={setFileContent}
+                onSaveContent={handleSaveContent}
+                editedFileContent={editedFileContent || ''}
+                setEditedFileContent={setEditedFileContent}
                 readOnly={readOnly}
-                onDeleteFile={handleDeleteFile}
                 width={width}
                 height={height}
             />
@@ -67,9 +100,10 @@ const ProjectFileEditor: FunctionComponent<Props> = ({fileName, readOnly, onFile
             <TextFileEditor
                 fileName={fileName}
                 fileContent={fileContent || ''}
-                setFileContent={setFileContent}
+                onSaveContent={handleSaveContent}
+                editedFileContent={editedFileContent || ''}
+                setEditedFileContent={setEditedFileContent}
                 readOnly={readOnly}
-                onDeleteFile={handleDeleteFile}
                 width={width}
                 height={height}
             />

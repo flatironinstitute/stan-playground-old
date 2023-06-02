@@ -4,14 +4,15 @@ import TextEditor from "./TextEditor";
 type Props = {
     fileName: string
     fileContent: string
-    setFileContent: (text: string) => void
+    onSaveContent: (text: string) => void
+    editedFileContent: string
+    setEditedFileContent: (text: string) => void
     readOnly: boolean
-    onDeleteFile?: () => void
     width: number
     height: number
 }
 
-const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
+const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSaveContent, editedFileContent, setEditedFileContent, readOnly, width, height}) => {
     const language = fileName.endsWith('.json') ? (
         'json'
     ) : fileName.endsWith('.yaml') ? (
@@ -35,11 +36,12 @@ const TextFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
             language={language}
             label={fileName}
             text={fileContent}
-            onSetText={setFileContent}
+            onSaveText={onSaveContent}
+            editedText={editedFileContent}
+            onSetEditedText={setEditedFileContent}
             wordWrap={wordWrap}
             // onReload=
             readOnly={readOnly}
-            onDeleteFile={onDeleteFile}
         />
     )
 }

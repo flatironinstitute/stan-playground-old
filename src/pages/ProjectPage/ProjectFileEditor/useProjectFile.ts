@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { deleteProjectFile, fetchProjectFile, fetchDataBlob, setProjectFileContent } from "../../../dbInterface/dbInterface"
 import { useGithubAuth } from "../../../GithubAuth/useGithubAuth"
 
+// this file to be deleted
+
 const useProjectFile = (workspaceId: string, projectId: string, fileName: string) => {
     const [refreshCode, setRefreshCode] = useState<number>(0)
     const [fileContent, setFileContent] = useState<string | undefined>(undefined)

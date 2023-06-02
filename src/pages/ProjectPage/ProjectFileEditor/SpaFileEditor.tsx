@@ -41,7 +41,7 @@ const options: {
 ]
 
 const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText, readOnly, outputFileName}) => {
-    const {openTab} = useProject()
+    const {openTab, fileHasBeenEdited} = useProject()
     const [editText, setEditText] = useState<string | undefined>(undefined)
     useEffect(() => {
         setEditText(text)
@@ -76,6 +76,9 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
         editText !== text
     ), [editText, text])
 
+    const stanFileEdited = useMemo(() => (fileHasBeenEdited(spa?.stan || '')), [spa?.stan, fileHasBeenEdited], [fileHasBeenEdited])
+    const dataFileEdited = useMemo(() => (fileHasBeenEdited(spa?.data || '')), [spa?.data, fileHasBeenEdited], [fileHasBeenEdited])
+
     if (!spa) {
         return (
             <div style={{position: 'absolute', width, height, overflow: 'auto', background: 'lightgray'}}>
@@ -84,6 +87,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
         )
     }
     const iconButtonFontSize = 22
+
     return (
         <div className="spa-table" style={{position: 'absolute', width, height, overflow: 'auto', background: '#eee'}}>
             <div style={{padding: 10}}>
@@ -98,10 +102,13 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                         )
                     }
                     {
-                        editing && <SmallIconButton disabled={!canSave} icon={<Save />} onClick={handleSave} title="Save changes to .spa file" fontSize={iconButtonFontSize} />
+                        editing && <SmallIconButton disabled={!canSave} icon={<Save />} onClick={handleSave} title="Save changes to .spa file" fontSize={iconButtonFontSize} label="Save" />
                     }
                     {
-                        editing && <SmallIconButton icon={<Cancel />} onClick={handleCancel} title="Cancel editing" fontSize={iconButtonFontSize} />
+                        editing && <span>&nbsp;&nbsp;&nbsp;</span>
+                    }
+                    {
+                        editing && <SmallIconButton icon={<Cancel />} onClick={handleCancel} title="Cancel editing" fontSize={iconButtonFontSize} label="Cancel" />
                     }
                 </div>
                 <hr />
@@ -114,7 +121,12 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                                     editing ? (
                                         <StanFileSelector value={spa.stan} onChange={stan => setEditText(yaml.dump({...spa, stan}))} />
                                     ) : (
-                                        <Hyperlink onClick={() => spa.stan && openTab(`file:${spa.stan}`)}>{spa.stan || ''}</Hyperlink>
+                                        <span>
+                                            <Hyperlink onClick={() => spa.stan && openTab(`file:${spa.stan}`)}>{spa.stan || ''}</Hyperlink>
+                                            {
+                                                stanFileEdited && <span style={{color: 'red'}}> (edited)</span>
+                                            }
+                                        </span>
                                     )
                                 }
                             </td>
@@ -126,7 +138,12 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                                     editing ? (
                                         <DataFileSelector value={spa.data} onChange={data => setEditText(yaml.dump({...spa, data}))} />
                                     ) : (
-                                        <Hyperlink onClick={() => spa.data && openTab(`file:${spa.data}`)}>{spa.data || ''}</Hyperlink>
+                                        <span>
+                                            <Hyperlink onClick={() => spa.data && openTab(`file:${spa.data}`)}>{spa.data || ''}</Hyperlink>
+                                            {
+                                                dataFileEdited && <span style={{color: 'red'}}> (edited)</span>
+                                            }
+                                        </span>
                                     )
                                 }
                             </td>

@@ -1,5 +1,5 @@
 import { Editor } from "@monaco-editor/react";
-import { Delete, Refresh, Save } from "@mui/icons-material";
+import { Refresh, Save } from "@mui/icons-material";
 import { editor } from 'monaco-editor';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { FunctionComponent, PropsWithChildren, useCallback, useEffect, useState } from "react";
@@ -10,17 +10,16 @@ import { highlightJsData } from "./stanLang";
 type Monaco = typeof monaco
 
 type Props = {
-    text: string | undefined
     defaultText?: string
-    onSetText: (text: string) => void
+    text: string | undefined
+    onSaveText: (text: string) => void
+    editedText?: string
+    onSetEditedText: (text: string) => void
     language: string
     readOnly?: boolean
     wordWrap?: boolean
     onReload?: () => void
-    onEditedTextChanged?: (text: string) => void
-    onEditedTextOverrider?: (cb: (text: string) => void) => void
     toolbarItems?: ToolbarItem[]
-    onDeleteFile?: () => void
     label: string
     width: number
     height: number
@@ -34,25 +33,13 @@ export type ToolbarItem = {
     color?: string
 }
 
-const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, readOnly, wordWrap, onReload, onEditedTextChanged, onEditedTextOverrider, toolbarItems, onDeleteFile, language, label, width, height}) => {
-    const [internalText, setInternalText] = useState('')
-    useEffect(() => {
-        if (text !== undefined) {
-            setInternalText(text)
-        }
-    }, [text])
+const TextEditor: FunctionComponent<Props> = ({defaultText, text, onSaveText, editedText, onSetEditedText, readOnly, wordWrap, onReload, toolbarItems, language, label, width, height}) => {
     const handleChange = useCallback((value: string | undefined) => {
-        setInternalText(value || '')
-    }, [])
+        onSetEditedText(value || '')
+    }, [onSetEditedText])
     const handleSave = useCallback(() => {
-        onSetText(internalText)
-    }, [internalText, onSetText])
-
-    useEffect(() => {
-        if ((onEditedTextChanged) && (internalText !== undefined)) {
-            onEditedTextChanged(internalText)
-        }
-    }, [internalText, onEditedTextChanged])
+        onSaveText(editedText || '')
+    }, [editedText, onSaveText])
 
     //////////////////////////////////////////////////
     // Seems that it is important to set the initial value of the editor
@@ -64,10 +51,10 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
     const [editor, setEditor] = useState<editor.IStandaloneCodeEditor | undefined>(undefined)
     useEffect(() => {
         if (!editor) return
-        if (text === undefined) return
-        if (editor.getValue() === text) return
-        editor.setValue(text || defaultText || '')
-    }, [text, editor, defaultText])
+        if (editedText === undefined) return
+        if (editor.getValue() === editedText) return
+        editor.setValue(editedText || defaultText || '')
+    }, [editedText, editor, defaultText])
     const handleEditorDidMount = useCallback((editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
         (async () => {
             if (language === 'stan') {
@@ -133,16 +120,6 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
     }, [language])
     /////////////////////////////////////////////////
 
-    const editedTextOverrider = useCallback((text: string) => {
-        editor?.setValue(text)
-    }, [editor])
-
-    useEffect(() => {
-        if (onEditedTextOverrider) {
-            onEditedTextOverrider(editedTextOverrider)
-        }
-    }, [editedTextOverrider, onEditedTextOverrider])
-
     // Can't do this in the usual way with monaco editor:
     // See: https://github.com/microsoft/monaco-editor/issues/2947
     const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -162,11 +139,11 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
                     {label}
                     &nbsp;&nbsp;&nbsp;
                     {!readOnly && (
-                        <SmallIconButton onClick={handleSave} icon={<Save />} title="Save file" disabled={text === internalText} label="save" />
+                        <SmallIconButton onClick={handleSave} icon={<Save />} title="Save file" disabled={text === editedText} label="save" />
                     )}
                     &nbsp;&nbsp;&nbsp;
                     {
-                        internalText !== text && (
+                        editedText !== text && (
                             <span style={{color: '#a33', fontSize: 12}}>edited</span>
                         )
                     }
@@ -178,17 +155,6 @@ const TextEditor: FunctionComponent<Props> = ({text, defaultText, onSetText, rea
                     {toolbarItems && toolbarItems.map((item, i) => (
                         <ToolbarItemComponent key={i} item={item} />
                     ))}
-                </div>
-                <div style={{position: 'absolute', paddingLeft: 20, paddingTop: 3, left: width - 50, width: 50, height: toolbarHeight, backgroundColor: 'lightgray'}}>
-                    {
-                        onDeleteFile && (
-                            <SmallIconButton
-                                onClick={onDeleteFile}
-                                icon={<Delete />}
-                                title="Delete this file"
-                            />
-                        )
-                    }
                 </div>
             </NotSelectable>
             <div style={{position: 'absolute', top: toolbarHeight, width, height: height - toolbarHeight}}>

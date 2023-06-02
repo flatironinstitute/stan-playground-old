@@ -10,30 +10,25 @@ import StanFileChatGPTWindow from "../StanFileChatGPTWindow/StanFileChatGPTWindo
 type Props = {
     fileName: string
     fileContent: string
-    setFileContent: (text: string) => void
+    onSaveContent: (text: string) => void
+    editedFileContent: string
+    setEditedFileContent: (text: string) => void
     onDeleteFile?: () => void
     readOnly: boolean
     width: number
     height: number
 }
 
-const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, onDeleteFile, readOnly, width, height}) => {
-    const [editedText, setEditedText] = useState<string>(fileContent)
-    const [editedStanTextOverrider, setEditedStanTextOverrider] = useState<(text: string) => void>()
-    const handleEditedTextOverrider = useCallback((overrider: (text: string) => void) => {
-        setEditedStanTextOverrider(() => overrider)
-    }, [])
-
+const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSaveContent, editedFileContent, setEditedFileContent, readOnly, width, height}) => {
     const handleAutoFormat = useCallback(() => {
-        if (editedText === undefined) return
-        if (editedStanTextOverrider === undefined) return
+        if (editedFileContent === undefined) return
         ;(async () => {
-            const model = await runStanc('main.stan', editedText, ["auto-format", "max-line-length=78"])
+            const model = await runStanc('main.stan', editedFileContent, ["auto-format", "max-line-length=78"])
             if (model.result) {
-                editedStanTextOverrider(model.result)
+                setEditedFileContent(model.result)
             }
         })()
-    }, [editedText, editedStanTextOverrider])
+    }, [editedFileContent, setEditedFileContent])
 
     const [chatGPTOpen, setChatGPTOpen] = useState<boolean>(false)
 
@@ -42,7 +37,7 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
 
         // auto format
         if (!readOnly) {
-            if (editedText !== undefined) {
+            if (editedFileContent !== undefined) {
                 ret.push({
                     icon: <AutoFixHigh />,
                     tooltip: 'Auto format this stan file',
@@ -62,7 +57,7 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
         })
 
         return ret
-    }, [handleAutoFormat, editedText, readOnly])
+    }, [handleAutoFormat, editedFileContent, readOnly])
 
     return (
         <Splitter
@@ -85,11 +80,9 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                     language="stan"
                     label={fileName}
                     text={fileContent}
-                    onSetText={setFileContent}
-                    // onReload={refreshMainStanText}
-                    onEditedTextChanged={setEditedText}
-                    onEditedTextOverrider={handleEditedTextOverrider}
-                    onDeleteFile={onDeleteFile}
+                    onSaveText={onSaveContent}
+                    editedText={editedFileContent}
+                    onSetEditedText={setEditedFileContent}
                     readOnly={readOnly}
                     toolbarItems={toolbarItems}
                 />
@@ -97,7 +90,7 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                     <StanCompileResultWindow
                         width={0}
                         height={0}
-                        mainStanText={editedText}
+                        mainStanText={editedFileContent}
                     />
                 }
             </Splitter>
@@ -106,7 +99,7 @@ const StanFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFil
                 width={0}
                 height={0}
                 stanFileName={fileName}
-                textHasBeenEdited={editedText !== fileContent}
+                textHasBeenEdited={editedFileContent !== fileContent}
             />
         </Splitter>
     )

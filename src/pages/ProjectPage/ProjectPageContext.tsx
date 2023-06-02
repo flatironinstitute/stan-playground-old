@@ -8,14 +8,26 @@ type Props = {
     projectId: string
 }
 
-type TabSelectionState = {
-    openTabNames: string[]
-    currentTabName: string | undefined
+type OpenTabsState = {
+    openTabs: {
+        tabName: string
+        content?: string
+        editedContent?: string
+    }[]
+    currentTabName?: string
 }
 
-type TabSelectionAction = {
+type OpenTabsAction = {
     type: 'openTab'
     tabName: string
+} | {
+    type: 'setTabContent'
+    tabName: string
+    content: string | undefined // undefined triggers a reload
+} | {
+    type: 'setTabEditedContent'
+    tabName: string
+    editedContent: string
 } | {
     type: 'closeTab'
     tabName: string
@@ -26,10 +38,10 @@ type TabSelectionAction = {
     tabName: string
 }
 
-const tabSelectionReducer = (state: TabSelectionState, action: TabSelectionAction) => {
+const openTabsReducer = (state: OpenTabsState, action: OpenTabsAction) => {
     switch (action.type) {
         case 'openTab':
-            if (state.openTabNames.includes(action.tabName)) {
+            if (state.openTabs.find(x => x.tabName === action.tabName)) {
                 return {
                     ...state,
                     currentTabName: action.tabName
@@ -37,26 +49,52 @@ const tabSelectionReducer = (state: TabSelectionState, action: TabSelectionActio
             }
             return {
                 ...state,
-                openTabNames: [...state.openTabNames, action.tabName],
+                openTabs: [...state.openTabs, {tabName: action.tabName}],
                 currentTabName: action.tabName
             }
+        case 'setTabContent':
+            return {
+                ...state,
+                openTabs: state.openTabs.map(x => {
+                    if (x.tabName === action.tabName) {
+                        return {
+                            ...x,
+                            content: action.content
+                        }
+                    }
+                    return x
+                })
+            }
+        case 'setTabEditedContent':
+            return {
+                ...state,
+                openTabs: state.openTabs.map(x => {
+                    if (x.tabName === action.tabName) {
+                        return {
+                            ...x,
+                            editedContent: action.editedContent
+                        }
+                    }
+                    return x
+                })
+            }
         case 'closeTab':
-            if (!state.openTabNames.includes(action.tabName)) {
+            if (!state.openTabs.find(x => x.tabName === action.tabName)) {
                 return state
             }
             return {
                 ...state,
-                openTabNames: state.openTabNames.filter(x => x !== action.tabName),
-                currentTabName: state.currentTabName === action.tabName ? state.openTabNames[0] : state.currentTabName
+                openTabs: state.openTabs.filter(x => x.tabName !== action.tabName),
+                currentTabName: state.currentTabName === action.tabName ? state.openTabs[0]?.tabName : state.currentTabName
             }
         case 'closeAllTabs':
             return {
                 ...state,
-                openTabNames: [],
+                openTabs: [],
                 currentTabName: undefined
             }
         case 'setCurrentTab':
-            if (!state.openTabNames.includes(action.tabName)) {
+            if (!state.openTabs.find(x => x.tabName === action.tabName)) {
                 return state
             }
             return {
@@ -71,13 +109,19 @@ type ProjectPageContextType = {
     workspaceId: string
     project?: SPProject
     projectFiles?: SPProjectFile[]
-    openTabNames: string[]
+    openTabs: {
+        tabName: string
+        content?: string
+        editedContent?: string
+    }[]
     currentTabName?: string
     scriptJobs?: SPScriptJob[]
     openTab: (tabName: string) => void
     closeTab: (tabName: string) => void
     closeAllTabs: () => void
     setCurrentTab: (tabName: string) => void
+    setTabContent: (tabName: string, content: string | undefined) => void
+    setTabEditedContent: (tabName: string, editedContent: string) => void
     refreshFiles: () => void
     deleteProject: () => Promise<void>
     cloneProject: (newWorkspaceId: string) => Promise<string>
@@ -90,17 +134,20 @@ type ProjectPageContextType = {
     duplicateFile: (fileName: string, newFileName: string) => void
     renameFile: (fileName: string, newFileName: string) => void
     askAboutStanProgram: (stanFileName: string, prompt: string, opts: {useCache: boolean, cacheOnly: boolean, force: boolean}) => Promise<{response: string, cumulativeTokensUsed: number}>
+    fileHasBeenEdited: (fileName: string) => boolean
 }
 
 const ProjectPageContext = React.createContext<ProjectPageContextType>({
     projectId: '',
     workspaceId: '',
-    openTabNames: [],
+    openTabs: [],
     currentTabName: undefined,
     openTab: () => {},
     closeTab: () => {},
     closeAllTabs: () => {},
     setCurrentTab: () => {},
+    setTabContent: () => {},
+    setTabEditedContent: () => {},
     refreshFiles: () => {},
     deleteProject: async () => {},
     cloneProject: async () => {return ''},
@@ -113,6 +160,7 @@ const ProjectPageContext = React.createContext<ProjectPageContextType>({
     duplicateFile: () => {},
     renameFile: () => {},
     askAboutStanProgram: async () => {return {response: '', cumulativeTokensUsed: 0}},
+    fileHasBeenEdited: () => false
 })
 
 export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({children, projectId}) => {
@@ -128,7 +176,7 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
     const [refreshProjectCode, setRefreshProjectCode] = React.useState(0)
     const refreshProject = useCallback(() => setRefreshProjectCode(rac => rac + 1), [])
 
-    const [selectedTabs, selectedTabsDispatch] = React.useReducer(tabSelectionReducer, {openTabNames: [], currentTabName: undefined})
+    const [openTabs, openTabsDispatch] = React.useReducer(openTabsReducer, {openTabs: [], currentTabName: undefined})
 
     const {accessToken, userId} = useGithubAuth()
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
@@ -241,7 +289,7 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         if (!project) return
         await renameProjectFile(project.workspaceId, projectId, fileName, newFileName, auth)
         refreshFiles()
-        selectedTabsDispatch({type: 'closeTab', tabName: `file:${fileName}`})
+        openTabsDispatch({type: 'closeTab', tabName: `file:${fileName}`})
     }, [project, projectId, refreshFiles, auth])
 
     const askAboutStanProgramHandler = useMemo(() => (async (stanFileName: string, prompt: string, opts: {useCache: boolean, cacheOnly: boolean, force: boolean}) => {
@@ -250,18 +298,26 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         return {response, cumulativeTokensUsed}
     }), [project, projectId, auth])
 
-    const value = React.useMemo(() => ({
+    const fileHasBeenEdited = useMemo(() => ((fileName: string) => {
+        const tab = openTabs.openTabs.find(x => x.tabName === `file:${fileName}`)
+        if (!tab) return false
+        return tab.editedContent !== tab.content
+    }), [openTabs])
+
+    const value: ProjectPageContextType = React.useMemo(() => ({
         projectId,
         workspaceId: project?.workspaceId ?? '',
         project,
         projectFiles,
-        openTabNames: selectedTabs.openTabNames,
-        currentTabName: selectedTabs.currentTabName,
+        openTabs: openTabs.openTabs,
+        currentTabName: openTabs.currentTabName,
         scriptJobs,
-        openTab: (tabName: string) => selectedTabsDispatch({type: 'openTab', tabName}),
-        closeTab: (tabName: string) => selectedTabsDispatch({type: 'closeTab', tabName}),
-        closeAllTabs: () => selectedTabsDispatch({type: 'closeAllTabs'}),
-        setCurrentTab: (tabName: string) => selectedTabsDispatch({type: 'setCurrentTab', tabName}),
+        openTab: (tabName: string) => openTabsDispatch({type: 'openTab', tabName}),
+        closeTab: (tabName: string) => openTabsDispatch({type: 'closeTab', tabName}),
+        closeAllTabs: () => openTabsDispatch({type: 'closeAllTabs'}),
+        setCurrentTab: (tabName: string) => openTabsDispatch({type: 'setCurrentTab', tabName}),
+        setTabContent: (tabName: string, content: string | undefined) => openTabsDispatch({type: 'setTabContent', tabName, content}),
+        setTabEditedContent: (tabName: string, editedContent: string) => openTabsDispatch({type: 'setTabEditedContent', tabName, editedContent}),
         refreshFiles,
         deleteProject: deleteProjectHandler,
         cloneProject: cloneProjectHandler,
@@ -273,8 +329,9 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         deleteFile,
         duplicateFile,
         renameFile,
-        askAboutStanProgram: askAboutStanProgramHandler
-    }), [project, projectFiles, projectId, refreshFiles, selectedTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile, askAboutStanProgramHandler])
+        askAboutStanProgram: askAboutStanProgramHandler,
+        fileHasBeenEdited
+    }), [project, projectFiles, projectId, refreshFiles, openTabs, deleteProjectHandler, cloneProjectHandler, setProjectPropertyHandler, refreshScriptJobs, scriptJobs, createScriptJobHandler, deleteScriptJobHandler, deleteCompletedScriptJobsHandler, deleteFile, duplicateFile, renameFile, askAboutStanProgramHandler, fileHasBeenEdited])
 
     return (
         <ProjectPageContext.Provider value={value}>

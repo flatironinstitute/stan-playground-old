@@ -7,7 +7,7 @@ import { useProject } from "./ProjectPageContext";
 import ScriptJobView from "./ScriptJobView/ScriptJobView";
 
 const ProjectMainPanel: FunctionComponent<{width: number, height: number}> = ({width, height}) => {
-    const {openTabNames, currentTabName, setCurrentTab, closeTab, refreshFiles} = useProject()
+    const {openTabs, currentTabName, setCurrentTab, closeTab, setTabContent, setTabEditedContent} = useProject()
     const {workspaceRole} = useWorkspace()
     const canEdit = workspaceRole === 'admin' || workspaceRole === 'editor'
     return (
@@ -15,7 +15,7 @@ const ProjectMainPanel: FunctionComponent<{width: number, height: number}> = ({w
             width={width}
             height={height}
             tabs={
-                openTabNames.map(tabName => ({
+                openTabs.map(({tabName}) => ({
                     id: tabName,
                     label: labelFromTabName(tabName),
                     closeable: true,
@@ -26,13 +26,20 @@ const ProjectMainPanel: FunctionComponent<{width: number, height: number}> = ({w
             setCurrentTabId={setCurrentTab}
             onCloseTab={fileName => closeTab(fileName)}
         >
-            {openTabNames.map(tabName => (
+            {openTabs.map(({tabName, content, editedContent}) => (
                 tabName.startsWith('file:') ? (
                     <ProjectFileEditor
                         key={tabName}
                         fileName={tabName.slice('file:'.length)}
+                        fileContent={content}
+                        editedFileContent={editedContent}
+                        setFileContent={content => {
+                            setTabContent(tabName, content)
+                        }}
+                        setEditedFileContent={content => {
+                            setTabEditedContent(tabName, content)
+                        }}
                         readOnly={!canEdit}
-                        onFileDeleted={() => {closeTab(tabName); refreshFiles()}}
                         width={0}
                         height={0}
                     />

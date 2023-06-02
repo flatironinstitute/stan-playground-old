@@ -8,14 +8,15 @@ import TextEditor from "./TextEditor";
 type Props = {
     fileName: string
     fileContent: string
-    setFileContent: (text: string) => void
+    onSaveContent: (text: string) => void
+    editedFileContent: string
+    setEditedFileContent: (text: string) => void
     readOnly: boolean
-    onDeleteFile?: () => void
     width: number
     height: number
 }
 
-const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setFileContent, readOnly, onDeleteFile, width, height}) => {
+const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSaveContent, editedFileContent, setEditedFileContent, readOnly, width, height}) => {
     const fileType = fileName.split('.').pop()
     const {projectFiles} = useProject()
     const outputFileName = fileType === 'spa' ? projectFiles?.find(f => (f.fileName === `${fileName}.out`))?.fileName : undefined
@@ -38,16 +39,17 @@ const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, setF
                         }
                         label={fileName}
                         text={fileContent}
-                        onSetText={setFileContent}
+                        onSaveText={onSaveContent}
+                        editedText={editedFileContent}
+                        onSetEditedText={setEditedFileContent}
                         readOnly={readOnly}
-                        onDeleteFile={onDeleteFile}
                     />
                 ) : (
                     <SpaFileEditor
                         width={0}
                         height={0}
                         text={fileContent}
-                        onSetText={setFileContent}
+                        onSetText={onSaveContent}
                         readOnly={readOnly}
                         outputFileName={outputFileName}
                     />
