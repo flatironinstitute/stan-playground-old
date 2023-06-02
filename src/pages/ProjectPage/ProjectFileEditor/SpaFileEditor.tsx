@@ -76,8 +76,8 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
         editText !== text
     ), [editText, text])
 
-    const stanFileEdited = useMemo(() => (fileHasBeenEdited(spa?.stan || '')), [spa?.stan, fileHasBeenEdited], [fileHasBeenEdited])
-    const dataFileEdited = useMemo(() => (fileHasBeenEdited(spa?.data || '')), [spa?.data, fileHasBeenEdited], [fileHasBeenEdited])
+    const stanFileEdited = useMemo(() => (fileHasBeenEdited(spa?.stan || '')), [spa?.stan, fileHasBeenEdited])
+    const dataFileEdited = useMemo(() => (fileHasBeenEdited(spa?.data || '')), [spa?.data, fileHasBeenEdited])
 
     if (!spa) {
         return (
