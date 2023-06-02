@@ -33,16 +33,17 @@ const CreateProjectWindow: FunctionComponent<Props> = ({onClose}) => {
     const submitEnabled = !!selectedProjectId && !creatingProject
     return (
         <div>
-            <div>
-                <label>Project name:</label>
-                <input type="text" value={newProjectName} onChange={e => setNewProjectName(e.target.value)} />
-            </div>
-            <hr />
+            <h3>Create a project</h3>
             <p>Choose a template for the new project</p>
             <ProjectTemplateSelector
                 selectedProjectId={selectedProjectId}
                 setSelectedProjectId={setSelectedProjectId}
             />
+            <hr />
+            <div>
+                <label>Project name:&nbsp;</label>
+                <input type="text" value={newProjectName} onChange={e => setNewProjectName(e.target.value)} />
+            </div>
             <hr />
             <div>
                 <button onClick={handleSubmit} disabled={!submitEnabled}>Create</button>

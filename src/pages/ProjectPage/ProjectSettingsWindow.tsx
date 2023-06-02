@@ -30,6 +30,12 @@ const ProjectSettingsWindow: FunctionComponent<Props> = () => {
                 </tbody>
             </table>
             <hr />
+            <p>
+                There are no project settings since all the access permissions are set at the workspace level.
+                This window is a placeholder for when we might have project settings in the future.
+                You can delete the project using the button below.
+            </p>
+            <hr />
             {
                 (workspaceRole === 'admin' || workspaceRole === 'editor') ? (
                     <DeleteProjectButton />
