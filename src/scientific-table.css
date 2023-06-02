@@ -4,6 +4,7 @@
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
+    cursor: default;
 }
 
 /* Table */
@@ -39,7 +40,6 @@
 /* Table hover */
 .scientific-table tbody tr:hover {
     background-color: #ddd;
-    cursor: pointer;
 }
 
 .scientific-table tr.selected {

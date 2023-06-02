@@ -228,17 +228,28 @@ export class RunningJob {
             fs.writeFileSync(path.join(scriptJobDir, dataFileName), dataFileContent)
             const runPyContent = createRunPyContent(spaFileName)
             fs.writeFileSync(path.join(scriptJobDir, 'run.py'), runPyContent)
-            // make sure all files are readable by everyone so that they can be deleted even if owned by docker user
             const runShContent = `
+set -e # exit on error and use return code of last command as return code of script
+clean_up () {
+    ARG=$?
+    chmod -R 777 * # make sure all files are readable by everyone so that they can be deleted even if owned by docker user
+    exit $ARG
+} 
+trap clean_up EXIT
 python3 run.py
-chmod -R 777 *
 `
             fs.writeFileSync(path.join(scriptJobDir, 'run.sh'), runShContent)
         }
         else if (scriptFileName.endsWith('.py')) {
             const runShContent = `
+set -e # exit on error and use return code of last command as return code of script
+clean_up () {
+    ARG=$?
+    chmod -R 777 * # make sure all files are readable by everyone so that they can be deleted even if owned by docker user
+    exit $ARG
+} 
+trap clean_up EXIT
 python3 ${scriptFileName}
-chmod -R 777 *
 `
             fs.writeFileSync(path.join(scriptJobDir, 'run.sh'), runShContent)
         }

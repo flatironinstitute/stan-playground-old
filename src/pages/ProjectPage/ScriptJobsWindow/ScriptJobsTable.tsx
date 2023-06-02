@@ -53,7 +53,9 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
                                 jj.status !== 'failed' ? (
                                     <span>{jj.status}</span>
                                 ) : (
-                                    <span style={{color: 'red'}}>{jj.status}: {jj.error}</span>
+                                    <Hyperlink onClick={() => openTab(`scriptJob:${jj.scriptJobId}`)}>
+                                        <span style={{color: 'red'}}>{jj.status}: {jj.error}</span>
+                                    </Hyperlink>
                                 )
                             }</td>
                             <td>{timeAgoString(jj.timestampCreated)}</td>

@@ -20,8 +20,8 @@ const ChainsTable: FunctionComponent<Props> = ({spaOutput}) => {
                 {spaOutput.chains.map((chain, index) => (
                     <tr key={index}>
                         <td>{chain.chainId}</td>
-                        <td>{Object.keys(chain.sequences).join(', ')}</td>
-                        <td>{chain.sequences[Object.keys(chain.sequences)[0]].length}</td>
+                        <td>{Object.keys(chain.sequences || {}).join(', ')}</td>
+                        <td>{chain?.sequences[Object.keys(chain.sequences || {})[0] || '']?.length}</td>
                     </tr>
                 ))}
             </tbody>
