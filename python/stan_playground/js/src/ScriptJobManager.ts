@@ -6,6 +6,7 @@ import fs from 'fs';
 import yaml from 'js-yaml'
 import {ChildProcessWithoutNullStreams, spawn} from 'child_process'
 import ChainFile from './ChainFile';
+import { ComputeResourceConfig } from './ScriptJobExecutor';
 
 type SpaOutput = {
     chains: {
@@ -22,9 +23,7 @@ type SpaOutput = {
 
 class ScriptJobManager {
     #runningJobs: RunningJob[] = []
-    #maxNumPythonJobs = 5
-    #maxNumSpaJobs = 2
-    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, containerMethod: 'none' | 'singularity' | 'docker', onScriptJobCompletedOrFailed: (job: RunningJob) => void}) {
+    constructor(private config: {dir: string, computeResourceId: string, privateKey: string, computeResourceConfig: ComputeResourceConfig, onScriptJobCompletedOrFailed: (job: RunningJob) => void}) {
 
     }
     async initiateJob(job: SPScriptJob): Promise<boolean> {
@@ -63,7 +62,8 @@ class ScriptJobManager {
     }
     private async _initiatePythonJob(job: SPScriptJob): Promise<boolean> {
         const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.py'))
-        if (x.length >= this.#maxNumPythonJobs) {
+        const {maxNumConcurrentPythonJobs} = this.config.computeResourceConfig
+        if (x.length >= maxNumConcurrentPythonJobs) {
             return false
         }
         const a = new RunningJob(job, this.config)
@@ -73,7 +73,8 @@ class ScriptJobManager {
     }
     private async _initiateSpaJob(job: SPScriptJob): Promise<boolean> {
         const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.spa'))
-        if (x.length >= this.#maxNumSpaJobs) {
+        const {maxNumConcurrentSpaJobs} = this.config.computeResourceConfig
+        if (x.length >= maxNumConcurrentSpaJobs) {
             return false
         }
         const a = new RunningJob(job, this.config)
@@ -95,7 +96,7 @@ export class RunningJob {
     #onCompletedOrFailedCallbacks: (() => void)[] = []
     #childProcess: ChildProcessWithoutNullStreams | null = null
     #status: 'pending' | 'running' | 'completed' | 'failed' = 'pending'
-    constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceId: string, privateKey: string, containerMethod: 'none' | 'docker' | 'singularity'}) {
+    constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceId: string, privateKey: string, computeResourceConfig: ComputeResourceConfig}) {
     }
     async initiate(): Promise<boolean> {
         console.info(`Initiating script job: ${this.scriptJob.scriptJobId} - ${this.scriptJob.scriptFileName}`)
@@ -282,7 +283,7 @@ python3 ${scriptFileName}
                 let cmd: string
                 let args: string[]
 
-                const containerMethod = this.config.containerMethod
+                const containerMethod = this.config.computeResourceConfig.containerMethod
 
                 const absScriptJobDir = path.resolve(scriptJobDir)
 
@@ -325,7 +326,7 @@ python3 ${scriptFileName}
                     if (scriptFileName.endsWith('.py')) {
                         args = [...args, ...[
                             '--cpus', '1', // limit CPU
-                            '--memory', '1g', // limit memory
+                            '--memory', `${this.config.computeResourceConfig.maxRAMPerPythonJobGB}g`, // limit memory
                             'jstoropoli/cmdstanpy',
                             '-c', `bash run.sh` // tricky - need to put the last two args together so that it ends up in a quoted argument
                         ]]
@@ -333,7 +334,7 @@ python3 ${scriptFileName}
                     else if (scriptFileName.endsWith('.spa')) {
                         args = [...args, ...[
                             '--cpus', '4', // limit CPU
-                            '--memory', '4g', // limit memory
+                            '--memory', `${this.config.computeResourceConfig.maxRAMPerSpaJobGB}g`, // limit memory
                             'jstoropoli/cmdstanpy',
                             '-c', 'bash run.sh' // tricky - need to put the last two args together so that it ends up in a quoted argument
                         ]]

@@ -4,25 +4,32 @@ import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFro
 import PubsubClient from './PubsubClient'
 import ScriptJobManager from "./ScriptJobManager"
 import { GetPendingScriptJobsRequest, GetPubsubSubscriptionRequest } from "./types/PlaygroundRequest"
+import yaml from 'js-yaml'
+
+export type ComputeResourceConfig = {
+    computeResourceId: string
+    privateKey: string
+    containerMethod: 'none' | 'docker' | 'singularity'
+    maxNumConcurrentPythonJobs: number
+    maxNumConcurrentSpaJobs: number
+    maxRAMPerPythonJobGB: number
+    maxRAMPerSpaJobGB: number
+}
 
 class ScriptJobExecutor {
     #stopped = false
-    #computeResourceId: string
-    #privateKey: string
     #scriptJobManager: ScriptJobManager
     #pubsubClient: PubsubClient | undefined
-    #containerMethod: 'none' | 'docker' | 'singularity'
+    #computeResourceConfig: ComputeResourceConfig
     constructor(private a: { dir: string }) {
-        // read computeResourceId from .stan-playground-compute-resource.json in dir directory
-        const configJson = fs.readFileSync(path.join(a.dir, '.stan-playground-compute-resource.json'), 'utf8')
-        const config = JSON.parse(configJson)
-        this.#computeResourceId = config.computeResourceId
-        this.#privateKey = config.privateKey
-        this.#containerMethod = config.containerMethod
-        if (!['none', 'docker', 'singularity'].includes(this.#containerMethod)) {
-            throw Error(`Invalid containerMethod: ${this.#containerMethod}`)
+        // read computeResourceId from .stan-playground-compute-resource.yaml in dir directory
+        const configYaml = fs.readFileSync(path.join(a.dir, '.stan-playground-compute-resource.yaml'), 'utf8')
+        this.#computeResourceConfig = yaml.load(configYaml) as ComputeResourceConfig
+        const {containerMethod} = this.#computeResourceConfig
+        if (!['none', 'docker', 'singularity'].includes(containerMethod)) {
+            throw Error(`Invalid containerMethod: ${containerMethod}`)
         }
-        if (this.#containerMethod === 'none') {
+        if (containerMethod === 'none') {
             console.info('Container method is set to none. Script jobs will be executed on the host.')
             if (process.env.STAN_PLAYGROUND_DANGEROUS_CONTAINER_METHOD_NONE !== 'true') {
                 throw Error('Container method is set to none. Set environment variable STAN_PLAYGROUND_DANGEROUS_CONTAINER_METHOD_NONE to true to allow this.')
@@ -30,9 +37,9 @@ class ScriptJobExecutor {
         }
         this.#scriptJobManager = new ScriptJobManager({
             dir: a.dir,
-            computeResourceId: this.#computeResourceId,
-            privateKey: this.#privateKey,
-            containerMethod: this.#containerMethod,
+            computeResourceId: this.#computeResourceConfig.computeResourceId,
+            privateKey: this.#computeResourceConfig.privateKey,
+            computeResourceConfig: this.#computeResourceConfig,
             onScriptJobCompletedOrFailed: (job) => {
                 if (job.status === 'completed') {
                     console.info(`Script job completed`)
@@ -53,7 +60,7 @@ class ScriptJobExecutor {
         const reqPubsub: GetPubsubSubscriptionRequest = {
             type: 'getPubsubSubscription',
             timestamp: Date.now() / 1000,
-            computeResourceId: this.#computeResourceId
+            computeResourceId: this.#computeResourceConfig.computeResourceId
         }
         const respPubsub = await this._postPlaygroundRequest(reqPubsub)
         if (respPubsub.type !== 'getPubsubSubscription') {
@@ -87,7 +94,7 @@ class ScriptJobExecutor {
         const req: GetPendingScriptJobsRequest = {
             type: 'getPendingScriptJobs',
             timestamp: Date.now() / 1000,
-            computeResourceId: this.#computeResourceId
+            computeResourceId: this.#computeResourceConfig.computeResourceId
         }
         const resp = await this._postPlaygroundRequest(req)
         if (resp) {
@@ -114,8 +121,8 @@ class ScriptJobExecutor {
     }
     private async _postPlaygroundRequest(req: any): Promise<any> {
         return await postPlaygroundRequestFromComputeResource(req, {
-            computeResourceId: this.#computeResourceId,
-            privateKey: this.#privateKey
+            computeResourceId: this.#computeResourceConfig.computeResourceId,
+            privateKey: this.#computeResourceConfig.privateKey
         })
     }
     

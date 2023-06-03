@@ -24,7 +24,7 @@ stan-playground register-compute-resource
 # Open the provided link in a browser and log in using GitHub
 ```
 
-Edit `$COMPUTE_RESOURCE_DIR/.stan-playground-compute-resource.json` and set `containerMethod` to `docker` or `singularity`. By default it is set to `docker`.
+Edit `$COMPUTE_RESOURCE_DIR/.stan-playground-compute-resource.yaml` and set `containerMethod` to `docker` or `singularity`. By default it is set to `docker`.
 
 ```bash
 # If using docker, initialize the docker container
