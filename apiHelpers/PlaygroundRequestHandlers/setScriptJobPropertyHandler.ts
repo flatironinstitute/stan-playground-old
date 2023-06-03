@@ -47,7 +47,32 @@ const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest,
     }
     update.timestampModified = Date.now() / 1000
 
-    scriptJobsCollection.updateOne({scriptJobId: request.scriptJobId}, {$set: update})
+    const filter: {[key: string]: any} = {scriptJobId: request.scriptJobId}
+    if (request.property === 'status') {
+        if (request.value === 'running') {
+            filter.status = 'pending' // previous status must be pending (this is important to allow multiple compute resource services to run at the same time)
+        }
+        else if (request.value === 'completed') {
+            filter.status = 'running' // previous status must be running
+        }
+        else if (request.value === 'failed') {
+            filter.status = 'running' // previous status must be running
+        }
+        else {
+            throw new Error(`Invalid status: ${request.value}`)
+        }
+    }
+    const x = await scriptJobsCollection.updateOne(filter, {$set: update})
+    if (x.modifiedCount === 0) {
+        return {
+            type: 'setScriptJobProperty',
+            success: false,
+            error: 'Failed to set script job property.'
+        }
+    }
+    if (x.modifiedCount > 1) {
+        throw new Error(`Unexpected: modified ${x.modifiedCount} > 1 script jobs`)
+    }
 
     if (request.property === 'status') {
         const pnClient = await getPubnubClient()
@@ -67,7 +92,8 @@ const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest,
     }
 
     return {
-        type: 'setScriptJobProperty'
+        type: 'setScriptJobProperty',
+        success: true
     }
 }
 

@@ -1,6 +1,6 @@
 import path from 'path';
 import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource";
-import { GetDataBlobRequest, GetProjectFileRequest, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest";
+import { GetDataBlobRequest, GetProjectFileRequest, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest";
 import { SPScriptJob } from "./types/stan-playground-types";
 import fs from 'fs';
 import yaml from 'js-yaml'
@@ -68,8 +68,8 @@ class ScriptJobManager {
         }
         const a = new RunningJob(job, this.config)
         this._addRunningJob(a)
-        await a.initiate()
-        return true
+        const okay = await a.initiate()
+        return okay
     }
     private async _initiateSpaJob(job: SPScriptJob): Promise<boolean> {
         const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.spa'))
@@ -97,16 +97,21 @@ export class RunningJob {
     #status: 'pending' | 'running' | 'completed' | 'failed' = 'pending'
     constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceId: string, privateKey: string, containerMethod: 'none' | 'docker' | 'singularity'}) {
     }
-    async initiate(): Promise<void> {
+    async initiate(): Promise<boolean> {
         console.info(`Initiating script job: ${this.scriptJob.scriptJobId} - ${this.scriptJob.scriptFileName}`)
-        await this._setScriptJobProperty('status', 'running')
+        const okay = await this._setScriptJobProperty('status', 'running')
+        if (!okay) {
+            console.warn('Unable to set script job status to running')
+            return false
+        }
         this.#status = 'running'
         this._run().then(() => { // don't await this!
             //
         }).catch((err) => {
             console.error(err)
             console.error('Problem running script job')
-        }) 
+        })
+        return true
     }
     onCompletedOrFailed(callback: () => void) {
         this.#onCompletedOrFailedCallbacks.push(callback)
@@ -125,7 +130,7 @@ export class RunningJob {
     public get status() {
         return this.#status
     }
-    private async _setScriptJobProperty(property: string, value: any) {
+    private async _setScriptJobProperty(property: string, value: any): Promise<boolean> {
         const req: SetScriptJobPropertyRequest = {
             type: 'setScriptJobProperty',
             timestamp: Date.now() / 1000,
@@ -143,8 +148,9 @@ export class RunningJob {
             console.warn(resp)
             throw Error('Unexpected response type. Expected setScriptJobProperty')
         }
+        return resp.success
     }
-    private async _postPlaygroundRequest(req: any): Promise<any> {
+    private async _postPlaygroundRequest(req: any): Promise<PlaygroundResponse> {
         return await postPlaygroundRequestFromComputeResource(req, {
             computeResourceId: this.config.computeResourceId,
             privateKey: this.config.privateKey

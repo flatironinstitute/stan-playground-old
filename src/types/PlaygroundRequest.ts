@@ -881,11 +881,15 @@ export const isSetScriptJobPropertyRequest = (x: any): x is SetScriptJobProperty
 
 export type SetScriptJobPropertyResponse = {
     type: 'setScriptJobProperty'
+    success?: boolean
+    error?: string
 }
 
 export const isSetScriptJobPropertyResponse = (x: any): x is SetScriptJobPropertyResponse => {
     return validateObject(x, {
-        type: isEqualTo('setScriptJobProperty')
+        type: isEqualTo('setScriptJobProperty'),
+        success: optional(isBoolean),
+        error: optional(isString)
     })
 }
 
