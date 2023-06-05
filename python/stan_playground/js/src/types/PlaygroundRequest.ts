@@ -833,13 +833,17 @@ export type GetPendingScriptJobsRequest = {
     type: 'getPendingScriptJobs'
     timestamp: number
     computeResourceId: string
+    nodeId: string
+    nodeName: string
 }
 
 export const isGetPendingScriptJobsRequest = (x: any): x is GetPendingScriptJobsRequest => {
     return validateObject(x, {
         type: isEqualTo('getPendingScriptJobs'),
         timestamp: isNumber,
-        computeResourceId: isString
+        computeResourceId: isString,
+        nodeId: isString,
+        nodeName: isString
     })
 }
 
@@ -852,6 +856,42 @@ export const isGetPendingScriptJobsResponse = (x: any): x is GetPendingScriptJob
     return validateObject(x, {
         type: isEqualTo('getPendingScriptJobs'),
         scriptJobs: isArrayOf(isSPScriptJob)
+    })
+}
+
+// getActiveComputeResourceNodes
+
+export type GetActiveComputeResourceNodesRequest = {
+    type: 'getActiveComputeResourceNodes'
+    timestamp: number
+    computeResourceId: string
+}
+
+export const isGetActiveComputeResourceNodesRequest = (x: any): x is GetActiveComputeResourceNodesRequest => {
+    return validateObject(x, {
+        type: isEqualTo('getActiveComputeResourceNodes'),
+        timestamp: isNumber,
+        computeResourceId: isString
+    })
+}
+
+export type GetActiveComputeResourceNodesResponse = {
+    type: 'getActiveComputeResourceNodes'
+    activeComputeResourceNodes: {
+        nodeId: string
+        nodeName: string
+        timestampLastActive: number
+    }[]
+}
+
+export const isGetActiveComputeResourceNodesResponse = (x: any): x is GetActiveComputeResourceNodesResponse => {
+    return validateObject(x, {
+        type: isEqualTo('getActiveComputeResourceNodes'),
+        activeComputeResourceNodes: isArrayOf(y => (validateObject(y, {
+            nodeId: isString,
+            nodeName: isString,
+            timestampLastActive: isNumber
+        })))
     })
 }
 
@@ -995,6 +1035,7 @@ export type PlaygroundRequestPayload =
     DeleteCompletedScriptJobsRequest |
     GetScriptJobRequest |
     GetPendingScriptJobsRequest |
+    GetActiveComputeResourceNodesRequest |
     SetScriptJobPropertyRequest |
     AskAboutStanProgramRequest |
     GetPubsubSubscriptionRequest
@@ -1030,6 +1071,7 @@ export const isPlaygroundRequestPayload = (x: any): x is PlaygroundRequestPayloa
         isDeleteCompletedScriptJobsRequest,
         isGetScriptJobRequest,
         isGetPendingScriptJobsRequest,
+        isGetActiveComputeResourceNodesRequest,
         isSetScriptJobPropertyRequest,
         isAskAboutStanProgramRequest,
         isGetPubsubSubscriptionRequest
@@ -1088,6 +1130,7 @@ export type PlaygroundResponse =
     DeleteCompletedScriptJobsResponse |
     GetScriptJobResponse |
     GetPendingScriptJobsResponse |
+    GetActiveComputeResourceNodesResponse |
     SetScriptJobPropertyResponse |
     AskAboutStanProgramResponse |
     GetPubsubSubscriptionResponse
@@ -1123,6 +1166,7 @@ export const isPlaygroundResponse = (x: any): x is PlaygroundResponse => {
         isDeleteCompletedScriptJobsResponse,
         isGetScriptJobResponse,
         isGetPendingScriptJobsResponse,
+        isGetActiveComputeResourceNodesResponse,
         isSetScriptJobPropertyResponse,
         isAskAboutStanProgramResponse,
         isGetPubsubSubscriptionResponse

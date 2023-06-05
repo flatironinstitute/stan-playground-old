@@ -22,6 +22,22 @@ const getPendingScriptJobsHandler = async (request: GetPendingScriptJobsRequest,
             throw new Error('Invalid script job in database (0)')
         }
     }
+
+    const computeResourceNodesCollection = client.db('stan-playground').collection('computeResourceNodes')
+    await computeResourceNodesCollection.updateOne({
+        computeResourceId: request.computeResourceId,
+        nodeId: request.nodeId,
+    }, {
+        $set: {
+            timestampLastActive: Date.now() / 1000,
+            computeResourceId: request.computeResourceId,
+            nodeId: request.nodeId,
+            nodeName: request.nodeName
+        }
+    }, {
+        upsert: true
+    })
+
     return {
         type: 'getPendingScriptJobs',
         scriptJobs

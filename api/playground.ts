@@ -16,6 +16,7 @@ import getComputeResourcesHandler from '../apiHelpers/PlaygroundRequestHandlers/
 import getComputeResourceHandler from '../apiHelpers/PlaygroundRequestHandlers/getComputeResourceHandler'
 import getDataBlobHandler from '../apiHelpers/PlaygroundRequestHandlers/getDataBlobHandler'
 import getPendingScriptJobsHandler from '../apiHelpers/PlaygroundRequestHandlers/getPendingScriptJobsHandler'
+import getActiveComputeResourceNodesHandler from '../apiHelpers/PlaygroundRequestHandlers/getActiveComputeResourceNodesHandler'
 import getProjectFileHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFileHandler'
 import getProjectFilesHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectFilesHandler'
 import getProjectHandler from '../apiHelpers/PlaygroundRequestHandlers/getProjectHandler'
@@ -34,7 +35,7 @@ import setWorkspaceUsersHandler from '../apiHelpers/PlaygroundRequestHandlers/se
 import askAboutStanProgramHandler from '../apiHelpers/PlaygroundRequestHandlers/askAboutStanProgramHandler'
 import getPubsubSubscriptionHandler from '../apiHelpers/PlaygroundRequestHandlers/getPubsubSubscriptionHandler'
 import verifySignature from '../apiHelpers/verifySignature'
-import { isAskAboutStanProgramRequest, isCloneProjectRequest, isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetComputeResourceRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetPubsubSubscriptionRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
+import { isAskAboutStanProgramRequest, isCloneProjectRequest, isCreateProjectRequest, isCreateScriptJobRequest, isCreateWorkspaceRequest, isDeleteCompletedScriptJobsRequest, isDeleteComputeResourceRequest, isDeleteProjectFileRequest, isDeleteProjectRequest, isDeleteScriptJobRequest, isDeleteWorkspaceRequest, isDuplicateProjectFileRequest, isGetActiveComputeResourceNodesRequest, isGetComputeResourceRequest, isGetComputeResourcesRequest, isGetDataBlobRequest, isGetPendingScriptJobsRequest, isGetProjectFileRequest, isGetProjectFilesRequest, isGetProjectRequest, isGetProjectsRequest, isGetPubsubSubscriptionRequest, isGetScriptJobRequest, isGetScriptJobsRequest, isGetWorkspaceRequest, isGetWorkspacesRequest, isPlaygroundRequest, isRegisterComputeResourceRequest, isRenameProjectFileRequest, isSetProjectFileRequest, isSetProjectPropertyRequest, isSetScriptJobPropertyRequest, isSetWorkspacePropertyRequest, isSetWorkspaceUsersRequest } from '../src/types/PlaygroundRequest'
 
 const ADMIN_USER_IDS = JSON.parse(process.env.ADMIN_USER_IDS || '[]') as string[]
 
@@ -185,6 +186,9 @@ module.exports = (req: VercelRequest, res: VercelResponse) => {
         }
         else if (isGetPendingScriptJobsRequest(payload)) {
             return await getPendingScriptJobsHandler(payload, {verifiedClientId, verifiedUserId})
+        }
+        else if (isGetActiveComputeResourceNodesRequest(payload)) {
+            return await getActiveComputeResourceNodesHandler(payload, {verifiedClientId, verifiedUserId})
         }
         else if (isSetScriptJobPropertyRequest(payload)) {
             return await setScriptJobPropertyHandler(payload, {verifiedClientId, verifiedUserId})

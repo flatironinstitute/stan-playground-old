@@ -1,10 +1,10 @@
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import ComputeResource from './ComputeResource'
+import ComputeResourceNode from './ComputeResourceNode'
 
 const main = () => {
     yargs(hideBin(process.argv))
-        .command('start', 'Start compute resource', (yargs) => {
+        .command('start', 'Start compute resource node', (yargs) => {
             return yargs
         }, (argv) => {
             const dir: string = argv.dir as string
@@ -12,23 +12,23 @@ const main = () => {
         })
         .option('dir', {
             type: 'string',
-            description: 'Directory of compute resource'
+            description: 'Directory of compute resource node'
         })
         .strictCommands()
         .demandCommand(1)
         .parse()
 }
 
-let computeResource: ComputeResource
+let computeResourceNode: ComputeResourceNode
 function start({ dir }: { dir: string }) {
-    computeResource = new ComputeResource({ dir })
-    computeResource.start()
+    computeResourceNode = new ComputeResourceNode({ dir })
+    computeResourceNode.start()
 }
 
 process.on('SIGINT', function () {
-    if (computeResource) {
-        console.info('Stopping compute resource.')
-        computeResource.stop().then(() => {
+    if (computeResourceNode) {
+        console.info('Stopping compute resource node.')
+        computeResourceNode.stop().then(() => {
             console.info('Exiting.')
             process.exit()
         })

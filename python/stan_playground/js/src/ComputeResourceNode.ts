@@ -1,12 +1,12 @@
 import ScriptJobExecutor from "./ScriptJobExecutor"
 
-class ComputeResource {
+class ComputeResourceNode {
     #scriptJobExecutor: ScriptJobExecutor
     constructor(private a: { dir: string }) {
         this.#scriptJobExecutor = new ScriptJobExecutor({ dir: a.dir })
     }
     async start() {
-        console.info('Starting compute resource.')
+        console.info('Starting compute resource node.')
         this.#scriptJobExecutor.start()
     }
     async stop() {
@@ -14,4 +14,4 @@ class ComputeResource {
     }
 }
 
-export default ComputeResource
+export default ComputeResourceNode

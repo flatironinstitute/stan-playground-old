@@ -17,23 +17,23 @@ pip install -e .
 ```
 
 ```bash
-# Register (one time)
+# Initialize (one time)
 export COMPUTE_RESOURCE_DIR=/some/path
 cd $COMPUTE_RESOURCE_DIR
-stan-playground register-compute-resource
+stan-playground init-compute-resource-node
 # Open the provided link in a browser and log in using GitHub
 ```
 
-Edit `$COMPUTE_RESOURCE_DIR/.stan-playground-compute-resource.yaml` and set `containerMethod` to `docker` or `singularity`. By default it is set to `docker`.
+Edit `$COMPUTE_RESOURCE_DIR/.stan-playground-compute-resource-node.yaml` and set `container_method` to `docker` or `singularity`. By default it is set to `docker`.
 
 ```bash
 # If using docker, initialize the docker container
-stan-playground initialize-docker-container
+stan-playground init-docker-container
 
 # --- or ---
 
 # If using singularity, initialize the singularity container
-stan-playground initialize-singularity-container
+stan-playground init-singularity-container
 ```
 
 ```bash

@@ -1,11 +1,11 @@
 import { signMessage } from "./signatures";
 import { isPlaygroundResponse, PlaygroundRequest, PlaygroundRequestPayload, PlaygroundResponse } from "./types/PlaygroundRequest";
 
-const postPlaygroundRequestFromComputeResource = async (req: PlaygroundRequestPayload, o: {computeResourceId: string, privateKey: string}): Promise<PlaygroundResponse | undefined> => {
+const postPlaygroundRequestFromComputeResource = async (req: PlaygroundRequestPayload, o: {computeResourceId: string, computeResourcePrivateKey: string}): Promise<PlaygroundResponse | undefined> => {
     const rr: PlaygroundRequest = {
         payload: req,
         fromClientId: o.computeResourceId,
-        signature: await signMessage(req, o.computeResourceId, o.privateKey)
+        signature: await signMessage(req, o.computeResourceId, o.computeResourcePrivateKey)
     }
 
     const stanPlaygroundUrl = process.env.STAN_PLAYGROUND_URL || 'https://stan-playground.vercel.app'

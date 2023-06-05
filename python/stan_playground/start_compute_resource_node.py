@@ -1,9 +1,11 @@
 import sys
+import os
+import yaml
 from pathlib import Path
 import subprocess
 from threading import Thread
 import signal
-from .register_compute_resource import default_config
+from .init_compute_resource_node import default_config
 
 
 this_directory = Path(__file__).parent
@@ -51,21 +53,8 @@ class Daemon:
             self.process.wait()
 
 
-def start_compute_resource(dir: str):
-
-    # migrate from .json to .yaml
-    import os
-    import yaml
-    import json
-    config_fname = os.path.join(dir, '.stan-playground-compute-resource.yaml')
-    config_fname_old = os.path.join(dir, '.stan-playground-compute-resource.json')
-    if not os.path.exists(config_fname) and os.path.exists(config_fname_old):
-        print('Migrating from .json to .yaml')
-        with open(config_fname_old, 'r') as f:
-            config_old = json.load(f)
-            with open(config_fname, 'w') as f:
-                yaml.dump(config_old, f)
-        os.rename(config_fname_old, config_fname_old + '.to-delete')
+def start_compute_resource_node(dir: str):
+    config_fname = os.path.join(dir, '.stan-playground-compute-resource-node.yaml')
     
     # set default config fields
     with open(config_fname, 'r') as f:
