@@ -71,8 +71,10 @@ class ScriptJobManager {
             return false
         }
         const a = new RunningJob(job, this.config)
-        this._addRunningJob(a)
         const okay = await a.initiate()
+        if (okay) {
+            this._addRunningJob(a)
+        }
         return okay
     }
     private async _initiateSpaJob(job: SPScriptJob): Promise<boolean> {
@@ -82,9 +84,11 @@ class ScriptJobManager {
             return false
         }
         const a = new RunningJob(job, this.config)
-        this._addRunningJob(a)
-        await a.initiate()
-        return true
+        const okay = await a.initiate()
+        if (okay) {
+            this._addRunningJob(a)
+        }
+        return okay
     }
     private _addRunningJob(job: RunningJob) {
         this.#runningJobs.push(job)
