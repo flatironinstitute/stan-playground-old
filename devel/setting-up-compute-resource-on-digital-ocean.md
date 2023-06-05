@@ -60,7 +60,7 @@ stan-playground register-compute-resource
 
 Edit the config file and set containerMethod to singularity
 
-stan-playground initialize-singularity-container
+stan-playground init-singularity-container
 
 tmux new -s compute-resource
 stan-playground start-compute-resource --dir .

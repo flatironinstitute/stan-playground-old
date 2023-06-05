@@ -19,14 +19,14 @@ def start_compute_resource_node():
     start_compute_resource_node_function(dir='.')
 
 @click.command(help='Initialize the singularity container')
-def initialize_singularity_container():
-    stan_playground.initialize_singularity_container()
+def init_singularity_container():
+    stan_playground.init_singularity_container()
 
 @click.command(help='Initialize the docker container')
-def initialize_docker_container():
-    stan_playground.initialize_docker_container()
+def init_docker_container():
+    stan_playground.init_docker_container()
 
 main.add_command(init_compute_resource_node)
 main.add_command(start_compute_resource_node)
-main.add_command(initialize_singularity_container)
-main.add_command(initialize_docker_container)
+main.add_command(init_singularity_container)
+main.add_command(init_docker_container)
