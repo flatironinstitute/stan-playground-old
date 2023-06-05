@@ -3,7 +3,6 @@ import stan_playground
 from .init_compute_resource_node import init_compute_resource_node as init_compute_resource_node_function
 from .start_compute_resource_node import start_compute_resource_node as start_compute_resource_node_function
 
-
 @click.group(help="stan-playground command line interface")
 def main():
     pass

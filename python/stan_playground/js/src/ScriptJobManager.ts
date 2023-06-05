@@ -430,7 +430,7 @@ python3 ${scriptFileName}
             const outputFileNames: string[] = []
             const files = fs.readdirSync(scriptJobDir)
             for (const file of files) {
-                if (file !== scriptFileName) {
+                if ((file !== scriptFileName) && (file !== 'run.sh')) {
                     // check whether it is a file
                     const stat = fs.statSync(path.join(scriptJobDir, file))
                     if (stat.isFile()) {

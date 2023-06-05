@@ -11,6 +11,8 @@ type Props = {
     fileName: string
 }
 
+const queryParams = parseQuery(window.location.href)
+
 const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName }) => {
     const {workspaceRole} = useWorkspace()
     const {refreshScriptJobs, createScriptJob, deleteCompletedScriptJobs, scriptJobs} = useProject()
@@ -26,8 +28,10 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
         const pendingJob = scriptJobs.find(jj => (jj.scriptFileName === fileName && jj.status === 'pending'))
         const runningJob = scriptJobs.find(jj => (jj.scriptFileName === fileName && jj.status === 'running'))
         if ((pendingJob) || (runningJob)) {
-            setCreateJobTitle('A job is already pending or running for this script.')
-            return false
+            if (!(queryParams['test'] === '1')) {
+                setCreateJobTitle('A job is already pending or running for this script.')
+                return false
+            }
         }
         if (workspaceRole === 'admin' || workspaceRole === 'editor') {
             setCreateJobTitle('Create job')
@@ -80,6 +84,18 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
             />
         </>
     )
+}
+
+function parseQuery(queryString: string) {
+    const ind = queryString.indexOf('?')
+    if (ind <0) return {}
+    const query: {[k: string]: string} = {};
+    const pairs = queryString.slice(ind + 1).split('&');
+    for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i].split('=');
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+    }
+    return query;
 }
 
 export default ScriptJobsWindow
