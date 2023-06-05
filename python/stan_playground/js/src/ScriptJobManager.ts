@@ -45,10 +45,14 @@ class ScriptJobManager {
         this.#runningJobs.forEach(j => j.stop())
     }
     async cleanupOldJobs() {
-        // list all folders in scriptJobs directory
-        const folders = await fs.promises.readdir(path.join(this.config.dir, 'scriptJobs'))
+        // list all folders in script_jobs directory
+        const scriptJobsDir = path.join(this.config.dir, 'script_jobs')
+        if (!fs.existsSync(scriptJobsDir)) {
+            return
+        }
+        const folders = await fs.promises.readdir(scriptJobsDir)
         for (const folder of folders) {
-            const folderPath = path.join(this.config.dir, 'scriptJobs', folder)
+            const folderPath = path.join(this.config.dir, 'script_jobs', folder)
             const stat = await fs.promises.stat(folderPath)
             if (stat.isDirectory()) {
                 // check how old the folder is
@@ -216,7 +220,7 @@ export class RunningJob {
         }
         const scriptFileName = this.scriptJob.scriptFileName
         const scriptFileContent = await this._loadFileContent(this.scriptJob.scriptFileName)
-        const scriptJobDir = path.join(this.config.dir, 'scriptJobs', this.scriptJob.scriptJobId)
+        const scriptJobDir = path.join(this.config.dir, 'script_jobs', this.scriptJob.scriptJobId)
         fs.mkdirSync(scriptJobDir, {recursive: true})
         fs.writeFileSync(path.join(scriptJobDir, scriptFileName), scriptFileContent)
 
