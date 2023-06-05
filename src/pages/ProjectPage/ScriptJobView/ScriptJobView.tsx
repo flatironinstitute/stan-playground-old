@@ -64,6 +64,10 @@ const ScriptJobView: FunctionComponent<Props> = ({ width, height, scriptJobId })
                         <td><ComputeResourceIdComponent computeResourceId={scriptJob.computeResourceId} /></td>
                     </tr>
                     <tr>
+                        <td>Node</td>
+                        <td>{scriptJob.computeResourceNodeId ? `${scriptJob.computeResourceNodeName} (${scriptJob.computeResourceNodeId})`: ''}</td>
+                    </tr>
+                    <tr>
                         <td>Job status:</td>
                         <td>{scriptJob.status}</td>
                     </tr>

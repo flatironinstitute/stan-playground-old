@@ -47,6 +47,13 @@ const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest,
     }
     update.timestampModified = Date.now() / 1000
 
+    if (request.computeResourceNodeId) {
+        update.computeResourceNodeId = request.computeResourceNodeId
+    }
+    if (request.computeResourceNodeName) {
+        update.computeResourceNodeName = request.computeResourceNodeName
+    }
+
     const filter: {[key: string]: any} = {scriptJobId: request.scriptJobId}
     if (request.property === 'status') {
         if (request.value === 'running') {

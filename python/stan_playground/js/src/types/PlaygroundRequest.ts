@@ -905,6 +905,8 @@ export type SetScriptJobPropertyRequest = {
     scriptJobId: string
     property: string
     value: any
+    computeResourceNodeId?: string
+    computeResourceNodeName?: string
 }
 
 export const isSetScriptJobPropertyRequest = (x: any): x is SetScriptJobPropertyRequest => {
@@ -915,7 +917,9 @@ export const isSetScriptJobPropertyRequest = (x: any): x is SetScriptJobProperty
         projectId: isString,
         scriptJobId: isString,
         property: isString,
-        value: () => (true)
+        value: () => (true),
+        computeResourceNodeId: optional(isString),
+        computeResourceNodeName: optional(isString)
     })
 }
 

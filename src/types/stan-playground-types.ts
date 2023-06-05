@@ -143,6 +143,8 @@ export type SPScriptJob = {
     error?: string
     consoleOutput?: string
     computeResourceId: string
+    computeResourceNodeId?: string
+    computeResourceNodeName?: string
     timestampCreated: number
     timestampModified: number
 }
@@ -157,6 +159,8 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
         error: optional(isString),
         consoleOutput: optional(isString),
         computeResourceId: isString,
+        computeResourceNodeId: optional(isString),
+        computeResourceNodeName: optional(isString),
         timestampCreated: isNumber,
         timestampModified: isNumber
     })

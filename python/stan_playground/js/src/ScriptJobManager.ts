@@ -147,7 +147,9 @@ export class RunningJob {
             projectId: this.scriptJob.projectId,
             scriptJobId: this.scriptJob.scriptJobId,
             property,
-            value
+            value,
+            computeResourceNodeId: this.config.computeResourceConfig.node_id,
+            computeResourceNodeName: this.config.computeResourceConfig.node_name
         }
         const resp = await this._postPlaygroundRequest(req)
         if (!resp) {
