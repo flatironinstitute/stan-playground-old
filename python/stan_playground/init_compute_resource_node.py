@@ -23,9 +23,15 @@ def init_compute_resource_node(*, dir: str, compute_resource_id: Optional[str]=N
     config_fname = os.path.join(dir, '.stan-playground-compute-resource-node.yaml')
 
     if not os.path.exists(config_fname):
-        public_key_hex, private_key_hex = generate_keypair()
-        compute_resource_id = public_key_hex
-        compute_resource_private_key = private_key_hex
+        if not compute_resource_id:
+            if compute_resource_private_key:
+                raise ValueError('Cannot specify compute_resource_private_key without specifying compute_resource_id.')
+            public_key_hex, private_key_hex = generate_keypair()
+            compute_resource_id = public_key_hex
+            compute_resource_private_key = private_key_hex
+        else:
+            if not compute_resource_private_key:
+                raise ValueError('Cannot specify compute_resource_id without specifying compute_resource_private_key.')
         x = {
             'compute_resource_id': compute_resource_id,
             'compute_resource_private_key': compute_resource_private_key
