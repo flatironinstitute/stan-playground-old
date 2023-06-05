@@ -302,7 +302,7 @@ python3 ${scriptFileName}
                     if (scriptFileName.endsWith('.py')) {
                         args = [...args, ...[
                             // '--cpus', '1', // limit CPU - having trouble with this - cgroups issue
-                            '--memory', '1G', // limit memory
+                            // '--memory', '1G', // limit memory - for now disable because this option is not available on the FI cluster
                             'docker://jstoropoli/cmdstanpy',
                             'bash', 'run.sh'
                         ]]
@@ -310,7 +310,7 @@ python3 ${scriptFileName}
                     else if (scriptFileName.endsWith('.spa')) {
                         args = [...args, ...[
                             // '--cpus', '4', // limit CPU - having trouble with this - cgroups issue
-                            '--memory', '4G', // limit memory
+                            // '--memory', '4G', // limit memory - for now disable because this option is not available on the FI cluster
                             'docker://jstoropoli/cmdstanpy',
                             'bash', 'run.sh'
                         ]]
