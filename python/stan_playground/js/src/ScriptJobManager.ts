@@ -583,13 +583,13 @@ const jobFitsInJobSlot = (jobSlot: {count: number, num_cpus: number, ram_gb: num
     if (jobSlot.count <= 0) {
         return false
     }
-    if (job.requiredResources?.numCpus || 1 > jobSlot.num_cpus) {
+    if ((job.requiredResources?.numCpus || 1) > jobSlot.num_cpus) {
         return false
     }
-    if (job.requiredResources?.ramGb || 1 > jobSlot.ram_gb) {
+    if ((job.requiredResources?.ramGb || 1) > jobSlot.ram_gb) {
         return false
     }
-    if (job.requiredResources?.timeoutSec || 10 > jobSlot.timeout_sec) {
+    if ((job.requiredResources?.timeoutSec || 10) > jobSlot.timeout_sec) {
         return false
     }
     return true
