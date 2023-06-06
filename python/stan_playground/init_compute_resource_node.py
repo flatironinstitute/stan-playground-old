@@ -19,7 +19,7 @@ default_config = {
             'count': 2,
             'num_cpus': 2,
             'ram_gb': 4,
-            'timeout_sec': 60
+            'timeout_sec': 180
         }
     ]
 }

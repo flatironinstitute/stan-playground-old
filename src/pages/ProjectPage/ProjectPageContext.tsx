@@ -258,8 +258,22 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
                 requiredResources = {
                     numCpus: spa.required_resources.num_cpus || 1,
                     ramGb: spa.required_resources.ram_gb || 1,
-                    timeoutSec: spa.required_resources.timeout_sec || 10
+                    timeoutSec: spa.required_resources.timeout_sec || 180
                 }
+            }
+            else {
+                requiredResources = {
+                    numCpus: 1,
+                    ramGb: 1,
+                    timeoutSec: 180
+                }
+            }
+        }
+        else if (o.scriptFileName.endsWith('.py')) {
+            requiredResources = {
+                numCpus: 1,
+                ramGb: 1,
+                timeoutSec: 10
             }
         }
         const oo = {
