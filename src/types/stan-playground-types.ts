@@ -138,6 +138,7 @@ export type SPScriptJob = {
     scriptJobId: string
     workspaceId: string
     projectId: string
+    userId?: string
     scriptFileName: string
     status: 'pending' | 'queued' | 'running' | 'completed' | 'failed'
     error?: string
@@ -147,6 +148,7 @@ export type SPScriptJob = {
     computeResourceNodeName?: string
     timestampCreated: number
     timestampModified: number
+    elapsedTimeSec?: number
     requiredResources?: {
         numCpus: number
         ramGb: number
@@ -159,6 +161,7 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
         scriptJobId: isString,
         workspaceId: isString,
         projectId: isString,
+        userId: optional(isString),
         scriptFileName: isString,
         status: isOneOf([isEqualTo('pending'), isEqualTo('queued'), isEqualTo('running'), isEqualTo('completed'), isEqualTo('failed')]),
         error: optional(isString),
@@ -168,6 +171,7 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
         computeResourceNodeName: optional(isString),
         timestampCreated: isNumber,
         timestampModified: isNumber,
+        elapsedTimeSec: optional(isNumber),
         requiredResources: optional((y: any) => (validateObject(y, {
             numCpus: isNumber,
             ramGb: isNumber,

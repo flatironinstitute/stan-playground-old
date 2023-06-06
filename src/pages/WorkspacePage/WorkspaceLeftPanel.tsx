@@ -53,7 +53,7 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
                     </tr>
                     <tr>
                         <td>Compute:</td>
-                        <td><ComputeResourceIdComponent computeResourceId={workspace?.computeResourceId} /></td>
+                        <td><ComputeResourceIdComponent computeResourceId={workspace?.computeResourceId} link={true} /></td>
                     </tr>
                 </tbody>
             </table>

@@ -46,7 +46,7 @@ const ComputeResourcesTable: FunctionComponent<Props> = () => {
                             </td>
                             <td>
                                 <Hyperlink onClick={() => setRoute({page: 'compute-resource', computeResourceId: cr.computeResourceId})}>
-                                    <ComputeResourceIdComponent computeResourceId={cr.computeResourceId} />
+                                    <ComputeResourceIdComponent computeResourceId={cr.computeResourceId} link={false} />
                                 </Hyperlink>
                             </td>
                             <td><UserIdComponent userId={cr.ownerId} /></td>

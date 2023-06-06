@@ -4,7 +4,8 @@ import { fetchComputeResource } from "../../dbInterface/dbInterface";
 import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import { timeAgoString } from "../../timeStrings";
 import { SPComputeResource } from "../../types/stan-playground-types";
-import { SetupComputeResources, useComputeResources } from "../ComputeResourcesPage/ComputeResourcesContext";
+import UserIdComponent from "../../UserIdComponent";
+import ComputeResourceScriptJobsTable from "./ComputeResourceScriptJobsTable";
 
 type Props = {
     width: number
@@ -45,16 +46,20 @@ const ComputeResourcesPage: FunctionComponent<Props> = ({width, height, computeR
                     </tr>
                     <tr>
                         <td>Owner</td>
-                        <td>{computeResource?.ownerId}</td>
+                        <td><UserIdComponent userId={computeResource?.ownerId || ''} /></td>
                     </tr>
                     <tr>
                         <td>Created</td>
                         <td>{timeAgoString(computeResource?.timestampCreated)}</td>
                     </tr>
-                    <hr />
-                    <p>Full ID: {computeResource?.computeResourceId}</p>
                 </tbody>
             </table>
+            <hr />
+            <p>Full ID: {computeResource?.computeResourceId}</p>
+            <hr />
+            <ComputeResourceScriptJobsTable
+                computeResourceId={computeResourceId}
+            />
         </div>
     )
 }

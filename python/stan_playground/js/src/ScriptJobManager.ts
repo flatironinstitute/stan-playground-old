@@ -300,6 +300,7 @@ python3 ${scriptFileName}
             lastUpdateConsoleOutputTimestamp = Date.now()
             await this._setScriptJobProperty('consoleOutput', consoleOutput)
         }
+        const timer = Date.now()
         try {
             await new Promise<void>((resolve, reject) => {
                 let returned = false
@@ -432,6 +433,10 @@ python3 ${scriptFileName}
             await this._setScriptJobProperty('error', err.message)
             await this._setScriptJobProperty('status', 'failed')
             this.#status = 'failed'
+
+            const elapsedSec = (Date.now() - timer) / 1000
+            await this._setScriptJobProperty('elapsedTimeSec', elapsedSec)
+
             this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
             return
         }
@@ -458,6 +463,10 @@ python3 ${scriptFileName}
                 await this._setScriptJobProperty('error', 'Too many output files.')
                 await this._setScriptJobProperty('status', 'failed')
                 this.#status = 'failed'
+
+                const elapsedSec = (Date.now() - timer) / 1000
+                await this._setScriptJobProperty('elapsedTimeSec', elapsedSec)
+
                 this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
                 return
             }
@@ -470,6 +479,9 @@ python3 ${scriptFileName}
 
         await this._setScriptJobProperty('status', 'completed')
         this.#status = 'completed'
+
+        const elapsedSec = (Date.now() - timer) / 1000
+        await this._setScriptJobProperty('elapsedTimeSec', elapsedSec)
 
         this.#onCompletedOrFailedCallbacks.forEach(cb => cb())
     }

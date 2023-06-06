@@ -19,7 +19,7 @@ Stan Playground allows the creation of workspaces, with each workspace owned by 
 
 ## Execution of Stan Analyses
 
-A Stan analysis involves a .stan file, a .json dataset file, and certain execution parameters for the Stan sampler, all specified using a .spa (Stan Playground analysis) file. With the "Create job" button, the system launches a job to perform the analysis using the workspace's allocated compute resources. Upon completion, results are stored in a corresponding .spa.out file and can be visualized using [MCMC Monitor](https://github.com/flatironinstitute/mcmc-monitor/blob/main/README.md).
+A Stan analysis involves a .stan file, a .json dataset file, and certain execution parameters for the Stan sampler, all specified using a .spa (Stan Playground analysis) file. With the "Run" button, the system launches a job to perform the analysis using the workspace's allocated compute resources. Upon completion, results are stored in a corresponding .spa.out file and can be visualized using [MCMC Monitor](https://github.com/flatironinstitute/mcmc-monitor/blob/main/README.md).
 
 ## Compute Resources
 

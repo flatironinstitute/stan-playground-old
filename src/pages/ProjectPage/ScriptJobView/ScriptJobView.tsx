@@ -4,6 +4,7 @@ import { fetchScriptJob } from "../../../dbInterface/dbInterface";
 import { useGithubAuth } from "../../../GithubAuth/useGithubAuth";
 import { GetScriptJobRequest } from "../../../types/PlaygroundRequest";
 import { SPScriptJob } from "../../../types/stan-playground-types";
+import UserIdComponent from "../../../UserIdComponent";
 import { useProject } from "../ProjectPageContext";
 
 type Props = {
@@ -56,12 +57,16 @@ const ScriptJobView: FunctionComponent<Props> = ({ width, height, scriptJobId })
                         <td>{scriptJob.scriptJobId}</td>
                     </tr>
                     <tr>
+                        <td>User</td>
+                        <td><UserIdComponent userId={scriptJob.userId} /></td>
+                    </tr>
+                    <tr>
                         <td>Script file name:</td>
                         <td>{scriptJob.scriptFileName}</td>
                     </tr>
                     <tr>
                         <td>Compute resource:</td>
-                        <td><ComputeResourceIdComponent computeResourceId={scriptJob.computeResourceId} /></td>
+                        <td><ComputeResourceIdComponent computeResourceId={scriptJob.computeResourceId} link={true} /></td>
                     </tr>
                     <tr>
                         <td>Node:</td>
@@ -74,6 +79,10 @@ const ScriptJobView: FunctionComponent<Props> = ({ width, height, scriptJobId })
                     <tr>
                         <td>Error:</td>
                         <td style={{color: 'red'}}>{scriptJob.error}</td>
+                    </tr>
+                    <tr>
+                        <td>Elapsed time (sec)</td>
+                        <td>{scriptJob.elapsedTimeSec}</td>
                     </tr>
                 </tbody>
             </table>

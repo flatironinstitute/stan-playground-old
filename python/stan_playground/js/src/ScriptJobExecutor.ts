@@ -3,7 +3,7 @@ import path from 'path'
 import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource"
 import PubsubClient from './PubsubClient'
 import ScriptJobManager from "./ScriptJobManager"
-import { GetPendingScriptJobsRequest, GetPubsubSubscriptionRequest } from "./types/PlaygroundRequest"
+import { GetScriptJobsRequest, GetPubsubSubscriptionRequest } from "./types/PlaygroundRequest"
 import yaml from 'js-yaml'
 
 export type ComputeResourceConfig = {
@@ -102,18 +102,19 @@ class ScriptJobExecutor {
         if (this.#stopped) {
             return
         }
-        const req: GetPendingScriptJobsRequest = {
-            type: 'getPendingScriptJobs',
+        const req: GetScriptJobsRequest = {
+            type: 'getScriptJobs',
             timestamp: Date.now() / 1000,
             computeResourceId: this.#computeResourceConfig.compute_resource_id,
+            status: 'pending',
             nodeId: this.#computeResourceConfig.node_id,
             nodeName: this.#computeResourceConfig.node_name
         }
         const resp = await this._postPlaygroundRequest(req)
         if (resp) {
-            if (resp.type !== 'getPendingScriptJobs') {
+            if (resp.type !== 'getScriptJobs') {
                 console.warn(resp)
-                throw Error('Unexpected response type. Expected getPendingScriptJobs')
+                throw Error('Unexpected response type. Expected getScriptJobs')
             }
             const {scriptJobs} = resp
             if (scriptJobs.length > 0) {

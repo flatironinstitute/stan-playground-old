@@ -362,11 +362,24 @@ export const deleteCompletedScriptJobs = async (workspaceId: string, projectId: 
     }
 }
 
-export const fetchScriptJobs = async (projectId: string, auth: Auth): Promise<SPScriptJob[]> => {
+export const fetchScriptJobsForProject = async (projectId: string, auth: Auth): Promise<SPScriptJob[]> => {
     const req: GetScriptJobsRequest = {
         type: 'getScriptJobs',
         timestamp: Date.now() / 1000,
         projectId
+    }
+    const resp = await postPlaygroundRequest(req, {...auth})
+    if (resp.type !== 'getScriptJobs') {
+        throw Error(`Unexpected response type ${resp.type}. Expected getScriptJobs.`)
+    }
+    return resp.scriptJobs
+}
+
+export const fetchScriptJobsForComputeResource = async (computeResourceId: string, auth: Auth): Promise<SPScriptJob[]> => {
+    const req: GetScriptJobsRequest = {
+        type: 'getScriptJobs',
+        timestamp: Date.now() / 1000,
+        computeResourceId
     }
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'getScriptJobs') {

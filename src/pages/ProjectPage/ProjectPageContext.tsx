@@ -1,5 +1,5 @@
 import React, { FunctionComponent, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobs, setProjectProperty, duplicateProjectFile, renameProjectFile, askAboutStanProgram } from '../../dbInterface/dbInterface';
+import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, deleteCompletedScriptJobs, deleteScriptJob, fetchProject, fetchProjectFiles, fetchScriptJobsForProject, setProjectProperty, duplicateProjectFile, renameProjectFile, askAboutStanProgram } from '../../dbInterface/dbInterface';
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { onPubsubMessage } from '../../pubnub/pubnub';
 import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
@@ -205,7 +205,7 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
         ;(async () => {
             setScriptJobs(undefined)
             if (!projectId) return
-            const x = await fetchScriptJobs(projectId, auth)
+            const x = await fetchScriptJobsForProject(projectId, auth)
             if (canceled) return
             setScriptJobs(x)
         })()

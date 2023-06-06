@@ -30,6 +30,10 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
             setCreateJobTitle('Unable to find open tab')
             return false
         }
+        if (!openTab.content) {
+            setCreateJobTitle('File is empty')
+            return false
+        }
         if (openTab.content !== openTab.editedContent) {
             setCreateJobTitle('File has unsaved changes')
             return false

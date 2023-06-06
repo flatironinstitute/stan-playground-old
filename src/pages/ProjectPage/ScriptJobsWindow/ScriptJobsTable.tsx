@@ -6,6 +6,7 @@ import ComputeResourceIdComponent from "../../../ComputeResourceIdComponent";
 import { confirm } from "../../../confirm_prompt_alert";
 import { timeAgoString } from "../../../timeStrings";
 import { SPScriptJob } from "../../../types/stan-playground-types";
+import UserIdComponent from "../../../UserIdComponent";
 import { useWorkspace } from "../../WorkspacePage/WorkspacePageContext";
 import { useProject } from "../ProjectPageContext";
 
@@ -30,6 +31,7 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
                     <th>Job</th>
                     <th>File</th>
                     <th>Status</th>
+                    <th>User</th>
                     <th>Created</th>
                     <th>Compute</th>
                 </tr>
@@ -58,8 +60,11 @@ const ScriptJobsTable: FunctionComponent<Props> = ({ fileName }) => {
                                     </Hyperlink>
                                 )
                             }</td>
+                            <td>
+                                <UserIdComponent userId={jj.userId} />
+                            </td>
                             <td>{timeAgoString(jj.timestampCreated)}</td>
-                            <td><ComputeResourceIdComponent computeResourceId={jj.computeResourceId} /></td>
+                            <td><ComputeResourceIdComponent computeResourceId={jj.computeResourceId} link={true} /></td>
                         </tr>
                     ))
                 }
