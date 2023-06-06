@@ -29,7 +29,7 @@ const postPlaygroundRequestFromComputeResource = async (req: PlaygroundRequestPa
             throw Error('Unable to parse playground response')
         }
         if (!isPlaygroundResponse(responseData)) {
-            console.warn(responseData)
+            console.warn(JSON.stringify(responseData, null, 2))
             throw Error('Unexpected playground response')
         }
         return responseData

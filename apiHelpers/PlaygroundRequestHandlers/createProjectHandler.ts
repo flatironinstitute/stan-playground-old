@@ -92,6 +92,7 @@ options:
 required_resources:
     num_cpus: 1
     ram_gb: 1
+    timeout_sec: 600
 `
 
 export default createProjectHandler

@@ -31,15 +31,18 @@ class ScriptJobManager {
         if (this.#runningJobs.filter(x => x.scriptJob.scriptJobId === job.scriptJobId).length > 0) {
             return false
         }
-        if (job.scriptFileName.endsWith(".py")) {
-            return await this._initiatePythonJob(job)
-        }
-        else if (job.scriptFileName.endsWith('.spa')) {
-            return await this._initiateSpaJob(job)
-        }
-        else {
+        const {job_slots} = this.config.computeResourceConfig
+        const job_slots2 = removeOccupiedJobSlots(job_slots, this.#runningJobs)
+        const availableJobSlot = getAvailableJobSlot(job_slots2, job)
+        if (!availableJobSlot) {
             return false
         }
+        const a = new RunningJob(job, this.config, availableJobSlot)
+        const okay = await a.initiate()
+        if (okay) {
+            this._addRunningJob(a)
+        }
+        return okay
     }
     stop() {
         this.#runningJobs.forEach(j => j.stop())
@@ -64,41 +67,41 @@ class ScriptJobManager {
             }
         }
     }
-    private async _initiatePythonJob(job: SPScriptJob): Promise<boolean> {
-        const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.py'))
-        const {max_num_concurrent_python_jobs, max_ram_per_python_job_gb} = this.config.computeResourceConfig
-        if (x.length >= max_num_concurrent_python_jobs) {
-            return false
-        }
-        if ((job.requiredResources?.ramGb || 1) > max_ram_per_python_job_gb) {
-            return false
-        }
-        const a = new RunningJob(job, this.config)
-        const okay = await a.initiate()
-        if (okay) {
-            this._addRunningJob(a)
-        }
-        return okay
-    }
-    private async _initiateSpaJob(job: SPScriptJob): Promise<boolean> {
-        const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.spa'))
-        const {max_num_concurrent_spa_jobs, num_cpus_per_spa_job, max_ram_per_spa_job_gb} = this.config.computeResourceConfig
-        if (x.length >= max_num_concurrent_spa_jobs) {
-            return false
-        }
-        if ((job.requiredResources?.numCpus || 1) > num_cpus_per_spa_job) {
-            return false
-        }
-        if ((job.requiredResources?.ramGb || 1) > max_ram_per_spa_job_gb) {
-            return false
-        }
-        const a = new RunningJob(job, this.config)
-        const okay = await a.initiate()
-        if (okay) {
-            this._addRunningJob(a)
-        }
-        return okay
-    }
+    // private async _initiatePythonJob(job: SPScriptJob): Promise<boolean> {
+    //     const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.py'))
+    //     const {max_num_concurrent_python_jobs, max_ram_per_python_job_gb} = this.config.computeResourceConfig
+    //     if (x.length >= max_num_concurrent_python_jobs) {
+    //         return false
+    //     }
+    //     if ((job.requiredResources?.ramGb || 1) > max_ram_per_python_job_gb) {
+    //         return false
+    //     }
+    //     const a = new RunningJob(job, this.config)
+    //     const okay = await a.initiate()
+    //     if (okay) {
+    //         this._addRunningJob(a)
+    //     }
+    //     return okay
+    // }
+    // private async _initiateSpaJob(job: SPScriptJob): Promise<boolean> {
+    //     const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.spa'))
+    //     const {max_num_concurrent_spa_jobs, num_cpus_per_spa_job, max_ram_per_spa_job_gb} = this.config.computeResourceConfig
+    //     if (x.length >= max_num_concurrent_spa_jobs) {
+    //         return false
+    //     }
+    //     if ((job.requiredResources?.numCpus || 1) > num_cpus_per_spa_job) {
+    //         return false
+    //     }
+    //     if ((job.requiredResources?.ramGb || 1) > max_ram_per_spa_job_gb) {
+    //         return false
+    //     }
+    //     const a = new RunningJob(job, this.config)
+    //     const okay = await a.initiate()
+    //     if (okay) {
+    //         this._addRunningJob(a)
+    //     }
+    //     return okay
+    // }
     private _addRunningJob(job: RunningJob) {
         this.#runningJobs.push(job)
         job.onCompletedOrFailed(() => {
@@ -113,7 +116,7 @@ export class RunningJob {
     #onCompletedOrFailedCallbacks: (() => void)[] = []
     #childProcess: ChildProcessWithoutNullStreams | null = null
     #status: 'pending' | 'running' | 'completed' | 'failed' = 'pending'
-    constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceConfig: ComputeResourceConfig}) {
+    constructor(public scriptJob: SPScriptJob, private config: {dir: string, computeResourceConfig: ComputeResourceConfig}, private jobSlot: {num_cpus: number, ram_gb: number, timeout_sec: number}) {
     }
     async initiate(): Promise<boolean> {
         console.info(`Initiating script job: ${this.scriptJob.scriptJobId} - ${this.scriptJob.scriptFileName}`)
@@ -252,7 +255,7 @@ export class RunningJob {
             const dataFileContent = await this._loadFileContent(dataFileName)
             fs.writeFileSync(path.join(scriptJobDir, stanProgramFileName), stanProgramFileContent)
             fs.writeFileSync(path.join(scriptJobDir, dataFileName), dataFileContent)
-            const parallelChains = this.config.computeResourceConfig.num_cpus_per_spa_job
+            const parallelChains = this.jobSlot.num_cpus
             const threadsPerChain = 1
             const runPyContent = createRunPyContent(spaFileName, {
                 parallelChains,
@@ -321,16 +324,16 @@ python3 ${scriptFileName}
                     ]
                     if (scriptFileName.endsWith('.py')) {
                         args = [...args, ...[
-                            // '--cpus', '1', // limit CPU - having trouble with this - cgroups issue
-                            // '--memory', '1G', // limit memory - for now disable because this option is not available on the FI cluster
+                            // '--cpus', `${this.jobSlot.num_cpus}`, // limit CPU - having trouble with this - cgroups issue
+                            // '--memory', `${this.jobSlot.ram_gb}G`, // limit memory - for now disable because this option is not available on the FI cluster
                             'docker://jstoropoli/cmdstanpy',
                             'bash', 'run.sh'
                         ]]
                     }
                     else if (scriptFileName.endsWith('.spa')) {
                         args = [...args, ...[
-                            // '--cpus', '4', // limit CPU - having trouble with this - cgroups issue
-                            // '--memory', '4G', // limit memory - for now disable because this option is not available on the FI cluster
+                            // '--cpus', `${this.jobSlot.num_cpus}`, // limit CPU - having trouble with this - cgroups issue
+                            // '--memory', `${this.jobSlot.ram_gb}G`, // limit memory - for now disable because this option is not available on the FI cluster
                             'docker://jstoropoli/cmdstanpy',
                             'bash', 'run.sh'
                         ]]
@@ -349,16 +352,16 @@ python3 ${scriptFileName}
                     ]
                     if (scriptFileName.endsWith('.py')) {
                         args = [...args, ...[
-                            '--cpus', '1', // limit CPU
-                            '--memory', `${this.config.computeResourceConfig.max_ram_per_python_job_gb}g`, // limit memory
+                            '--cpus', `${this.jobSlot.num_cpus}`, // limit CPU
+                            '--memory', `${this.jobSlot.ram_gb}g`, // limit memory
                             'jstoropoli/cmdstanpy',
                             '-c', `bash run.sh` // tricky - need to put the last two args together so that it ends up in a quoted argument
                         ]]
                     }
                     else if (scriptFileName.endsWith('.spa')) {
                         args = [...args, ...[
-                            '--cpus', '4', // limit CPU
-                            '--memory', `${this.config.computeResourceConfig.max_ram_per_spa_job_gb}g`, // limit memory
+                            '--cpus', `${this.jobSlot.num_cpus}`, // limit CPU
+                            '--memory', `${this.jobSlot.ram_gb}g`, // limit memory
                             'jstoropoli/cmdstanpy',
                             '-c', 'bash run.sh' // tricky - need to put the last two args together so that it ends up in a quoted argument
                         ]]
@@ -377,16 +380,7 @@ python3 ${scriptFileName}
 
                 console.info('EXECUTING:', `${cmd} ${args.join(' ')}`)
 
-                let timeoutSec: number
-                if (scriptFileName.endsWith('.py')) {
-                    timeoutSec = 10
-                }
-                else if (scriptFileName.endsWith('.spa')) {
-                    timeoutSec = 60 * 10
-                }
-                else {
-                    throw Error(`Unsupported script file name: ${scriptFileName}`)
-                }
+                const timeoutSec: number = this.jobSlot.timeout_sec
 
                 this.#childProcess = spawn(cmd, args, {
                     cwd: scriptJobDir
@@ -567,6 +561,53 @@ const loadSpaOutput = async (outputDir: string): Promise<SpaOutput> => {
     }
 
     return ret
+}
+
+const removeOccupiedJobSlots = (jobSlots: {count: number, num_cpus: number, ram_gb: number, timeout_sec: number}[], runningJobs: RunningJob[]): {count: number, num_cpus: number, ram_gb: number, timeout_sec: number}[] => {
+    const ret: {count: number, num_cpus: number, ram_gb: number, timeout_sec: number}[] = []
+    for (const js of jobSlots) {
+        ret.push({...js})
+    }
+    for (const job of runningJobs) {
+        for (const js of ret) {
+            if (jobFitsInJobSlot(js, job.scriptJob)) {
+                js.count -= 1
+                break
+            }
+        }
+    }
+    return ret
+}
+
+const jobFitsInJobSlot = (jobSlot: {count: number, num_cpus: number, ram_gb: number, timeout_sec: number}, job: SPScriptJob): boolean => {
+    if (jobSlot.count <= 0) {
+        return false
+    }
+    if (job.requiredResources?.numCpus || 1 > jobSlot.num_cpus) {
+        return false
+    }
+    if (job.requiredResources?.ramGb || 1 > jobSlot.ram_gb) {
+        return false
+    }
+    if (job.requiredResources?.timeoutSec || 10 > jobSlot.timeout_sec) {
+        return false
+    }
+    return true
+}
+
+const getAvailableJobSlot = (jobSlots: {count: number, num_cpus: number, ram_gb: number, timeout_sec: number}[], job: SPScriptJob): {num_cpus: number, ram_gb: number, timeout_sec: number} | undefined => {
+    for (const js of jobSlots) {
+        if (js.count > 0) {
+            if (jobFitsInJobSlot(js, job)) {
+                return {
+                    num_cpus: js.num_cpus,
+                    ram_gb: js.ram_gb,
+                    timeout_sec: js.timeout_sec
+                }
+            }
+        }
+    }
+    return undefined
 }
 
 export default ScriptJobManager

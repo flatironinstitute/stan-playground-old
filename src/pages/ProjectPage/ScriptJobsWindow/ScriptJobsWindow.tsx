@@ -15,7 +15,7 @@ const queryParams = parseQuery(window.location.href)
 
 const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName }) => {
     const {workspaceRole} = useWorkspace()
-    const {refreshScriptJobs, createScriptJob, deleteCompletedScriptJobs, scriptJobs} = useProject()
+    const {refreshScriptJobs, createScriptJob, deleteCompletedScriptJobs, scriptJobs, openTabs} = useProject()
 
     const handleCreateJob = useCallback(async () => {
         createScriptJob({scriptFileName: fileName})
@@ -25,6 +25,15 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
 
     const canCreateJob = useMemo(() => {
         if (!scriptJobs) return false // not loaded yet
+        const openTab = openTabs.find(t => t.tabName === `file:${fileName}`)
+        if (!openTab) {
+            setCreateJobTitle('Unable to find open tab')
+            return false
+        }
+        if (openTab.content !== openTab.editedContent) {
+            setCreateJobTitle('File has unsaved changes')
+            return false
+        }
         const pendingJob = scriptJobs.find(jj => (jj.scriptFileName === fileName && jj.status === 'pending'))
         const runningJob = scriptJobs.find(jj => (jj.scriptFileName === fileName && jj.status === 'running'))
         if ((pendingJob) || (runningJob)) {
@@ -41,7 +50,7 @@ const ScriptJobsWindow: FunctionComponent<Props> = ({ width, height, fileName })
             setCreateJobTitle('You do not have permission to run scripts for this project.')
         }
         return false
-    }, [workspaceRole, scriptJobs, fileName])
+    }, [workspaceRole, scriptJobs, fileName, openTabs])
 
     const handleDeleteCompletedJobs = useCallback(async () => {
         const okay = await confirm('Delete all completed or failed jobs?')

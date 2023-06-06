@@ -18,7 +18,7 @@ const getPendingScriptJobsHandler = async (request: GetPendingScriptJobsRequest,
     }).toArray())
     for (const scriptJob of scriptJobs) {
         if (!isSPScriptJob(scriptJob)) {
-            console.warn(scriptJob)
+            console.warn(JSON.stringify(scriptJob, null, 2))
             console.warn('Invalid script job in database (0)')
             throw new Error('Invalid script job in database (0)')
         }

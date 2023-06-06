@@ -150,6 +150,7 @@ export type SPScriptJob = {
     requiredResources?: {
         numCpus: number
         ramGb: number
+        timeoutSec: number
     }
 }
 
@@ -169,7 +170,8 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
         timestampModified: isNumber,
         requiredResources: optional((y: any) => (validateObject(y, {
             numCpus: isNumber,
-            ramGb: isNumber
+            ramGb: isNumber,
+            timeoutSec: isNumber
         })))
     })
 }

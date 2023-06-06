@@ -686,6 +686,7 @@ export type CreateScriptJobRequest = {
     requiredResources?: {
         numCpus: number
         ramGb: number
+        timeoutSec: number
     }
 }
 
@@ -698,7 +699,8 @@ export const isCreateScriptJobRequest = (x: any): x is CreateScriptJobRequest =>
         scriptFileName: isString,
         requiredResources: optional((y: any) => (validateObject(y, {
             numCpus: isNumber,
-            ramGb: isNumber
+            ramGb: isNumber,
+            timeoutSec: isNumber
         })))
     })
 }

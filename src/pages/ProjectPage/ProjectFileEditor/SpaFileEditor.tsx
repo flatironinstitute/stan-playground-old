@@ -28,6 +28,7 @@ type Spa = {
     required_resources?: {
         num_cpus: number
         ram_gb: number
+        timeout_sec: number
     }
 }
 
@@ -44,7 +45,8 @@ const options: {
     {key: 'chains', label: 'chains', type: 'number', required: true},
     {key: 'seed', label: 'seed', type: 'number', required: false},
     {key: 'num_cpus', label: 'num. CPUs', type: 'number', required: true, resources: true},
-    {key: 'ram_gb', label: 'RAM (GB)', type: 'number', required: true, resources: true}
+    {key: 'ram_gb', label: 'RAM (GB)', type: 'number', required: true, resources: true},
+    {key: 'timeout_sec', label: 'timeout (sec)', type: 'number', required: true, resources: true}
 ]
 
 const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText, readOnly, outputFileName}) => {

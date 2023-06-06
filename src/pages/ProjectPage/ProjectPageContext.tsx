@@ -251,13 +251,14 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
             console.warn(`Script file ${o.scriptFileName} has been edited but not saved. Not creating job.`)
             return
         }
-        let requiredResources: {numCpus: number, ramGb: number} | undefined = undefined
+        let requiredResources: {numCpus: number, ramGb: number, timeoutSec: number} | undefined = undefined
         if (o.scriptFileName.endsWith('.spa')) {
             const spa: {[k: string]: any} = yaml.load(t.content || '') as any
             if (spa.required_resources) {
                 requiredResources = {
                     numCpus: spa.required_resources.num_cpus || 1,
-                    ramGb: spa.required_resources.ram_gb || 1
+                    ramGb: spa.required_resources.ram_gb || 1,
+                    timeoutSec: spa.required_resources.timeout_sec || 10
                 }
             }
         }

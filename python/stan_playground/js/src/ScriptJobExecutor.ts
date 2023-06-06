@@ -12,11 +12,12 @@ export type ComputeResourceConfig = {
     node_id: string
     node_name: string
     container_method: 'none' | 'docker' | 'singularity'
-    max_num_concurrent_python_jobs: number
-    max_num_concurrent_spa_jobs: number
-    max_ram_per_python_job_gb: number
-    max_ram_per_spa_job_gb: number
-    num_cpus_per_spa_job: number
+    job_slots: {
+        count: number
+        num_cpus: number
+        ram_gb: number
+        timeout_sec: number
+    }[]
 }
 
 class ScriptJobExecutor {
