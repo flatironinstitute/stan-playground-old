@@ -66,8 +66,11 @@ class ScriptJobManager {
     }
     private async _initiatePythonJob(job: SPScriptJob): Promise<boolean> {
         const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.py'))
-        const {max_num_concurrent_python_jobs} = this.config.computeResourceConfig
+        const {max_num_concurrent_python_jobs, max_ram_per_python_job_gb} = this.config.computeResourceConfig
         if (x.length >= max_num_concurrent_python_jobs) {
+            return false
+        }
+        if ((job.requiredResources?.ramGb || 1) > max_ram_per_python_job_gb) {
             return false
         }
         const a = new RunningJob(job, this.config)
@@ -79,8 +82,14 @@ class ScriptJobManager {
     }
     private async _initiateSpaJob(job: SPScriptJob): Promise<boolean> {
         const x = this.#runningJobs.filter(x => x.scriptJob.scriptFileName.endsWith('.spa'))
-        const {max_num_concurrent_spa_jobs} = this.config.computeResourceConfig
+        const {max_num_concurrent_spa_jobs, num_cpus_per_spa_job, max_ram_per_spa_job_gb} = this.config.computeResourceConfig
         if (x.length >= max_num_concurrent_spa_jobs) {
+            return false
+        }
+        if ((job.requiredResources?.numCpus || 1) > num_cpus_per_spa_job) {
+            return false
+        }
+        if ((job.requiredResources?.ramGb || 1) > max_ram_per_spa_job_gb) {
             return false
         }
         const a = new RunningJob(job, this.config)
@@ -243,7 +252,12 @@ export class RunningJob {
             const dataFileContent = await this._loadFileContent(dataFileName)
             fs.writeFileSync(path.join(scriptJobDir, stanProgramFileName), stanProgramFileContent)
             fs.writeFileSync(path.join(scriptJobDir, dataFileName), dataFileContent)
-            const runPyContent = createRunPyContent(spaFileName)
+            const parallelChains = this.config.computeResourceConfig.num_cpus_per_spa_job
+            const threadsPerChain = 1
+            const runPyContent = createRunPyContent(spaFileName, {
+                parallelChains,
+                threadsPerChain
+            })
             fs.writeFileSync(path.join(scriptJobDir, 'run.py'), runPyContent)
             const runShContent = `
 set -e # exit on error and use return code of last command as return code of script
@@ -467,7 +481,7 @@ python3 ${scriptFileName}
     }
 }
 
-const createRunPyContent = (spaFileName: string): string => {
+const createRunPyContent = (spaFileName: string, o: {parallelChains: number, threadsPerChain: number}): string => {
     return `import yaml
 import time
 import json
@@ -489,6 +503,8 @@ iter_warmup = options.get('iter_warmup', None)
 chains = options.get('chains', 4)
 save_warmup = options.get('save_warmup', True)
 seed = options.get('seed', None)
+parallel_chains = ${o.parallelChains}
+threads_per_chain = ${o.threadsPerChain}
 
 if iter_sampling is None:
     raise Exception('iter_sampling not specified in options')
@@ -507,7 +523,9 @@ fit = model.sample(
     chains=chains,
     seed=seed,
     save_warmup=save_warmup,
-    show_console=True
+    show_console=True,
+    parallel_chains=parallel_chains,
+    threads_per_chain=threads_per_chain
 )
 print(f'====================')
 elapsed = time.time() - timer

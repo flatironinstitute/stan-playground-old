@@ -11,7 +11,8 @@ default_config = {
     'max_num_concurrent_python_jobs': 5,
     'max_num_concurrent_spa_jobs': 2,
     'max_ram_per_python_job_gb': 1,
-    'max_ram_per_spa_job_gb': 4
+    'max_ram_per_spa_job_gb': 4,
+    'num_cpus_per_spa_job': 2
 }
 
 def init_compute_resource_node(*, dir: str, compute_resource_id: Optional[str]=None, compute_resource_private_key: Optional[str]=None):

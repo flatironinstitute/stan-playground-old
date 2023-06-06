@@ -49,7 +49,7 @@ const ScriptFileEditor: FunctionComponent<Props> = ({fileName, fileContent, onSa
                         width={0}
                         height={0}
                         text={fileContent}
-                        onSetText={onSaveContent}
+                        onSetText={txt => {onSaveContent(txt); setEditedFileContent(txt)}}
                         readOnly={readOnly}
                         outputFileName={outputFileName}
                     />

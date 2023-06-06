@@ -683,6 +683,10 @@ export type CreateScriptJobRequest = {
     workspaceId: string
     projectId: string
     scriptFileName: string
+    requiredResources?: {
+        numCpus: number
+        ramGb: number
+    }
 }
 
 export const isCreateScriptJobRequest = (x: any): x is CreateScriptJobRequest => {
@@ -691,7 +695,11 @@ export const isCreateScriptJobRequest = (x: any): x is CreateScriptJobRequest =>
         timestamp: isNumber,
         workspaceId: isString,
         projectId: isString,
-        scriptFileName: isString
+        scriptFileName: isString,
+        requiredResources: optional((y: any) => (validateObject(y, {
+            numCpus: isNumber,
+            ramGb: isNumber
+        })))
     })
 }
 

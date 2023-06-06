@@ -3,6 +3,7 @@ import { createScriptJob, deleteProject, cloneProject, deleteProjectFile, delete
 import { useGithubAuth } from '../../GithubAuth/useGithubAuth';
 import { onPubsubMessage } from '../../pubnub/pubnub';
 import { SPProject, SPProjectFile, SPScriptJob } from '../../types/stan-playground-types';
+import yaml from 'js-yaml'
 
 type Props = {
     projectId: string
@@ -241,9 +242,32 @@ export const SetupProjectPage: FunctionComponent<PropsWithChildren<Props>> = ({c
 
     const createScriptJobHandler = useCallback(async (o: {scriptFileName: string}) => {
         if (!project) return
-        await createScriptJob(project.workspaceId, projectId, o, auth)
+        const t = openTabs.openTabs.find(x => x.tabName === `file:${o.scriptFileName}`)
+        if (!t) {
+            console.warn(`Could not find tab for script file ${o.scriptFileName}. Not creating job.`)
+            return
+        }
+        if (t.content !== t.editedContent) {
+            console.warn(`Script file ${o.scriptFileName} has been edited but not saved. Not creating job.`)
+            return
+        }
+        let requiredResources: {numCpus: number, ramGb: number} | undefined = undefined
+        if (o.scriptFileName.endsWith('.spa')) {
+            const spa: {[k: string]: any} = yaml.load(t.content || '') as any
+            if (spa.required_resources) {
+                requiredResources = {
+                    numCpus: spa.required_resources.num_cpus || 1,
+                    ramGb: spa.required_resources.ram_gb || 1
+                }
+            }
+        }
+        const oo = {
+            scriptFileName: o.scriptFileName,
+            requiredResources
+        }
+        await createScriptJob(project.workspaceId, projectId, oo, auth)
         refreshScriptJobs()
-    }, [project, projectId, refreshScriptJobs, auth])
+    }, [project, projectId, refreshScriptJobs, auth, openTabs])
 
     const deleteScriptJobHandler = useCallback(async (scriptJobId: string) => {
         if (!project) return

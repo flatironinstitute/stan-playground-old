@@ -318,13 +318,14 @@ export const deleteComputeResource = async (computeResourceId: string, auth: Aut
     }
 }
 
-export const createScriptJob = async (workspaceId: string, projectId: string, o: {scriptFileName: string}, auth: Auth): Promise<string> => {
+export const createScriptJob = async (workspaceId: string, projectId: string, o: {scriptFileName: string, requiredResources?: {numCpus: number, ramGb: number}}, auth: Auth): Promise<string> => {
     const req: CreateScriptJobRequest = {
         type: 'createScriptJob',
         timestamp: Date.now() / 1000,
         workspaceId,
         projectId,
-        scriptFileName: o.scriptFileName
+        scriptFileName: o.scriptFileName,
+        requiredResources: o.requiredResources
     }
     const resp = await postPlaygroundRequest(req, {...auth})
     if (resp.type !== 'createScriptJob') {

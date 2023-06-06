@@ -89,6 +89,9 @@ options:
     save_warmup: True
     chains: 4
     seed: 0
+required_resources:
+    num_cpus: 1
+    ram_gb: 1
 `
 
 export default createProjectHandler

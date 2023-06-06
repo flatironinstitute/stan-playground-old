@@ -26,7 +26,7 @@ const getScriptJobs = async (request: GetScriptJobsRequest, o: {verifiedClientId
             console.warn(job)
 
             // // during development, delete the record
-            // await scriptJobsCollection.deleteOne({
+            // await scriptJobsCollection.deleteMany({
             //     projectId: request.projectId,
             //     scriptJobId: job.scriptJobId
             // })

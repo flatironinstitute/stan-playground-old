@@ -62,6 +62,9 @@ const createScriptJobHandler = async (request: CreateScriptJobRequest, o: {verif
         timestampCreated: Date.now() / 1000,
         timestampModified: Date.now() / 1000
     }
+    if (request.requiredResources) {
+        job.requiredResources = request.requiredResources
+    }
     const scriptJobsCollection = client.db('stan-playground').collection('scriptJobs')
     await scriptJobsCollection.insertOne(job)
 

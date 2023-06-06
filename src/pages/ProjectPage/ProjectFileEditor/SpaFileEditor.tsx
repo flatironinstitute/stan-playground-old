@@ -25,6 +25,10 @@ type Spa = {
         chains?: number
         seed?: number
     }
+    required_resources?: {
+        num_cpus: number
+        ram_gb: number
+    }
 }
 
 const options: {
@@ -32,12 +36,15 @@ const options: {
     label: string
     type: 'number' | 'boolean' | 'string'
     required: boolean
+    resources?: boolean
 }[] = [
     {key: 'iter_sampling', label: 'iter_sampling', type: 'number', required: true},
     {key: 'iter_warmup', label: 'iter_warmup', type: 'number', required: true},
     {key: 'save_warmup', label: 'save_warmup', type: 'boolean', required: true},
     {key: 'chains', label: 'chains', type: 'number', required: true},
-    {key: 'seed', label: 'seed', type: 'number', required: false}
+    {key: 'seed', label: 'seed', type: 'number', required: false},
+    {key: 'num_cpus', label: 'num. CPUs', type: 'number', required: true, resources: true},
+    {key: 'ram_gb', label: 'RAM (GB)', type: 'number', required: true, resources: true}
 ]
 
 const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText, readOnly, outputFileName}) => {
@@ -48,9 +55,9 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
     }, [text])
 
     const spa: Spa | undefined = useMemo(() => {
-        if (!editText) return undefined
+        if (editText === undefined) return undefined
         try {
-            return yaml.load(editText) as Spa
+            return yaml.load(editText) || {} as Spa
         } catch (e) {
             console.warn(editText)
             console.warn('Error parsing spa yaml')
@@ -79,7 +86,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
     const stanFileEdited = useMemo(() => (fileHasBeenEdited(spa?.stan || '')), [spa?.stan, fileHasBeenEdited])
     const dataFileEdited = useMemo(() => (fileHasBeenEdited(spa?.data || '')), [spa?.data, fileHasBeenEdited])
 
-    if (!spa) {
+    if (spa === undefined) {
         return (
             <div style={{position: 'absolute', width, height, overflow: 'auto', background: 'lightgray'}}>
                 Loading...
@@ -159,7 +166,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                             )
                         }
                         {
-                            options.map(option => (
+                            options.filter(o => !o.resources).map(option => (
                                 <tr key={option.key}>
                                     <td>{option.label}</td>
                                     <td>
@@ -174,6 +181,35 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                                             ) : (
                                                 <OptionDisplay
                                                     value={(spa.options as any)?.[option.key]}
+                                                    type={option.type}
+                                                />
+                                            )
+                                        }
+                                    </td>
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
+                <h4>Required resources (may affect whether or how quickly the job gets picked up by a compute resource):</h4>
+                <table>
+                    <tbody>
+                        {
+                            options.filter(o => o.resources).map(option => (
+                                <tr key={option.key}>
+                                    <td>{option.label}</td>
+                                    <td>
+                                        {
+                                            editing ? (
+                                                <OptionInput
+                                                    value={(spa.required_resources as any)?.[option.key]}
+                                                    type={option.type}
+                                                    required={option.required}
+                                                    onChange={value => setEditText(yaml.dump({...spa, required_resources: {...spa.required_resources, [option.key]: value}}))}
+                                                />
+                                            ) : (
+                                                <OptionDisplay
+                                                    value={(spa.required_resources as any)?.[option.key]}
                                                     type={option.type}
                                                 />
                                             )

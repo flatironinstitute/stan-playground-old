@@ -147,6 +147,10 @@ export type SPScriptJob = {
     computeResourceNodeName?: string
     timestampCreated: number
     timestampModified: number
+    requiredResources?: {
+        numCpus: number
+        ramGb: number
+    }
 }
 
 export const isSPScriptJob = (x: any): x is SPScriptJob => {
@@ -162,6 +166,10 @@ export const isSPScriptJob = (x: any): x is SPScriptJob => {
         computeResourceNodeId: optional(isString),
         computeResourceNodeName: optional(isString),
         timestampCreated: isNumber,
-        timestampModified: isNumber
+        timestampModified: isNumber,
+        requiredResources: optional((y: any) => (validateObject(y, {
+            numCpus: isNumber,
+            ramGb: isNumber
+        })))
     })
 }

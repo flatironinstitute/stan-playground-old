@@ -147,6 +147,10 @@ export type SPScriptJob = {
     computeResourceNodeName?: string
     timestampCreated: number
     timestampModified: number
+    requiredResources?: {
+        numCpus: number
+        ramGb: number
+    }
 }
 
 export const isSPScriptJob = (x: any): x is SPScriptJob => {

@@ -16,6 +16,7 @@ export type ComputeResourceConfig = {
     max_num_concurrent_spa_jobs: number
     max_ram_per_python_job_gb: number
     max_ram_per_spa_job_gb: number
+    num_cpus_per_spa_job: number
 }
 
 class ScriptJobExecutor {
@@ -116,7 +117,8 @@ class ScriptJobExecutor {
             const {scriptJobs} = resp
             if (scriptJobs.length > 0) {
                 console.info(`Found ${scriptJobs.length} pending script jobs.`)
-                const scriptJob = scriptJobs[0]
+            }
+            for (const scriptJob of scriptJobs) {
                 try {
                     const initiated = await this.#scriptJobManager.initiateJob(scriptJob)
                     if (initiated) {
