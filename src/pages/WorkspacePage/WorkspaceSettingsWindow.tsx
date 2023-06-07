@@ -15,7 +15,7 @@ const WorkspaceSettingsWindow: FunctionComponent<Props> = () => {
 
     return (
         <div>
-            <h3>Workspace Settings for {workspace?.name}</h3>
+            <h3>Settings for workspace: {workspace?.name}</h3>
             <table>
                 <tbody>
                     <tr>

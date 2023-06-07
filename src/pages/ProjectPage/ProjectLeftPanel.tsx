@@ -1,4 +1,4 @@
-import { Add, ContentCopy, Edit, NoteAdd, Refresh, Settings } from "@mui/icons-material";
+import { ContentCopy, Edit, NoteAdd, Refresh, Settings } from "@mui/icons-material";
 import { FunctionComponent, useCallback, useEffect, useMemo, useState } from "react";
 import { useModalDialog } from "../../ApplicationBar";
 import Hyperlink from "../../components/Hyperlink";
@@ -9,12 +9,12 @@ import { setProjectFileContent } from "../../dbInterface/dbInterface";
 import { useGithubAuth } from "../../GithubAuth/useGithubAuth";
 import useRoute from "../../useRoute";
 import { useWorkspace } from "../WorkspacePage/WorkspacePageContext";
+import BackButton from "./BackButton";
+import CloneProjectWindow from "./CloneProjectWindow/CloneProjectWindow";
+import NewFileWindow from "./NewFileWindow/NewFileWindow";
 import ProjectFileBrowser2 from "./ProjectFileBrowser/ProjectFileBrowser2";
 import { useProject } from "./ProjectPageContext";
 import ProjectSettingsWindow from "./ProjectSettingsWindow";
-import BackButton from "./BackButton";
-import CloneProjectWindow from "./CloneProjectWindow/CloneProjectWindow";
-import { IconButton } from "@mui/material";
 
 type Props = {
     width: number
@@ -25,6 +25,7 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
     const {projectId, project, workspaceId, openTab, closeTab, projectFiles, setProjectProperty, refreshFiles, deleteFile, duplicateFile, renameFile} = useProject()
     const {visible: settingsWindowVisible, handleOpen: openSettingsWindow, handleClose: closeSettingsWindow} = useModalDialog()
     const {visible: cloneProjectWindowVisible, handleOpen: openCloneProjectWindow, handleClose: closeCloneProjectWindow} = useModalDialog()
+    const {visible: newFileWindowVisible, handleOpen: openNewFileWindow, handleClose: closeNewFileWindow} = useModalDialog()
     const {workspace, workspaceRole} = useWorkspace()
     const {setRoute} = useRoute()
     const handleOpenFile = useCallback((fileName: string) => {
@@ -98,13 +99,12 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
     const {accessToken, userId} = useGithubAuth()
     const auth = useMemo(() => (accessToken ? {githubAccessToken: accessToken, userId} : {}), [accessToken, userId])
 
-    const handleCreateFile = useCallback(async () => {
-        const fileName = await prompt('Enter file name:', '')
-        if (!fileName) return
-        await setProjectFileContent(workspaceId, projectId, fileName, '', auth)
+    const handleCreateFile = useCallback(async (fileName: string, fileContent: string) => {
+        await setProjectFileContent(workspaceId, projectId, fileName, fileContent, auth)
+        closeNewFileWindow()
         refreshFiles()
         openTab(`file:${fileName}`)
-    }, [workspaceId, projectId, auth, refreshFiles, openTab])
+    }, [workspaceId, projectId, auth, refreshFiles, openTab, closeNewFileWindow])
 
     const cloneProjectTitle = userId ? 'Clone this project' : 'You must be logged in to clone this project.'
 
@@ -144,7 +144,7 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
             <hr />
 
             <div style={{paddingBottom: 5}}>
-                <SmallIconButton onClick={handleCreateFile} title="Create a new file" icon={<NoteAdd />} label="new file" fontSize={24} />
+                <SmallIconButton onClick={openNewFileWindow} title="Create a new file" icon={<NoteAdd />} label="new file" fontSize={24} />
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <SmallIconButton onClick={refreshFiles} title="Refresh files" icon={<Refresh />} fontSize={24} />
             </div>
@@ -168,6 +168,14 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
             >
                 <CloneProjectWindow
                     onClose={closeCloneProjectWindow}
+                />
+            </ModalWindow>
+            <ModalWindow
+                open={newFileWindowVisible}
+                onClose={closeNewFileWindow}
+            >
+                <NewFileWindow
+                    onCreateFile={handleCreateFile}
                 />
             </ModalWindow>
         </div>

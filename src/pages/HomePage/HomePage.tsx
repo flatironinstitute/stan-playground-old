@@ -22,6 +22,7 @@ const HomePage: FunctionComponent<Props> = ({width, height}) => {
                     <p style={{textAlign: 'center'}}>
                         Create, run, and share Stan analyses. <Hyperlink onClick={() => setRoute({page: 'about'})}>Learn more...</Hyperlink>
                     </p>
+                    <p>This software is in <a href="https://github.com/scratchrealm/stan-playground/blob/main/doc/beta_testing.md" target="_blank" rel="noreferrer">beta</a></p>
                     <hr />
                     <h2>Community Workspaces</h2>
                     <WorkspacesTable filter="community" />

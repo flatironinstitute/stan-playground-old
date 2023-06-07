@@ -16,7 +16,7 @@ const ProjectSettingsWindow: FunctionComponent<Props> = () => {
 
     return (
         <div>
-            <h3>Project Settings for {project?.name}</h3>
+            <h3>Settings for project: {project?.name}</h3>
             <table>
                 <tbody>
                     <tr>
