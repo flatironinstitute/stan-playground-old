@@ -42,8 +42,11 @@ const setScriptJobPropertyHandler = async (request: SetScriptJobPropertyRequest,
     else if (request.property === 'consoleOutput') {
         update.consoleOutput = request.value
     }
+    else if (request.property === 'elapsedTimeSec') {
+        update.elapsedTimeSec = request.value
+    }
     else {
-        throw new Error('Invalid property')
+        throw new Error(`Invalid property: ${request.property}`)
     }
     update.timestampModified = Date.now() / 1000
 

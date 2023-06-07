@@ -2,7 +2,6 @@ import { ChangeEvent, FunctionComponent, useCallback, useEffect, useMemo, useSta
 import yaml from 'js-yaml'
 import Hyperlink from "../../../components/Hyperlink";
 import { useProject } from "../ProjectPageContext";
-import './SpaFileEditor.css'
 import SmallIconButton from "../../../components/SmallIconButton";
 import { Cancel, Edit, Save } from "@mui/icons-material";
 
@@ -98,7 +97,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
     const iconButtonFontSize = 22
 
     return (
-        <div className="spa-table" style={{position: 'absolute', width, height, overflow: 'auto', background: '#eee'}}>
+        <div style={{position: 'absolute', width, height, overflow: 'auto', background: '#eee'}}>
             <div style={{padding: 10}}>
                 <div>
                     {
@@ -121,7 +120,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                     }
                 </div>
                 <hr />
-                <table style={{maxWidth: 500}}>
+                <table className="table1" style={{maxWidth: 400}}>
                     <tbody>
                         <tr>
                             <td>Stan file</td>
@@ -194,7 +193,7 @@ const SpaFileEditor: FunctionComponent<Props> = ({width, height, text, onSetText
                     </tbody>
                 </table>
                 <h4>Required resources (may affect whether or how quickly the job gets picked up by a compute resource):</h4>
-                <table>
+                <table className="table1" style={{maxWidth: 400}}>
                     <tbody>
                         {
                             options.filter(o => o.resources).map(option => (

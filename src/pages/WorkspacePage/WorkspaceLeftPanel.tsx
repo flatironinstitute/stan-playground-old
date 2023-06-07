@@ -41,7 +41,7 @@ const WorkspaceLeftPanel: FunctionComponent<Props> = ({ width, height }) => {
                     }
                 </div>
             </div>
-            <table>
+            <table className="table1">
                 <tbody>
                     <tr>
                         <td>ID:</td>

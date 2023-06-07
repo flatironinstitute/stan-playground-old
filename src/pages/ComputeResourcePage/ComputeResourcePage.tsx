@@ -34,7 +34,7 @@ const ComputeResourcesPage: FunctionComponent<Props> = ({width, height, computeR
                 Compute resource: {computeResource?.name}
             </h3>
             <hr />
-            <table className="scientific-table" style={{maxWidth: 550}}>
+            <table className="table1" style={{maxWidth: 550}}>
                 <tbody>
                     <tr>
                         <td>Compute resource name</td>

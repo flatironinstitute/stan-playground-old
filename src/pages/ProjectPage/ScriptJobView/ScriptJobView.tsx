@@ -50,7 +50,7 @@ const ScriptJobView: FunctionComponent<Props> = ({ width, height, scriptJobId })
     return (
         <div style={{position: 'absolute', width, height, background: 'white', overflowY: 'auto'}}>
             <hr />
-            <table>
+            <table className="table1">
                 <tbody>
                     <tr>
                         <td>Script job ID:</td>

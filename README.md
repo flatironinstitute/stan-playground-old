@@ -2,7 +2,7 @@
 
 Stan Playground is a browser-based application designed to simplify the creation, execution, and sharing of Stan analyses.
 
-:warning: This software is in beta
+:warning: This software is in [beta](./doc/beta_testing.md)
 
 * [Live site](https://stan-playground.vercel.app)
 * [About](https://stan-playground.vercel.app/about)

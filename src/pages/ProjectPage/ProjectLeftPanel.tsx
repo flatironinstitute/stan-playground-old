@@ -123,7 +123,7 @@ const ProjectLeftPanel: FunctionComponent<Props> = ({width, height}) => {
                     )
                 }
             </div>
-            <table>
+            <table className="table1">
                 <tbody>
                     <tr>
                         <td>ID:</td>
