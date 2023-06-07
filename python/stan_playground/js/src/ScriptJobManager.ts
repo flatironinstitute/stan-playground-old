@@ -1,12 +1,12 @@
-import path from 'path';
-import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource";
-import { GetDataBlobRequest, GetProjectFileRequest, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest";
-import { SPScriptJob } from "./types/stan-playground-types";
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import fs from 'fs';
-import yaml from 'js-yaml'
-import {ChildProcessWithoutNullStreams, spawn} from 'child_process'
+import yaml from 'js-yaml';
+import path from 'path';
 import ChainFile from './ChainFile';
+import postPlaygroundRequestFromComputeResource from "./postPlaygroundRequestFromComputeResource";
 import { ComputeResourceConfig } from './ScriptJobExecutor';
+import { GetDataBlobRequest, GetProjectFileRequest, GetProjectFilesRequest, PlaygroundResponse, SetProjectFileRequest, SetScriptJobPropertyRequest } from "./types/PlaygroundRequest";
+import { SPProjectFile, SPScriptJob } from "./types/stan-playground-types";
 
 type SpaOutput = {
     chains: {
@@ -232,6 +232,22 @@ export class RunningJob {
             throw Error('Unexpected response type. Expected setProjectFile')
         }
     }
+    private async _loadProjectFiles(projectId: string): Promise<SPProjectFile[]> {
+        const req: GetProjectFilesRequest = {
+            type: 'getProjectFiles',
+            timestamp: Date.now() / 1000,
+            projectId
+        }
+        const resp = await this._postPlaygroundRequest(req)
+        if (!resp) {
+            throw Error('Unable to get project')
+        }
+        if (resp.type !== 'getProjectFiles') {
+            console.warn(resp)
+            throw Error('Unexpected response type. Expected getProjectFiles')
+        }
+        return resp.projectFiles
+    }
     private async _run() {
         if (this.#childProcess) {
             throw Error('Unexpected: Child process already running')
@@ -241,6 +257,28 @@ export class RunningJob {
         const scriptJobDir = path.join(this.config.dir, 'script_jobs', this.scriptJob.scriptJobId)
         fs.mkdirSync(scriptJobDir, {recursive: true})
         fs.writeFileSync(path.join(scriptJobDir, scriptFileName), scriptFileContent)
+
+        if (scriptFileName.endsWith('.py')) {
+            const projectFiles = await this._loadProjectFiles(this.scriptJob.projectId)
+            for (const pf of projectFiles) {
+                let includeFile = false
+                if ((scriptFileContent.includes(`'${pf.fileName}'`)) || (scriptFileContent.includes(`"${pf.fileName}"`))) {
+                    // the file is referenced in the script
+                    includeFile = true
+                }
+                else if (pf.fileName.endsWith('.py')) {
+                    const moduleName = pf.fileName.replace('.py', '')
+                    if ((scriptFileContent.includes(`import ${moduleName}`)) || (scriptFileContent.includes(`from ${moduleName}`)) || (scriptFileContent.includes(`import ${moduleName}.`)) || (scriptFileContent.includes(`from ${moduleName}.`))) {
+                        // the module is imported in the script
+                        includeFile = true
+                    }
+                }
+                if (includeFile) {
+                    const content = await this._loadFileContent(pf.fileName)
+                    fs.writeFileSync(path.join(scriptJobDir, pf.fileName), content)
+                }
+            }
+        }
 
         if (scriptFileName.endsWith('.spa')) {
             const spaFileName = scriptFileName

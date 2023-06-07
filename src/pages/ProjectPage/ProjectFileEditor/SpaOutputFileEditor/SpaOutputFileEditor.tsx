@@ -2,6 +2,7 @@ import { FunctionComponent, useMemo } from "react";
 import Hyperlink from "../../../../components/Hyperlink";
 import { useProject } from "../../ProjectPageContext";
 import ChainsTable from "./ChainsTable";
+import ExportComponent from "./ExportComponent";
 
 type Props = {
     fileName: string
@@ -46,6 +47,8 @@ const SpaOutputFileEditor: FunctionComponent<Props> = ({fileName, fileContent, w
                 <div><Hyperlink href={mcmcMonitorUrl} target="_blank">View in MCMC Monitor</Hyperlink></div>
                 <hr />
                 <ChainsTable spaOutput={spaOutput} />
+                <hr />
+                <ExportComponent spaOutput={spaOutput} /> 
             </div>
         </div>
     )
