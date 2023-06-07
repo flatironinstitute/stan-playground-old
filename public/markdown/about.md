@@ -23,8 +23,8 @@ A Stan analysis involves a .stan file, a .json dataset file, and certain executi
 
 ## Compute Resources
 
-Every workspace comes equipped with a dedicated compute resource for executing Python scripts and Stan analyses. The default setting uses a cloud resource with specific limitations on CPU, memory, and number of concurrent jobs, shared among all users. Alternatively, you can [host your own compute resource](https://github.com/scratchrealm/stan-playground/blob/main/doc/host_compute_resource.md) on a local or remote machine and link this to your workspaces.
+Every workspace comes equipped with a dedicated compute resource for executing Python scripts and Stan analyses. The default setting uses a cloud resource with specific limitations on CPU, memory, and number of concurrent jobs, shared among all users. Alternatively, you can [host your own compute resource](https://github.com/flatironinstitute/stan-playground/blob/main/doc/host_compute_resource.md) on a local or remote machine and link this to your workspaces.
 
 ## Feedback
 
-Please provide feedback during the [beta testing](https://github.com/scratchrealm/stan-playground/blob/main/doc/beta_testing.md) phase. You can submit issues or suggestions to [this GitHub repository](https://github.com/scratchrealm/stan-playground). You can also [reach out to the author](https://www.simonsfoundation.org/people/jeremy-magland/).
+Please provide feedback during the [beta testing](https://github.com/flatironinstitute/stan-playground/blob/main/doc/beta_testing.md) phase. You can submit issues or suggestions to [this GitHub repository](https://github.com/flatironinstitute/stan-playground). You can also [reach out to the author](https://www.simonsfoundation.org/people/jeremy-magland/).

@@ -46,7 +46,7 @@ sudo dpkg -i singularity-ce_3.11.3-jammy_amd64.deb
 Install stan-playground
 mkdir src
 cd src
-git clone https://github.com/scratchrealm/stan-playground
+git clone https://github.com/flatironinstitute/stan-playground
 cd stan-playground
 cd python
 pip install -e .
